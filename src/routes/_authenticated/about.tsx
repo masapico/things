@@ -24,7 +24,7 @@ function About() {
 
   const handleLogout = () => {
     Logout();
-    navigate({ to: '/login' });
+    navigate({ to: '/login', search: { redirect: '/' } });
   };
 
   return (

@@ -14,6 +14,9 @@ export const Route = createFileRoute('/login')({
 })
 
 function LoginPage() {
+
+  pb.authStore.clear()
+
   const navigate = useNavigate()
   const search = Route.useSearch()
 
@@ -48,7 +51,9 @@ function LoginPage() {
     >
       <Card style={{ width: '360px' }}>
         <Card.Body>
-          <h2 className="text-center mb-4">Login to Things</h2>
+          <h2 className="h5 text-secondary text-center mb-4">
+            Login to Things
+          </h2>
 
           {error && (
             <Alert variant="danger">
@@ -58,7 +63,7 @@ function LoginPage() {
 
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
-              <Form.Label>メールアドレス</Form.Label>
+              <Form.Label>MAIL</Form.Label>
               <Form.Control
                 type="email"
                 value={email}
@@ -69,7 +74,7 @@ function LoginPage() {
             </Form.Group>
 
             <Form.Group className="mb-4">
-              <Form.Label>パスワード</Form.Label>
+              <Form.Label>PASSWORD</Form.Label>
               <Form.Control
                 type="password"
                 value={password}

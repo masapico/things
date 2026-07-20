@@ -1,5 +1,8 @@
 import { createFileRoute, redirect, Outlet } from '@tanstack/react-router'
 import { pb } from '../lib/pocketbase'
+import { Container, Row } from 'react-bootstrap'
+
+import Header from '../components/Header'
 
 export const Route = createFileRoute('/_authenticated')({
   // この配下の全ルートへのアクセス前に一括で実行される
@@ -22,13 +25,13 @@ export const Route = createFileRoute('/_authenticated')({
 
 function AuthLayout() {
   return (
-    <div className="container">
-      {/* 共通のサイドバーやナビゲーションを置くことも可能 */}
-      <aside>Dashboard Navigation</aside>
-      <main>
-        {/* 子ルート (dashboard.tsx や profile.tsx) がここに描画される */}
+    <Container>
+      <Row>
+        <Header />
+      </Row>
+      <Row>
         <Outlet />
-      </main>
-    </div>
+      </Row>
+    </Container>
   )
 }

@@ -1,0 +1,212 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #d9d9e3;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-bottom: 1px solid #e6e6ee;
+  background: #fafafc;
+}
+
+.toolbarGroup {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-right: 6px;
+  margin-right: 6px;
+  border-right: 1px solid #ececf4;
+}
+
+.toolbarGroup:last-child {
+  padding-right: 0;
+  margin-right: 0;
+  border-right: none;
+}
+
+.toolbarButton {
+  min-width: 30px;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  color: #444;
+  cursor: pointer;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.toolbarButton:hover:not(:disabled) {
+  background: #eeeef4;
+}
+
+.toolbarButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.toolbarButtonActive {
+  background: #e4e4fb;
+  color: #4b3fd6;
+  border-color: #cfcdf6;
+}
+
+/* Tiptap の contenteditable 本体 */
+.proseMirror {
+  min-height: 220px;
+  padding: 12px 14px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #1f1f28;
+  outline: none;
+  /* 画像等が親幅を超えてもエディタ自体がはみ出さないようにする */
+  overflow-x: hidden;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.proseMirror * {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.proseMirror p {
+  margin: 0 0 0.6em;
+}
+
+.proseMirror h2 {
+  font-size: 1.3em;
+  font-weight: 700;
+  margin: 0.8em 0 0.4em;
+}
+
+.proseMirror ul {
+  padding-left: 1.4em;
+  margin: 0 0 0.6em;
+}
+
+/* ========================================= */
+/* Task list 最終奥義（独自クラスへの直接指定） */
+/* ========================================= */
+
+.proseMirror :global(.tiptap-task-list) {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 0 1rem 0 !important;
+}
+
+.proseMirror :global(.tiptap-task-item) {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: flex-start !important;
+  gap: 8px !important;
+  margin: 0 0 8px 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+}
+
+/* 黒丸マーカー非表示 */
+.proseMirror :global(.tiptap-task-item)::marker {
+  display: none !important;
+  content: "" !important;
+}
+
+/* 1列目: チェックボックスのラベル */
+.proseMirror :global(.tiptap-task-item > label) {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 4px 0 0 0 !important; /* 下がらないように上余白のみ設定 */
+  padding: 0 !important;
+  width: auto !important;
+  flex: 0 0 auto !important; /* 横幅固定 */
+}
+
+/* チェックボックス本体 */
+.proseMirror :global(.tiptap-task-item input[type="checkbox"]) {
+  margin: 0 !important;
+  width: 16px !important;
+  height: 16px !important;
+  appearance: auto !important;
+}
+
+/* 2列目: テキスト領域 (Tiptapはここにdivやpを生成する) */
+.proseMirror :global(.tiptap-task-item > div) {
+  flex: 1 1 0% !important; /* 残りの幅を強制的に確保 */
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+}
+
+/* テキスト領域内の段落 */
+.proseMirror :global(.tiptap-task-item p) {
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+  word-break: break-word !important;
+}
+
+/***********************************/
+/* リサイズ可能な画像のラッパー */
+.imageWrapper {
+  position: relative;
+  display: block;
+  max-width: 100%;
+  margin: 8px 0;
+  line-height: 0; /* img下の余白を消す */
+}
+
+.imageWrapper[data-selected] {
+  outline: 2px solid #6d5ff0;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  user-select: none;
+}
+
+/* 右下のリサイズハンドル */
+.resizeHandle {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  background: #6d5ff0;
+  border: 2px solid #ffffff;
+  cursor: nwse-resize;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+.imageWrapper:hover .resizeHandle,
+.resizeHandleActive {
+  opacity: 1;
+}
+
+/* Placeholder（空欄時のプレースホルダーテキスト） */
+.proseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #adadb8;
+  pointer-events: none;
+  height: 0;
+}

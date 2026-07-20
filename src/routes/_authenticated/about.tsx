@@ -1,7 +1,9 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import Editor, { type EditorContentJSON } from '../../components/Editor/Editor'
-import { Button } from 'react-bootstrap'
+import { Button, Stack } from 'react-bootstrap'
+
+import { Logout } from '../../lib/pocketbase'
 
 
 export const Route = createFileRoute('/_authenticated/about')({
@@ -18,10 +20,20 @@ function About() {
     // 例: localStorage.setItem('note', json);
   };
 
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    Logout();
+    navigate({ to: '/login' });
+  };
+
   return (
     <div>
       <Editor value={content} onChange={setContent} />
-      <Button variant="primary" className="mt-3" onClick={handleSave}>保存</Button>
+      <Stack direction="horizontal" gap={2} className="mt-3">
+        <Button variant="primary" className="mt-3" onClick={handleSave}>保存</Button>
+        <Button variant="danger" className="mt-3" onClick={handleLogout}>ログアウト</Button>
+      </Stack>
     </div>
   )
 }

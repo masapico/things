@@ -30,16 +30,13 @@ function LoginPage() {
 
     try {
       await pb.collection('users').authWithPassword(email, password)
-      console.log(pb.authStore.token)
-      console.log(pb.authStore.record)
-      console.log(pb.authStore.isValid)
       navigate({
         to: search.redirect ?? '/',
       })
     } catch (err) {
       console.error(err)
       pb.authStore.clear()
-      setError('メールアドレスまたはパスワードが正しくありません。')
+      setError('ログイン情報が正しくありません。')
     } finally {
       setLoading(false)
     }
@@ -49,9 +46,9 @@ function LoginPage() {
     <Container
       className="d-flex justify-content-center align-items-center vh-100"
     >
-      <Card style={{ width: '420px' }}>
+      <Card style={{ width: '360px' }}>
         <Card.Body>
-          <h2 className="text-center mb-4">ログイン</h2>
+          <h2 className="text-center mb-4">Login to Things</h2>
 
           {error && (
             <Alert variant="danger">

@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.101.4",
     "@tanstack/react-router": "^1.170.18",
     "@tiptap/extension-image": "^3.28.0",
     "@tiptap/extension-placeholder": "^3.28.0",

@@ -1,4 +1,4 @@
-import { Card, Image } from 'react-bootstrap'
+import { Badge, Card, Image } from 'react-bootstrap'
 import type { ClipsResponse } from '../../../lib/pb_types'
 import { pb } from '../../../lib/pocketbase'
 
@@ -28,8 +28,16 @@ function getThumbnailUrl(clip: ClipsResponse) {
   return `${pb.baseUrl}/api/files/${clip.collectionId}/${clip.id}/${fileName}?thumb=100x100`
 }
 
+function getFileExtension(fileName?: string) {
+  if (!fileName) return null
+
+  const match = fileName.match(/\.([A-Za-z0-9]+)$/)
+  return match ? match[1].toUpperCase() : null
+}
+
 export function ClipCard({ clip }: ClipCardProps) {
   const thumbnailUrl = getThumbnailUrl(clip)
+  const extension = getFileExtension(clip.file?.[0])
 
   return (
     <Card className="h-100 shadow-sm border-0">
@@ -38,6 +46,11 @@ export function ClipCard({ clip }: ClipCardProps) {
           <Card.Title as="h2" className="h6 mb-0 flex-grow-1">
             {clip.name}
           </Card.Title>
+          {extension ? (
+            <Badge bg="secondary" pill>
+              {extension}
+            </Badge>
+          ) : null}
         </div>
 
         {thumbnailUrl ? (

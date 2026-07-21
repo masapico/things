@@ -101,11 +101,13 @@ export function ClipComposer() {
         try {
             const formData = new FormData()
             const safeTitle = title.trim() || (clipType === 'text' ? 'Pasted text' : fileContent?.name || 'Pasted clip')
+            const hasFileAttachment = clipType !== 'text' && fileContent !== null
+
             formData.append('name', safeTitle)
 
             if (clipType === 'text') {
                 formData.append('text', textContent)
-            } else if (fileContent) {
+            } else if (hasFileAttachment) {
                 formData.append('file', fileContent, fileContent.name)
             }
 

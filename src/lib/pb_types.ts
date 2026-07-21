@@ -99,7 +99,7 @@ export type SuperusersRecord = {
 
 export type ClipsRecord = {
 	created: IsoAutoDateString
-	file?: FileNameString[]
+	file?: FileNameString
 	id: string
 	name: string
 	text?: string

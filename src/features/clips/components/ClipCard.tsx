@@ -22,10 +22,10 @@ function formatDate(value?: string) {
 }
 
 function getThumbnailUrl(clip: ClipsResponse) {
-  const fileName = clip.file?.[0]
+  const fileName = clip.file
   if (!fileName) return null
 
-  return `${pb.baseUrl}/api/files/${clip.collectionId}/${clip.id}/${fileName}?thumb=100x100`
+  return `${pb.baseURL}/api/files/${clip.collectionId}/${clip.id}/${fileName}?thumb=100x100`
 }
 
 function getFileExtension(fileName?: string) {
@@ -37,7 +37,7 @@ function getFileExtension(fileName?: string) {
 
 export function ClipCard({ clip }: ClipCardProps) {
   const thumbnailUrl = getThumbnailUrl(clip)
-  const extension = getFileExtension(clip.file?.[0])
+  const extension = getFileExtension(clip.file)
 
   return (
     <Card className="h-100 shadow-sm border-0">
@@ -66,10 +66,6 @@ export function ClipCard({ clip }: ClipCardProps) {
         ) : null}
 
         {clip.text ? <Card.Text className="text-muted mb-0">{clip.text}</Card.Text> : null}
-
-        {!clip.text && clip.file?.length ? (
-          <Card.Text className="text-muted mb-0">{clip.file.length} file(s)</Card.Text>
-        ) : null}
 
         <div className="text-muted small mt-auto">
           {formatDate(clip.created)}

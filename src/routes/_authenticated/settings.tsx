@@ -6,11 +6,11 @@ import { Button, Stack } from 'react-bootstrap'
 import { Logout } from '../../lib/pocketbase'
 
 
-export const Route = createFileRoute('/_authenticated/about')({
-  component: About,
+export const Route = createFileRoute('/_authenticated/settings')({
+  component: Settings,
 })
 
-function About() {
+function Settings() {
   const [content, setContent] = useState<EditorContentJSON | null>(null);
 
   const handleSave = () => {

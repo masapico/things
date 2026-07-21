@@ -1,8 +1,8 @@
 /// <reference path="../pb_data/types.d.ts" />
 migrate((app) => {
   const collection = new Collection({
-    "createRule": null,
-    "deleteRule": null,
+    "createRule": "@request.auth.id != \"\"",
+    "deleteRule": "@request.auth.id != \"\"",
     "fields": [
       {
         "autogeneratePattern": "[a-z0-9]{15}",
@@ -23,10 +23,10 @@ migrate((app) => {
         "autogeneratePattern": "",
         "help": "",
         "hidden": false,
-        "id": "text724990059",
+        "id": "text1579384326",
         "max": 0,
         "min": 0,
-        "name": "title",
+        "name": "name",
         "pattern": "",
         "presentable": false,
         "primaryKey": false,
@@ -35,15 +35,34 @@ migrate((app) => {
         "type": "text"
       },
       {
+        "autogeneratePattern": "",
         "help": "",
         "hidden": false,
-        "id": "json4274335913",
-        "maxSize": 500000,
-        "name": "content",
+        "id": "text999008199",
+        "max": 0,
+        "min": 0,
+        "name": "text",
+        "pattern": "",
         "presentable": false,
+        "primaryKey": false,
         "required": false,
         "system": false,
-        "type": "json"
+        "type": "text"
+      },
+      {
+        "help": "",
+        "hidden": false,
+        "id": "file2359244304",
+        "maxSelect": 10,
+        "maxSize": 0,
+        "mimeTypes": null,
+        "name": "file",
+        "presentable": false,
+        "protected": false,
+        "required": false,
+        "system": false,
+        "thumbs": null,
+        "type": "file"
       },
       {
         "hidden": false,
@@ -66,19 +85,19 @@ migrate((app) => {
         "type": "autodate"
       }
     ],
-    "id": "pbc_3395098727",
+    "id": "pbc_53716239",
     "indexes": [],
-    "listRule": null,
-    "name": "notes",
+    "listRule": "@request.auth.id != \"\"",
+    "name": "clips",
     "system": false,
     "type": "base",
-    "updateRule": null,
-    "viewRule": null
+    "updateRule": "@request.auth.id != \"\"",
+    "viewRule": "@request.auth.id != \"\""
   });
 
   return app.save(collection);
 }, (app) => {
-  const collection = app.findCollectionByNameOrId("pbc_3395098727");
+  const collection = app.findCollectionByNameOrId("pbc_53716239");
 
   return app.delete(collection);
 })

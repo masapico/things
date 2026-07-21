@@ -11,6 +11,10 @@ export const Collections = {
 	Mfas: "_mfas",
 	Otps: "_otps",
 	Superusers: "_superusers",
+	Clips: "clips",
+	Contexts: "contexts",
+	Projects: "projects",
+	Tasks: "tasks",
 	Users: "users",
 } as const
 export type Collections = typeof Collections[keyof typeof Collections]
@@ -93,6 +97,64 @@ export type SuperusersRecord = {
 	verified?: boolean
 }
 
+export type ClipsRecord = {
+	created: IsoAutoDateString
+	file?: FileNameString[]
+	id: string
+	name: string
+	text?: string
+	updated: IsoAutoDateString
+}
+
+export type ContextsRecord = {
+	created: IsoAutoDateString
+	id: string
+	name: string
+	sort?: number
+	updated: IsoAutoDateString
+}
+
+export type ProjectsRecord = {
+	clips?: RecordIdString[]
+	created: IsoAutoDateString
+	endDate?: IsoDateString
+	id: string
+	isActive?: boolean
+	memo?: string
+	name: string
+	reviewToggle?: boolean
+	startDate?: IsoDateString
+	updated: IsoAutoDateString
+}
+
+export const TasksStatusOptions = {
+	"inbox": "inbox",
+	"next": "next",
+	"waiting": "waiting",
+	"completed": "completed",
+	"someday": "someday",
+} as const
+export type TasksStatusOptions = typeof TasksStatusOptions[keyof typeof TasksStatusOptions]
+
+export const TasksPriorityOptions = {
+	"high": "high",
+	"low": "low",
+} as const
+export type TasksPriorityOptions = typeof TasksPriorityOptions[keyof typeof TasksPriorityOptions]
+export type TasksRecord = {
+	clips?: RecordIdString[]
+	created: IsoAutoDateString
+	duedate?: IsoDateString
+	id: string
+	memo?: string
+	priority?: TasksPriorityOptions
+	project?: RecordIdString
+	sort?: number
+	status: TasksStatusOptions
+	title: string
+	updated: IsoAutoDateString
+}
+
 export type UsersRecord = {
 	avatar?: FileNameString
 	created: IsoAutoDateString
@@ -112,6 +174,10 @@ export type ExternalauthsResponse<Texpand = unknown> = Required<ExternalauthsRec
 export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemFields<Texpand>
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
+export type ClipsResponse<Texpand = unknown> = Required<ClipsRecord> & BaseSystemFields<Texpand>
+export type ContextsResponse<Texpand = unknown> = Required<ContextsRecord> & BaseSystemFields<Texpand>
+export type ProjectsResponse<Texpand = unknown> = Required<ProjectsRecord> & BaseSystemFields<Texpand>
+export type TasksResponse<Texpand = unknown> = Required<TasksRecord> & BaseSystemFields<Texpand>
 export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
 
 // Types containing all Records and Responses, useful for creating typing helper functions
@@ -122,6 +188,10 @@ export type CollectionRecords = {
 	_mfas: MfasRecord
 	_otps: OtpsRecord
 	_superusers: SuperusersRecord
+	clips: ClipsRecord
+	contexts: ContextsRecord
+	projects: ProjectsRecord
+	tasks: TasksRecord
 	users: UsersRecord
 }
 
@@ -131,6 +201,10 @@ export type CollectionResponses = {
 	_mfas: MfasResponse
 	_otps: OtpsResponse
 	_superusers: SuperusersResponse
+	clips: ClipsResponse
+	contexts: ContextsResponse
+	projects: ProjectsResponse
+	tasks: TasksResponse
 	users: UsersResponse
 }
 

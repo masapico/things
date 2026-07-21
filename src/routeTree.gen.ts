@@ -12,10 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
-import { Route as AuthenticatedAboutRouteImport } from './routes/_authenticated/about'
-import { Route as AuthenticatedFilesRouteImport } from './routes/_authenticated/files'
+import { Route as AuthenticatedClipsRouteImport } from './routes/_authenticated/clips'
 import { Route as AuthenticatedGtdRouteImport } from './routes/_authenticated/gtd'
-import { Route as AuthenticatedNotesRouteImport } from './routes/_authenticated/notes'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
@@ -31,14 +30,9 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedAboutRoute = AuthenticatedAboutRouteImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedFilesRoute = AuthenticatedFilesRouteImport.update({
-  id: '/files',
-  path: '/files',
+const AuthenticatedClipsRoute = AuthenticatedClipsRouteImport.update({
+  id: '/clips',
+  path: '/clips',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedGtdRoute = AuthenticatedGtdRouteImport.update({
@@ -46,51 +40,47 @@ const AuthenticatedGtdRoute = AuthenticatedGtdRouteImport.update({
   path: '/gtd',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedNotesRoute = AuthenticatedNotesRouteImport.update({
-  id: '/notes',
-  path: '/notes',
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
-  '/about': typeof AuthenticatedAboutRoute
-  '/files': typeof AuthenticatedFilesRoute
+  '/clips': typeof AuthenticatedClipsRoute
   '/gtd': typeof AuthenticatedGtdRoute
-  '/notes': typeof AuthenticatedNotesRoute
+  '/settings': typeof AuthenticatedSettingsRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
-  '/about': typeof AuthenticatedAboutRoute
-  '/files': typeof AuthenticatedFilesRoute
+  '/clips': typeof AuthenticatedClipsRoute
   '/gtd': typeof AuthenticatedGtdRoute
-  '/notes': typeof AuthenticatedNotesRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/': typeof AuthenticatedIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
-  '/_authenticated/about': typeof AuthenticatedAboutRoute
-  '/_authenticated/files': typeof AuthenticatedFilesRoute
+  '/_authenticated/clips': typeof AuthenticatedClipsRoute
   '/_authenticated/gtd': typeof AuthenticatedGtdRoute
-  '/_authenticated/notes': typeof AuthenticatedNotesRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/about' | '/files' | '/gtd' | '/notes'
+  fullPaths: '/' | '/login' | '/clips' | '/gtd' | '/settings'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/about' | '/files' | '/gtd' | '/notes' | '/'
+  to: '/login' | '/clips' | '/gtd' | '/settings' | '/'
   id:
     | '__root__'
     | '/_authenticated'
     | '/login'
-    | '/_authenticated/about'
-    | '/_authenticated/files'
+    | '/_authenticated/clips'
     | '/_authenticated/gtd'
-    | '/_authenticated/notes'
+    | '/_authenticated/settings'
     | '/_authenticated/'
   fileRoutesById: FileRoutesById
 }
@@ -122,18 +112,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/about': {
-      id: '/_authenticated/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AuthenticatedAboutRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/files': {
-      id: '/_authenticated/files'
-      path: '/files'
-      fullPath: '/files'
-      preLoaderRoute: typeof AuthenticatedFilesRouteImport
+    '/_authenticated/clips': {
+      id: '/_authenticated/clips'
+      path: '/clips'
+      fullPath: '/clips'
+      preLoaderRoute: typeof AuthenticatedClipsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/gtd': {
@@ -143,29 +126,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedGtdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/notes': {
-      id: '/_authenticated/notes'
-      path: '/notes'
-      fullPath: '/notes'
-      preLoaderRoute: typeof AuthenticatedNotesRouteImport
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
   }
 }
 
 interface AuthenticatedRouteChildren {
-  AuthenticatedAboutRoute: typeof AuthenticatedAboutRoute
-  AuthenticatedFilesRoute: typeof AuthenticatedFilesRoute
+  AuthenticatedClipsRoute: typeof AuthenticatedClipsRoute
   AuthenticatedGtdRoute: typeof AuthenticatedGtdRoute
-  AuthenticatedNotesRoute: typeof AuthenticatedNotesRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedAboutRoute: AuthenticatedAboutRoute,
-  AuthenticatedFilesRoute: AuthenticatedFilesRoute,
+  AuthenticatedClipsRoute: AuthenticatedClipsRoute,
   AuthenticatedGtdRoute: AuthenticatedGtdRoute,
-  AuthenticatedNotesRoute: AuthenticatedNotesRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
 

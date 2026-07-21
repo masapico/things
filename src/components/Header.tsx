@@ -1,6 +1,6 @@
 import { Link, useLocation } from "@tanstack/react-router"
-import { Container, Stack } from "react-bootstrap"
-import { LogOut } from 'lucide-react'
+import { Container, Form, InputGroup, Stack } from "react-bootstrap"
+import { LogOut, ScanSearch } from 'lucide-react'
 import { ClipComposer } from './ClipComposer'
 
 export function Header() {
@@ -13,7 +13,18 @@ export function Header() {
               <h1 className="h5 fw-bold text-secondary">
                   <Link to="/">Things</Link>
               </h1>
-              <Link to="/" className={pathname === '/' ? 'ms-auto active_menu' : 'ms-auto'}>HOME</Link>
+              <div className="ms-auto">
+                  <InputGroup size="sm" className="flex-grow-1">
+                      <InputGroup.Text id="omniSearch">
+                          <ScanSearch size={16} />
+                      </InputGroup.Text>
+                      <Form.Control
+                        aria-label="omniSearch"
+                        aria-describedby="omniSearch"
+                      />
+                  </InputGroup>
+              </div>
+              <Link to="/" className={pathname === '/' ? 'active_menu' : ''}>HOME</Link>
               <Link to="/clips" className={pathname === '/clips' ? 'active_menu' : ''}>
                 CLIPS
               </Link>

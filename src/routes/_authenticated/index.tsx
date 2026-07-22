@@ -3,8 +3,7 @@ import { useRef } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { ArrowBigRightDash, Inbox, ListPlus } from 'lucide-react'
 import { Button, Container, Form, InputGroup, ListGroup, Row } from 'react-bootstrap'
-import { useInboxTasks } from '../../features/gtd/hooks/useTasks'
-import { useCreateInboxTask } from '../../features/gtd/hooks/useTaskCreate'
+import { useInboxTasks, useCreateInboxTask } from '../../features/gtd/hooks/useTasks'
 
 
 export const Route = createFileRoute('/_authenticated/')({

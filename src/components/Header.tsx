@@ -24,6 +24,7 @@ export function Header() {
                       <Form.Control
                         aria-label="omniSearch"
                         aria-describedby="omniSearch"
+                        tabIndex={1}
                       />
                   </InputGroup>
               </div>

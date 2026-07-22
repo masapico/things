@@ -17,8 +17,10 @@ function Index() {
               aria-label="input-task"
               aria-describedby="input-task"
               autoComplete='off'
+              tabIndex={2}
             />
-            <Button size="sm" variant="outline-secondary" id="button-add-task">
+            <Button size="sm" variant="outline-secondary" id="button-add-task" tabIndex={3}
+              style={{borderColor:"#ddd"}}>
               <ListPlus />
             </Button>
           </InputGroup>

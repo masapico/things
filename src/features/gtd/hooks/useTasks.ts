@@ -3,7 +3,7 @@ import { getInboxTasks } from '../api'
 
 export function useInboxTasks() {
   return useQuery({
-    queryKey: ['tasks'],
+    queryKey: ['inboxTasks'],
     queryFn: getInboxTasks,
   })
 }

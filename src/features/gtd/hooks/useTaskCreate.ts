@@ -16,7 +16,7 @@ export const useCreateInboxTask = () => {
     },
     // 作成が成功したら 'tasks' のキャッシュを無効化して自動再取得させる
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['inboxTasks'] });
     },
     onError: (error) => {
       console.error('Taskの作成に失敗しました:', error);

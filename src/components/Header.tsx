@@ -1,7 +1,7 @@
 import { Link, useLocation } from "@tanstack/react-router"
 import { Container, Form, InputGroup, Stack } from "react-bootstrap"
 import { LogOut, Paperclip , ScanSearch, ListTodo } from 'lucide-react'
-import { ClipComposer } from '../features/clips/components/ClipComposer'
+import { ClipRegister } from '../features/clips/components/ClipRegister'
 
 export function Header() {
     const { pathname } = useLocation()
@@ -42,7 +42,7 @@ export function Header() {
                 <LogOut size={18} className="text-danger" />
               </Link>
             </Stack>
-            <ClipComposer />
+            <ClipRegister />
           </Container>
         </>
     )

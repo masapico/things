@@ -9,7 +9,7 @@ import {
     CheckCircle2Icon,
     AlertCircleIcon,
 } from 'lucide-react'
-import './ClipComposer.css'
+import './ClipRegister.css'
 
 type ClipType = 'text' | 'image' | 'file'
 
@@ -19,7 +19,7 @@ const TYPE_META: Record<ClipType, { label: string; icon: typeof FileTextIcon }> 
     file: { label: 'File', icon: FileIcon },
 }
 
-export function ClipComposer() {
+export function ClipRegister() {
     const [showModal, setShowModal] = useState(false)
     const [clipType, setClipType] = useState<ClipType>('text')
     const [textContent, setTextContent] = useState('')
@@ -242,4 +242,4 @@ export function ClipComposer() {
     )
 }
 
-export default ClipComposer
+export default ClipRegister

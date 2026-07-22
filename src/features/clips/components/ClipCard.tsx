@@ -41,7 +41,13 @@ export function ClipCard({ clip }: ClipCardProps) {
   const extension = getFileExtension(clip.file)
 
   return (
-    <Card className="clip-card h-100">
+    <Card
+      as="a"
+      href={`/clips/${clip.id}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="clip-card h-100 text-decoration-none text-reset"
+    >
       <Card.Body className="d-flex flex-column gap-2">
         <div className="d-flex justify-content-between align-items-start gap-2">
           <Card.Title as="h2" className="clip-card-title h6 mb-0 flex-grow-1">

@@ -1,9 +1,10 @@
 // src/routes/index.tsx
 import { useRef } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { ArrowBigRightDash, Inbox, ListPlus } from 'lucide-react'
+import { Inbox, ListPlus, Target } from 'lucide-react'
 import { Button, Container, Form, InputGroup, ListGroup, Row } from 'react-bootstrap'
 import { useInboxTasks, useCreateInboxTask } from '../../features/gtd/hooks/useTasks'
+import { TaskListRow } from '../../features/gtd/components/TaskListRow'
 
 
 export const Route = createFileRoute('/_authenticated/')({
@@ -69,7 +70,7 @@ function Index() {
               </ListGroup.Item>
             )}
             {inboxTasks?.map((task) => (
-              <ListGroup.Item key={task.id}>{task.title}</ListGroup.Item>
+              <TaskListRow key={task.id} task={task} />
             ))}
           </ListGroup>
         </div>
@@ -78,7 +79,7 @@ function Index() {
       <Row className='mb-3 justify-content-center'>
         <div className='w-75'>
           <div className='p-2'>
-            <ArrowBigRightDash size={24} className='me-2' />Current
+            <Target size={24} className='me-2' />Next
           </div>
           <ListGroup>
             <ListGroup.Item>aaaaa</ListGroup.Item>

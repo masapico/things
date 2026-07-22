@@ -1,0 +1,96 @@
+/* ClipCard — shares the "steno pad" design language with ClipComposer.
+   Same palette, no external fonts, --clip-teal written as the literal
+   #146b62 wherever it's used as a value (kept consistent with ClipComposer.css).
+*/
+
+.clip-card {
+  --clip-ink: #1b2a28;
+  --clip-teal-soft: #e4f0ee;
+  --clip-margin: #c4564f;
+  --clip-paper: #f3f6ec;
+  --clip-line: #d8e2ce;
+  --clip-paper-white: #fcfdfa;
+
+  background: var(--clip-paper-white) !important;
+  border: 1px solid var(--clip-line) !important;
+  border-radius: 0.7rem !important;
+  color: var(--clip-ink);
+  box-shadow: 0 3px 10px rgba(27, 42, 40, 0.06) !important;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.clip-card:hover {
+  box-shadow: 0 10px 24px rgba(27, 42, 40, 0.14) !important;
+  transform: translateY(-2px);
+}
+
+.clip-card-title {
+  color: var(--clip-ink);
+  font-weight: 600;
+}
+
+.clip-card-badge {
+  background: var(--clip-teal-soft) !important;
+  color: #146b62 !important;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.32rem 0.55rem !important;
+}
+
+/* ---------- image thumbnail ---------- */
+.clip-card-thumb {
+  border: 1px solid var(--clip-line);
+  border-radius: 0.5rem;
+  background: repeating-conic-gradient(#eef2ea 0% 25%, #f7faf3 0% 50%) 0 0/14px 14px;
+}
+
+.clip-card-thumb img {
+  box-shadow: 0 2px 8px rgba(27, 42, 40, 0.12);
+}
+
+/* ---------- text preview, mini ruled note ---------- */
+.clip-card-note {
+  position: relative;
+  border: 1px solid var(--clip-line);
+  border-radius: 0.5rem;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 1.3rem,
+    var(--clip-line) 1.3rem,
+    var(--clip-line) calc(1.3rem + 1px)
+  );
+  background-position: 0 0.35rem;
+  padding: 0.35rem 0.6rem 0.35rem 1.4rem;
+  overflow: hidden;
+  max-height: 4.3rem;
+}
+
+.clip-card-note::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0.85rem;
+  width: 1px;
+  background: var(--clip-margin);
+  opacity: 0.55;
+}
+
+.clip-card-note-text {
+  color: var(--clip-ink) !important;
+  font-size: 0.85rem;
+  line-height: 1.3rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ---------- footer / meta ---------- */
+.clip-card-meta {
+  border-top: 1px solid var(--clip-line);
+  padding-top: 0.45rem;
+  color: #5b6b64 !important;
+}

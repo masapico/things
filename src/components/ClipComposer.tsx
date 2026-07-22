@@ -1,9 +1,23 @@
 import { useEffect, useState } from 'react'
 import { Button, Form, Modal } from 'react-bootstrap'
 import { pb } from '../lib/pocketbase'
-import { ClipboardPlusIcon } from 'lucide-react'
+import {
+    ClipboardPlusIcon,
+    FileTextIcon,
+    ImageIcon,
+    FileIcon,
+    CheckCircle2Icon,
+    AlertCircleIcon,
+} from 'lucide-react'
+import './ClipComposer.css'
 
 type ClipType = 'text' | 'image' | 'file'
+
+const TYPE_META: Record<ClipType, { label: string; icon: typeof FileTextIcon }> = {
+    text: { label: 'Text', icon: FileTextIcon },
+    image: { label: 'Image', icon: ImageIcon },
+    file: { label: 'File', icon: FileIcon },
+}
 
 export function ClipComposer() {
     const [showModal, setShowModal] = useState(false)
@@ -13,6 +27,8 @@ export function ClipComposer() {
     const [previewUrl, setPreviewUrl] = useState('')
     const [title, setTitle] = useState('')
     const [statusMessage, setStatusMessage] = useState('')
+    const [statusKind, setStatusKind] = useState<'success' | 'error'>('success')
+    const [isSaving, setIsSaving] = useState(false)
 
     useEffect(() => {
         const handlePaste = (event: ClipboardEvent) => {
@@ -62,9 +78,9 @@ export function ClipComposer() {
                             }
                             return ''
                         })
-                        setShowModal(true)
                     })
                     event.preventDefault()
+                    setShowModal(true)
                     return
                 }
             }
@@ -82,13 +98,18 @@ export function ClipComposer() {
         }
     }, [previewUrl])
 
+    useEffect(() => {
+        if (!statusMessage) return
+        const timer = setTimeout(() => setStatusMessage(''), 3200)
+        return () => clearTimeout(timer)
+    }, [statusMessage])
+
     const resetState = () => {
         setShowModal(false)
         setTextContent('')
         setFileContent(null)
         setClipType('text')
         setTitle('')
-        setStatusMessage('')
         setPreviewUrl((current) => {
             if (current) {
                 URL.revokeObjectURL(current)
@@ -98,6 +119,7 @@ export function ClipComposer() {
     }
 
     const handleSave = async () => {
+        setIsSaving(true)
         try {
             const formData = new FormData()
             const safeTitle = title.trim() || (clipType === 'text' ? 'Pasted text' : fileContent?.name || 'Pasted clip')
@@ -112,64 +134,107 @@ export function ClipComposer() {
             }
 
             await pb.collection('clips').create(formData)
-            setStatusMessage('Clip saved successfully.')
             resetState()
+            setStatusKind('success')
+            setStatusMessage('Clip saved.')
         } catch (error) {
             console.error('Failed to save clip:', error)
-            setStatusMessage('Failed to save the clip. Please try again.')
+            setStatusKind('error')
+            setStatusMessage('Failed to save the clip. Try again.')
+        } finally {
+            setIsSaving(false)
         }
     }
 
+    const { label: typeLabel, icon: TypeIcon } = TYPE_META[clipType]
+
     return (
         <div className="clip-composer">
-            {statusMessage ? <p className="text-success">{statusMessage}</p> : null}
+            {statusMessage ? (
+                <div
+                    className={`clip-status ${statusKind === 'success' ? 'clip-status--success' : 'clip-status--error'}`}
+                    role="status"
+                >
+                    {statusKind === 'success' ? (
+                        <CheckCircle2Icon size={16} />
+                    ) : (
+                        <AlertCircleIcon size={16} />
+                    )}
+                    {statusMessage}
+                </div>
+            ) : null}
 
-            <Modal show={showModal} onHide={resetState} centered>
-                <Modal.Header closeButton>
-                    <Modal.Title><ClipboardPlusIcon className="me-2" />Register clip</Modal.Title>
+            <Modal show={showModal} size='xl' onHide={resetState} centered className="clip-modal">
+                <Modal.Header closeButton className="clip-modal-header">
+                    <div className="clip-header-row w-100">
+                        <div className="clip-header-icon">
+                            <ClipboardPlusIcon size={20} />
+                        </div>
+                        <div>
+                            <Modal.Title className="clip-title">Register clip</Modal.Title>
+                            <p className="clip-subtitle">Give it a name, then save it.</p>
+                        </div>
+                        <span className="clip-type-badge">
+                            <TypeIcon size={12} />
+                            {typeLabel}
+                        </span>
+                    </div>
                 </Modal.Header>
                 <Modal.Body>
                     <Form.Group className="mb-3">
-                        <Form.Label>Title</Form.Label>
+                        <Form.Label className="clip-field-label">Title</Form.Label>
                         <Form.Control
+                            className="clip-title-input"
                             type="text"
                             value={title}
                             onChange={(event) => setTitle(event.target.value)}
+                            placeholder="Name this clip"
                         />
                     </Form.Group>
 
                     <Form.Group className="mb-3">
-                        <Form.Label>Preview</Form.Label>
+                        <Form.Label className="clip-field-label">Preview</Form.Label>
 
                         {clipType === 'text' ? (
-                            <Form.Control
-                                as="textarea"
-                                rows={6}
-                                value={textContent}
-                                onChange={(event) => setTextContent(event.target.value)}
-                            />
+                            <div className="clip-pad-wrap">
+                                <Form.Control
+                                    as="textarea"
+                                    rows={7}
+                                    className="clip-pad-textarea"
+                                    value={textContent}
+                                    onChange={(event) => setTextContent(event.target.value)}
+                                    placeholder="Nothing pasted yet"
+                                />
+                            </div>
                         ) : null}
 
                         {clipType === 'image' ? (
-                            <div className="border rounded p-2 text-center">
+                            <div className="clip-image-card">
                                 <img src={previewUrl} alt="Preview" style={{ maxWidth: '100%', maxHeight: '280px' }} />
                             </div>
                         ) : null}
 
                         {clipType === 'file' ? (
-                            <div className="border rounded p-3 bg-light">
-                                <strong>{fileContent?.name ?? 'File'}</strong>
-                                {fileContent?.size ? ` (${Math.round(fileContent.size / 1024)} KB)` : null}
+                            <div className="clip-file-card">
+                                <div className="clip-file-icon">
+                                    <FileIcon size={20} />
+                                </div>
+                                <div>
+                                    <div className="clip-file-name">{fileContent?.name ?? 'File'}</div>
+                                    {fileContent?.size ? (
+                                        <div className="clip-file-meta">{Math.round(fileContent.size / 1024)} KB</div>
+                                    ) : null}
+                                </div>
                             </div>
                         ) : null}
                     </Form.Group>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={resetState}>
+                    <Button className="clip-btn-cancel" onClick={resetState}>
                         Cancel
                     </Button>
-                    <Button variant="primary" onClick={handleSave}>
-                        Save Clip
+                    <Button className="clip-btn-save" onClick={handleSave} disabled={isSaving}>
+                        {isSaving ? 'Saving…' : 'Save clip'}
                     </Button>
                 </Modal.Footer>
             </Modal>

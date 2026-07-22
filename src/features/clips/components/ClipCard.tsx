@@ -1,6 +1,7 @@
 import { Badge, Card, Image } from 'react-bootstrap'
 import type { ClipsResponse } from '../../../lib/pb_types'
 import { pb } from '../../../lib/pocketbase'
+import './ClipCard.css'
 
 type ClipCardProps = {
   clip: ClipsResponse
@@ -40,21 +41,21 @@ export function ClipCard({ clip }: ClipCardProps) {
   const extension = getFileExtension(clip.file)
 
   return (
-    <Card className="h-100 shadow-sm border-0">
+    <Card className="clip-card h-100">
       <Card.Body className="d-flex flex-column gap-2">
         <div className="d-flex justify-content-between align-items-start gap-2">
-          <Card.Title as="h2" className="h6 mb-0 flex-grow-1">
+          <Card.Title as="h2" className="clip-card-title h6 mb-0 flex-grow-1">
             {clip.name}
           </Card.Title>
           {extension ? (
-            <Badge bg="secondary" pill>
+            <Badge className="clip-card-badge" pill>
               {extension}
             </Badge>
           ) : null}
         </div>
 
         {thumbnailUrl ? (
-          <div className="d-flex justify-content-center align-items-center rounded bg-light p-2" style={{ minHeight: 120 }}>
+          <div className="clip-card-thumb d-flex justify-content-center align-items-center p-2" style={{ minHeight: 120 }}>
             <Image
               src={thumbnailUrl}
               alt={clip.name}
@@ -65,9 +66,13 @@ export function ClipCard({ clip }: ClipCardProps) {
           </div>
         ) : null}
 
-        {clip.text ? <Card.Text className="text-muted mb-0">{clip.text}</Card.Text> : null}
+        {clip.text ? (
+          <div className="clip-card-note">
+            <Card.Text className="clip-card-note-text mb-0">{clip.text}</Card.Text>
+          </div>
+        ) : null}
 
-        <div className="text-muted small mt-auto">
+        <div className="clip-card-meta small mt-auto">
           {formatDate(clip.created)}
         </div>
       </Card.Body>

@@ -1,0 +1,316 @@
+/* ClipComposer — "steno pad" aesthetic
+   Palette:
+     --clip-ink:      #1B2A28  (near-black, cool green-cast ink)
+     --clip-teal:      #146B62  (accent — deep stationery teal)
+     --clip-teal-soft: #E4F0EE  (badge/hover tint)
+     --clip-margin:   #C4564F  (legal-pad margin rule, warm red — used ONLY for the rule + tiny accents)
+     --clip-paper:    #F3F6EC  (pale steno-pad green-white)
+     --clip-line:     #D8E2CE  (rule lines on the pad)
+     --clip-paper-white: #FCFDFA
+   Type: system font stack only (no external font loading).
+   Note: var(--clip-teal) is written as the literal #146b62 wherever it's
+   used as a value, since custom properties aren't wanted here.
+   Signature element: the text preview renders as an actual ruled steno pad —
+   horizontal rule lines + a red margin rule — because a "clip" of text is,
+   physically, a note on a pad.
+*/
+
+
+.clip-composer {
+  --clip-ink: #1b2a28;
+  --clip-teal: #146b62;
+  --clip-teal-soft: #e4f0ee;
+  --clip-margin: #c4564f;
+  --clip-paper: #f3f6ec;
+  --clip-line: #d8e2ce;
+  --clip-paper-white: #fcfdfa;
+  color: var(--clip-ink);
+}
+
+/* ---------- status banner ---------- */
+.clip-status {
+  position: fixed;
+  top: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1080;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 1.1rem;
+  border-radius: 0.6rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: 0 6px 20px rgba(27, 42, 40, 0.18);
+  animation: clip-toast-in 0.28s ease-out;
+}
+
+.clip-status--success {
+  background: var(--clip-ink);
+  color: var(--clip-paper-white);
+}
+
+.clip-status--error {
+  background: #fdecea;
+  color: #8a2c25;
+  border: 1px solid #f0b3ac;
+}
+
+@keyframes clip-toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -8px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* ---------- modal shell ---------- */
+.clip-modal .modal-content {
+  border: none;
+  border-radius: 0.9rem;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(20, 40, 38, 0.28);
+}
+
+.clip-modal-header {
+  position: relative;
+  background: var(--clip-paper-white);
+  border-bottom: 1px solid var(--clip-line);
+  padding: 1.1rem 1.4rem 1rem;
+}
+
+.clip-modal-header .btn-close {
+  margin-top: -0.2rem;
+}
+
+.clip-header-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.clip-header-icon {
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: 0.6rem;
+  background: var(--clip-teal-soft);
+  color: #146b62;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transform: rotate(-8deg);
+}
+
+.clip-title {
+  font-weight: 600;
+  font-size: 1.15rem;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.clip-subtitle {
+  font-size: 0.8rem;
+  color: #5b6b64;
+  margin: 0.1rem 0 0;
+}
+
+.clip-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  background: var(--clip-teal-soft);
+  color: #146b62;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+/* ---------- body / form ---------- */
+.clip-modal .modal-body {
+  background: var(--clip-paper-white);
+  padding: 1.25rem 1.4rem 0.5rem;
+}
+
+.clip-field-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #5b6b64;
+  margin-bottom: 0.35rem;
+}
+
+.clip-title-input.form-control {
+  font-weight: 500;
+  font-size: 1rem;
+  border: 1px solid var(--clip-line);
+  border-radius: 0.5rem;
+  padding: 0.55rem 0.75rem;
+}
+
+.clip-title-input.form-control:focus {
+  border-color: #146b62;
+  box-shadow: 0 0 0 0.2rem rgba(20, 107, 98, 0.15);
+}
+
+/* ---------- signature element: ruled steno-pad text preview ---------- */
+.clip-pad-wrap {
+  position: relative;
+  border-radius: 0.6rem;
+  border: 1px solid var(--clip-line);
+  overflow: hidden;
+  background: var(--clip-paper);
+}
+
+.clip-pad-wrap::before {
+  /* the red margin rule, like a real steno/legal pad */
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 2.5rem;
+  width: 1px;
+  background: var(--clip-margin);
+  opacity: 0.55;
+  z-index: 1;
+}
+
+.clip-pad-textarea.form-control {
+  position: relative;
+  z-index: 2;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 1.68rem,
+    var(--clip-line) 1.68rem,
+    var(--clip-line) calc(1.68rem + 1px)
+  );
+  background-position: 0 0.4rem;
+  line-height: 1.68rem;
+  padding: 0.4rem 0.9rem 0.4rem 3.1rem;
+  border: none;
+  border-radius: 0;
+  font-size: 0.95rem;
+  color: var(--clip-ink);
+  resize: vertical;
+}
+
+.clip-pad-textarea.form-control:focus {
+  box-shadow: none;
+  outline: none;
+  background-color: var(--clip-paper);
+}
+
+.clip-pad-textarea.form-control::placeholder {
+  color: #93a396;
+  font-style: italic;
+}
+
+/* ---------- image preview ---------- */
+.clip-image-card {
+  border: 1px solid var(--clip-line);
+  border-radius: 0.6rem;
+  background: repeating-conic-gradient(#eef2ea 0% 25%, #f7faf3 0% 50%) 0 0/16px 16px;
+  padding: 0.85rem;
+  text-align: center;
+}
+
+.clip-image-card img {
+  border-radius: 0.35rem;
+  box-shadow: 0 4px 16px rgba(27, 42, 40, 0.15);
+}
+
+/* ---------- file preview ---------- */
+.clip-file-card {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  border: 1px solid var(--clip-line);
+  border-radius: 0.6rem;
+  background: var(--clip-paper);
+  padding: 0.9rem 1rem;
+}
+
+.clip-file-icon {
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 0.5rem;
+  background: var(--clip-paper-white);
+  border: 1px solid var(--clip-line);
+  color: #146b62;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.clip-file-name {
+  font-weight: 600;
+  font-size: 0.92rem;
+  word-break: break-all;
+}
+
+.clip-file-meta {
+  font-size: 0.75rem;
+  color: #5b6b64;
+  margin-top: 0.15rem;
+}
+
+/* ---------- footer ---------- */
+.clip-modal .modal-footer {
+  background: var(--clip-paper-white);
+  border-top: 1px solid var(--clip-line);
+  padding: 0.9rem 1.4rem 1.1rem;
+}
+
+.clip-btn-cancel.btn {
+  background: transparent;
+  border: 1px solid var(--clip-line);
+  color: var(--clip-ink);
+  font-weight: 500;
+  border-radius: 0.5rem;
+  padding: 0.45rem 1rem;
+}
+
+.clip-btn-cancel.btn:hover {
+  background: var(--clip-paper);
+  border-color: var(--clip-line);
+  color: var(--clip-ink);
+}
+
+.clip-btn-save.btn {
+  background: #146b62;
+  border: 1px solid #146b62;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  padding: 0.45rem 1.15rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.clip-btn-save.btn:hover,
+.clip-btn-save.btn:focus {
+  background: #0f544d;
+  border-color: #0f544d;
+}
+
+.clip-btn-save.btn:disabled {
+  background: #9fb6b2;
+  border-color: #9fb6b2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .clip-status {
+    animation: none;
+  }
+}

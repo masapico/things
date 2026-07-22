@@ -1,7 +1,7 @@
 import { Link, useLocation } from "@tanstack/react-router"
 import { Container, Form, InputGroup, Stack } from "react-bootstrap"
 import { LogOut, Paperclip , ScanSearch, ListTodo } from 'lucide-react'
-import { ClipComposer } from './ClipComposer'
+import { ClipComposer } from '../features/clips/components/ClipComposer'
 
 export function Header() {
     const { pathname } = useLocation()

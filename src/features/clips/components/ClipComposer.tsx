@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Button, Form, Modal } from 'react-bootstrap'
-import { pb } from '../lib/pocketbase'
+import { pb } from '../../../lib/pocketbase'
 import {
     ClipboardPlusIcon,
     FileTextIcon,

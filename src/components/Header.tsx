@@ -1,6 +1,6 @@
 import { Link, useLocation } from "@tanstack/react-router"
 import { Container, Form, InputGroup, Stack } from "react-bootstrap"
-import { LogOut, ScanSearch } from 'lucide-react'
+import { LogOut, Paperclip , ScanSearch, ListTodo } from 'lucide-react'
 import { ClipComposer } from './ClipComposer'
 
 export function Header() {
@@ -9,11 +9,14 @@ export function Header() {
     return (
         <>
           <Container className="border-bottom py-2">
-            <Stack direction="horizontal" gap={4} className="mt-2">
-              <h1 className="h5 fw-bold text-secondary">
-                  <Link to="/">Things</Link>
-              </h1>
-              <div className="ms-auto">
+            <Stack direction="horizontal" gap={4} className="mt-2 justify-content-center">
+              <Link to="/clips">
+                <Paperclip size={21} />
+              </Link>
+              <Link to="/gtd">
+                <ListTodo size={21} />
+              </Link>
+              <div className="">
                   <InputGroup size="sm" className="flex-grow-1">
                       <InputGroup.Text id="omniSearch">
                           <ScanSearch size={16} />

@@ -1,7 +1,7 @@
 // src/routes/index.tsx
 import { useRef } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Inbox, ListPlus, PhoneCall, Smile, Target } from "lucide-react";
+import { Inbox, ListPlus, PhoneIncoming, Smile, Target } from "lucide-react";
 import {
   Button,
   Container,
@@ -123,7 +123,7 @@ function Index() {
       <Row className="mb-3 justify-content-center">
         <div className="w-75">
           <div className="p-2">
-            <PhoneCall size={16} className="me-2" />
+            <PhoneIncoming size={16} className="me-2" />
             Waiting
           </div>
           <ListGroup>

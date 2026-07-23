@@ -3,13 +3,13 @@
 }
 
 .next {
-  background-color: hsl(68, 76%, 90%);
+  background-color: #E3F2FD;
 }
 
 .waiting {
-  background-color: #cbd7d4;
+  background-color: #F0F0F0;
 }
 
 .completed {
-  background-color: rgb(234, 234, 234);
+  background-color: #E6FFEC;
 }

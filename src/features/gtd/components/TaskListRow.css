@@ -3,13 +3,13 @@
 }
 
 .next {
-  background-color: #E3F2FD;
+  background-color: #E8F0FE; /* Soft Blue for Upcoming/Focus */
 }
 
 .waiting {
-  background-color: #F0F0F0;
+  background-color: #FFFDE7; /* Soft Yellow for Waiting/Attention */
 }
 
 .completed {
-  background-color: #E6FFEC;
+  background-color: #E8F5E9; /* Soft Green for Completion/Success */
 }

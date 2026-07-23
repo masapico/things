@@ -16,7 +16,9 @@
   border-radius: 0.7rem !important;
   color: var(--clip-ink);
   box-shadow: 0 3px 10px rgba(27, 42, 40, 0.06) !important;
-  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  transition:
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
 }
 
 .clip-card:hover {
@@ -42,7 +44,8 @@
 .clip-card-thumb {
   border: 1px solid var(--clip-line);
   border-radius: 0.5rem;
-  background: repeating-conic-gradient(#eef2ea 0% 25%, #f7faf3 0% 50%) 0 0/14px 14px;
+  background: repeating-conic-gradient(#eef2ea 0% 25%, #f7faf3 0% 50%) 0 0/14px
+    14px;
 }
 
 .clip-card-thumb img {
@@ -68,7 +71,7 @@
 }
 
 .clip-card-note::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   bottom: 0;

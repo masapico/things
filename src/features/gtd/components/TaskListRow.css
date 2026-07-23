@@ -1,15 +1,15 @@
 .inbox {
-    background-color: white;
+  background-color: white;
 }
 
 .next {
-    background-color: hsl(68, 76%, 90%);
+  background-color: hsl(68, 76%, 90%);
 }
 
 .waiting {
-    background-color: #cbd7d4;
+  background-color: #cbd7d4;
 }
 
 .completed {
-    background-color: rgb(234, 234, 234);
+  background-color: rgb(234, 234, 234);
 }

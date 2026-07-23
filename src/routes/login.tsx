@@ -1,65 +1,55 @@
-import { useState } from 'react'
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { Alert, Button, Card, Container, Form } from 'react-bootstrap'
-import { pb } from '../lib/pocketbase'
+import { useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Alert, Button, Card, Container, Form } from "react-bootstrap";
+import { pb } from "../lib/pocketbase";
 
-export const Route = createFileRoute('/login')({
+export const Route = createFileRoute("/login")({
   validateSearch: (search: Record<string, unknown>) => ({
-    redirect:
-      typeof search.redirect === 'string'
-        ? search.redirect
-        : undefined,
+    redirect: typeof search.redirect === "string" ? search.redirect : undefined,
   }),
   component: LoginPage,
-})
+});
 
 function LoginPage() {
+  pb.authStore.clear();
 
-  pb.authStore.clear()
+  const navigate = useNavigate();
+  const search = Route.useSearch();
 
-  const navigate = useNavigate()
-  const search = Route.useSearch()
-
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    setLoading(true)
-    setError('')
+    setLoading(true);
+    setError("");
 
     try {
-      await pb.collection('users').authWithPassword(email, password)
+      await pb.collection("users").authWithPassword(email, password);
       navigate({
-        to: search.redirect ?? '/',
-      })
+        to: search.redirect ?? "/",
+      });
     } catch (err) {
-      console.error(err)
-      pb.authStore.clear()
-      setError('ログイン情報が正しくありません。')
+      console.error(err);
+      pb.authStore.clear();
+      setError("ログイン情報が正しくありません。");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
-    <Container
-      className="d-flex justify-content-center align-items-center vh-100"
-    >
-      <Card style={{ width: '360px' }}>
+    <Container className="d-flex justify-content-center align-items-center vh-100">
+      <Card style={{ width: "360px" }}>
         <Card.Body>
           <h2 className="h5 text-secondary text-center mb-4">
             Login to Things
           </h2>
 
-          {error && (
-            <Alert variant="danger">
-              {error}
-            </Alert>
-          )}
+          {error && <Alert variant="danger">{error}</Alert>}
 
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
@@ -84,16 +74,12 @@ function LoginPage() {
               />
             </Form.Group>
 
-            <Button
-              type="submit"
-              className="w-100"
-              disabled={loading}
-            >
-              {loading ? 'ログイン中...' : 'ログイン'}
+            <Button type="submit" className="w-100" disabled={loading}>
+              {loading ? "ログイン中..." : "ログイン"}
             </Button>
           </Form>
         </Card.Body>
       </Card>
     </Container>
-  )
+  );
 }

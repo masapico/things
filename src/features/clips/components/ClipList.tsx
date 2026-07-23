@@ -1,12 +1,12 @@
-import { Alert, Col, Row, Spinner } from 'react-bootstrap'
-import { ClipCard } from './ClipCard'
-import type { ClipsResponse } from '../../../lib/pb_types'
+import { Alert, Col, Row, Spinner } from "react-bootstrap";
+import { ClipCard } from "./ClipCard";
+import type { ClipsResponse } from "../../../lib/pb_types";
 
 type ClipListProps = {
-  clips: ClipsResponse[]
-  isLoading: boolean
-  isError: boolean
-}
+  clips: ClipsResponse[];
+  isLoading: boolean;
+  isError: boolean;
+};
 
 export function ClipList({ clips, isLoading, isError }: ClipListProps) {
   if (isLoading) {
@@ -15,15 +15,15 @@ export function ClipList({ clips, isLoading, isError }: ClipListProps) {
         <Spinner animation="border" size="sm" />
         <span>Loading clips…</span>
       </div>
-    )
+    );
   }
 
   if (isError) {
-    return <Alert variant="danger">Failed to load clips.</Alert>
+    return <Alert variant="danger">Failed to load clips.</Alert>;
   }
 
   if (!clips.length) {
-    return <Alert variant="light">No clips yet.</Alert>
+    return <Alert variant="light">No clips yet.</Alert>;
   }
 
   return (
@@ -34,5 +34,5 @@ export function ClipList({ clips, isLoading, isError }: ClipListProps) {
         </Col>
       ))}
     </Row>
-  )
+  );
 }

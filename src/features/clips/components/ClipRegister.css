@@ -15,7 +15,6 @@
    physically, a note on a pad.
 */
 
-
 .clip-composer {
   --clip-ink: #1b2a28;
   --clip-teal: #146b62;
@@ -173,7 +172,7 @@
 
 .clip-pad-wrap::before {
   /* the red margin rule, like a real steno/legal pad */
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   bottom: 0;
@@ -219,7 +218,8 @@
 .clip-image-card {
   border: 1px solid var(--clip-line);
   border-radius: 0.6rem;
-  background: repeating-conic-gradient(#eef2ea 0% 25%, #f7faf3 0% 50%) 0 0/16px 16px;
+  background: repeating-conic-gradient(#eef2ea 0% 25%, #f7faf3 0% 50%) 0 0/16px
+    16px;
   padding: 0.85rem;
   text-align: center;
 }

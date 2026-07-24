@@ -77,6 +77,11 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
   const [hasUnsavedAnnotations, setHasUnsavedAnnotations] = useState(false);
   const prevClipIdRef = useRef<string | undefined>(undefined);
 
+  // Track the latest saved data for the readonly view — this persists
+  // across edit cycles so the readonly view doesn't rely on the stale `clip` prop.
+  const [savedAnnotations, setSavedAnnotations] = useState<Annotation[]>([]);
+  const [savedText, setSavedText] = useState("");
+
   // Reset local state when the clip changes (before render, not in an effect)
   if (clip?.id !== prevClipIdRef.current) {
     prevClipIdRef.current = clip?.id;
@@ -84,6 +89,12 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
     setShowDeleteConfirm(false);
     setStatusMessage("");
     setHasUnsavedAnnotations(false);
+    setSavedAnnotations(
+      clip?.annotations && Array.isArray(clip.annotations)
+        ? clip.annotations
+        : [],
+    );
+    setSavedText(clip?.text ?? "");
   }
 
   useEffect(() => {
@@ -96,19 +107,22 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
 
   const clipType = getClipType(clip);
   const { label: typeLabel, icon: TypeIcon } = TYPE_META[clipType];
-  const annotations: Annotation[] = clip.annotations
-    ? Array.isArray(clip.annotations)
+  // Use saved state for the readonly view to stay up to date after saving
+  // while the `clip` prop is still stale.
+  const readonlyText = savedText || clip.text || "";
+  const readonlyAnnotations: Annotation[] = savedAnnotations.length > 0
+    ? savedAnnotations
+    : clip.annotations && Array.isArray(clip.annotations)
       ? clip.annotations
-      : []
-    : [];
+      : [];
   const fullFileUrl = clip.file
     ? `${pb.baseURL}/api/files/${clip.collectionId}/${clip.id}/${clip.file}`
     : null;
 
   const handleEnterEdit = () => {
     setEditName(clip.name);
-    setEditText(clip.text ?? "");
-    setEditAnnotations(annotations);
+    setEditText(readonlyText);
+    setEditAnnotations(readonlyAnnotations);
     setHasUnsavedAnnotations(false);
     setIsEditing(true);
   };
@@ -126,6 +140,14 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
       }
       await updateClip(clip.id, data as { name?: string; text?: string });
       queryClient.invalidateQueries({ queryKey: ["clips"] });
+      // Persist the saved data so the readonly view stays up to date
+      // even though the `clip` prop is still stale.
+      if (hasUnsavedAnnotations) {
+        setSavedAnnotations(editAnnotations);
+      }
+      if (clipType === "text") {
+        setSavedText(editText);
+      }
       setIsEditing(false);
       setStatusKind("success");
       setStatusMessage("Clip updated.");
@@ -154,8 +176,8 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
 
   const handleCancelEdit = () => {
     setEditName(clip.name);
-    setEditText(clip.text ?? "");
-    setEditAnnotations(annotations);
+    setEditText(readonlyText);
+    setEditAnnotations(readonlyAnnotations);
     setHasUnsavedAnnotations(false);
     setIsEditing(false);
   };
@@ -265,13 +287,13 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
           ) : (
             <>
               {/* Text content */}
-              {clip.text ? (
+              {readonlyText ? (
                 <div className="mb-3">
                   <Form.Label className="clip-field-label">Note</Form.Label>
                   <div className="clip-pad-wrap clip-pad-preview">
                     <div className="clip-markdown-body">
                       <Markdown remarkPlugins={[remarkGfm]}>
-                        {clip.text}
+                        {readonlyText}
                       </Markdown>
                     </div>
                   </div>
@@ -285,7 +307,7 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
                   <div className="clip-image-card">
                     <ImageAnnotator
                       src={fullFileUrl}
-                      annotations={annotations}
+                      annotations={readonlyAnnotations}
                       onChange={() => {}}
                       readonly
                     />

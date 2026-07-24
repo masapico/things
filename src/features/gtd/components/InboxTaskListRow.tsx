@@ -14,69 +14,68 @@ type InboxTaskListRowProps = {
 export function InboxTaskListRow({ task }: InboxTaskListRowProps) {
   const iconSize = 16;
 
-  const { mutate, isPending } = useChangeStatusInboxTask();
-  const { mutate: mutateDelete, isPending: isPendingDelete } =
+  const { mutate: mutateStatus, isPending: isStatusPending } =
+    useChangeStatusInboxTask();
+  const { mutate: mutateDelete, isPending: isDeletePending } =
     useDeleteInboxTask();
 
   function handleNext() {
-    mutate(
-      {
-        targetTask: task,
-        newStatus: "next",
-      },
-      {
-        onSuccess: () => {
-          console.log("task next", task.id);
-        },
-      },
+    mutateStatus(
+      { targetTask: task, newStatus: "next" },
+      { onSuccess: () => console.log("task next", task.id) },
     );
   }
 
   function handleWaiting() {
-    mutate(
-      {
-        targetTask: task,
-        newStatus: "waiting",
-      },
-      {
-        onSuccess: () => {
-          console.log("task waiting", task.id);
-        },
-      },
+    mutateStatus(
+      { targetTask: task, newStatus: "waiting" },
+      { onSuccess: () => console.log("task waiting", task.id) },
     );
   }
 
   function handleDelete() {
     mutateDelete(task, {
-      onSuccess: () => {
-        console.log("task delete", task.id);
-      },
+      onSuccess: () => console.log("task delete", task.id),
     });
   }
 
   return (
-    <ListGroup.Item className={task.status}>
-      <Stack direction="horizontal" gap={2}>
-        <div>{task.title}</div>
+    <ListGroup.Item className={`task-row ${task.status}`}>
+      <Stack direction="horizontal" gap={1}>
+        <div className="task-title">{task.title}</div>
         <div
-          className="ms-auto"
+          className={`task-action-btn task-action-btn--next ${isStatusPending ? "task-action-btn--loading" : ""}`}
           role="button"
-          title="next"
-          onClick={!isPending ? handleNext : () => {}}
+          title="Move to Next"
+          tabIndex={0}
+          onClick={!isStatusPending ? handleNext : undefined}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !isStatusPending) handleNext();
+          }}
         >
           <Target size={iconSize} />
         </div>
         <div
+          className={`task-action-btn task-action-btn--waiting ${isStatusPending ? "task-action-btn--loading" : ""}`}
           role="button"
-          title="waiting"
-          onClick={!isPending ? handleWaiting : () => {}}
+          title="Move to Waiting"
+          tabIndex={0}
+          onClick={!isStatusPending ? handleWaiting : undefined}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !isStatusPending) handleWaiting();
+          }}
         >
           <PhoneIncoming size={iconSize} />
         </div>
         <div
+          className={`task-action-btn task-action-btn--delete ${isDeletePending ? "task-action-btn--loading" : ""}`}
           role="button"
-          title="delete"
-          onClick={!isPendingDelete ? handleDelete : () => {}}
+          title="Delete task"
+          tabIndex={0}
+          onClick={!isDeletePending ? handleDelete : undefined}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !isDeletePending) handleDelete();
+          }}
         >
           <Trash size={iconSize} />
         </div>

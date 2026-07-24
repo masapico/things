@@ -47,16 +47,6 @@ export const useCreateInboxTask = () => {
 };
 
 // inbox task: change status
-function confirmChangeStatus(task: TasksResponse, newStatus: string): boolean {
-  return window.confirm(
-    `ステータスを変更しますか? ${task.status} -> ${newStatus}`,
-  );
-}
-
-function confirmDelete(task: TasksResponse): boolean {
-  return window.confirm(`削除しますか? ${task.title}`);
-}
-
 export const useChangeStatusInboxTask = () => {
   const queryClient = useQueryClient();
 
@@ -68,9 +58,6 @@ export const useChangeStatusInboxTask = () => {
       targetTask: TasksResponse;
       newStatus: string;
     }) => {
-      if (!confirmChangeStatus(targetTask, newStatus)) {
-        return Promise.reject(new Error("User cancelled"));
-      }
       return await pb
         .collection("tasks")
         .update<TasksResponse>(targetTask.id, { status: newStatus });
@@ -79,7 +66,7 @@ export const useChangeStatusInboxTask = () => {
       queryClient.invalidateQueries({ queryKey: [queryKeyIndexPage] });
     },
     onError: (error) => {
-      console.error("タスクの完了に失敗しました:", error);
+      console.error("タスクのステータス変更に失敗しました:", error);
     },
   });
 };
@@ -90,9 +77,6 @@ export const useDeleteInboxTask = () => {
 
   return useMutation({
     mutationFn: async (targetTask: TasksResponse) => {
-      if (!confirmDelete(targetTask)) {
-        return Promise.reject(new Error("User cancelled"));
-      }
       return await pb.collection("tasks").delete(targetTask.id);
     },
     onSuccess: () => {

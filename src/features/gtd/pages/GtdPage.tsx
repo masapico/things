@@ -1,7 +1,9 @@
+import { ProjectList } from "../components/ProjectList";
+
 export function GtdPage() {
   return (
     <div>
-      <p>GTD page.........</p>
+      <ProjectList />
     </div>
   );
 }

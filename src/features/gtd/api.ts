@@ -1,11 +1,23 @@
 import { pb } from "../../lib/pocketbase";
-import type { TasksResponse } from "../../lib/pb_types";
+import type { TasksResponse, ProjectsResponse } from "../../lib/pb_types";
 
 export async function getIndexPageTasks(): Promise<TasksResponse[]> {
-  const result = await pb.collection("tasks").getFullList<TasksResponse>({
+  return await pb.collection("tasks").getFullList<TasksResponse>({
     filter: '(status="inbox"&&project="" )||status="next"||status="waiting"',
+    sort: "created",
+  });
+}
+
+export async function getActiveProjects(): Promise<ProjectsResponse[]> {
+  return await pb.collection("projects").getFullList<ProjectsResponse>({
+    filter: "isActive = true",
     sort: "-updated",
   });
+}
 
-  return result;
+export async function getProjectTasks(projectId: string): Promise<TasksResponse[]> {
+  return await pb.collection("tasks").getFullList<TasksResponse>({
+    filter: `project = "${projectId}"`,
+    sort: "sort",
+  });
 }

@@ -8,3 +8,14 @@ export async function getClips(): Promise<ClipsResponse[]> {
 
   return result;
 }
+
+export async function updateClip(
+  id: string,
+  data: { name?: string; text?: string },
+): Promise<void> {
+  await pb.collection("clips").update(id, data);
+}
+
+export async function deleteClip(id: string): Promise<void> {
+  await pb.collection("clips").delete(id);
+}

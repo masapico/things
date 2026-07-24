@@ -97,7 +97,8 @@ export type SuperusersRecord = {
 	verified?: boolean
 }
 
-export type ClipsRecord = {
+export type ClipsRecord<Tannotations = unknown> = {
+	annotations?: null | Tannotations
 	created: IsoAutoDateString
 	file?: FileNameString
 	id: string
@@ -174,7 +175,7 @@ export type ExternalauthsResponse<Texpand = unknown> = Required<ExternalauthsRec
 export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemFields<Texpand>
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
-export type ClipsResponse<Texpand = unknown> = Required<ClipsRecord> & BaseSystemFields<Texpand>
+export type ClipsResponse<Tannotations = unknown, Texpand = unknown> = Required<ClipsRecord<Tannotations>> & BaseSystemFields<Texpand>
 export type ContextsResponse<Texpand = unknown> = Required<ContextsRecord> & BaseSystemFields<Texpand>
 export type ProjectsResponse<Texpand = unknown> = Required<ProjectsRecord> & BaseSystemFields<Texpand>
 export type TasksResponse<Texpand = unknown> = Required<TasksRecord> & BaseSystemFields<Texpand>

@@ -5,6 +5,7 @@ import "./ClipCard.css";
 
 type ClipCardProps = {
   clip: ClipsResponse;
+  onClick?: (clip: ClipsResponse) => void;
 };
 
 function formatDate(value?: string) {
@@ -36,16 +37,21 @@ function getFileExtension(fileName?: string) {
   return match ? match[1].toUpperCase() : null;
 }
 
-export function ClipCard({ clip }: ClipCardProps) {
+export function ClipCard({ clip, onClick }: ClipCardProps) {
   const thumbnailUrl = getThumbnailUrl(clip);
   const extension = getFileExtension(clip.file);
 
   return (
     <Card
-      as="a"
-      href={`/clips/${clip.id}`}
-      target="_blank"
-      rel="noopener noreferrer"
+      role="button"
+      tabIndex={0}
+      onClick={() => onClick?.(clip)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick?.(clip);
+        }
+      }}
       className="clip-card h-100 text-decoration-none text-reset"
     >
       <Card.Body className="d-flex flex-column gap-2">

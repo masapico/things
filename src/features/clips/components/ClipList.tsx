@@ -6,9 +6,10 @@ type ClipListProps = {
   clips: ClipsResponse[];
   isLoading: boolean;
   isError: boolean;
+  onClipClick?: (clip: ClipsResponse) => void;
 };
 
-export function ClipList({ clips, isLoading, isError }: ClipListProps) {
+export function ClipList({ clips, isLoading, isError, onClipClick }: ClipListProps) {
   if (isLoading) {
     return (
       <div className="d-flex align-items-center gap-2 text-muted">
@@ -30,7 +31,7 @@ export function ClipList({ clips, isLoading, isError }: ClipListProps) {
     <Row xs={1} md={2} lg={3} className="g-3">
       {clips.map((clip) => (
         <Col key={clip.id}>
-          <ClipCard clip={clip} />
+          <ClipCard clip={clip} onClick={onClipClick} />
         </Col>
       ))}
     </Row>

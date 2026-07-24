@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Button, Form, Modal } from "react-bootstrap";
+import { useQueryClient } from "@tanstack/react-query";
+import { Button, Form, Modal, Nav } from "react-bootstrap";
 import { pb } from "../../../lib/pocketbase";
 import {
   ClipboardPlusIcon,
@@ -8,7 +9,12 @@ import {
   FileIcon,
   CheckCircle2Icon,
   AlertCircleIcon,
+  EyeIcon,
+  PenLineIcon,
 } from "lucide-react";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { ImageAnnotator, type Annotation } from "./ImageAnnotator";
 import "./ClipRegister.css";
 
 type ClipType = "text" | "image" | "file";
@@ -31,7 +37,10 @@ export function ClipRegister() {
   const [title, setTitle] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
   const [statusKind, setStatusKind] = useState<"success" | "error">("success");
+  const queryClient = useQueryClient();
   const [isSaving, setIsSaving] = useState(false);
+  const [textTab, setTextTab] = useState<"edit" | "preview">("edit");
+  const [annotations, setAnnotations] = useState<Annotation[]>([]);
 
   useEffect(() => {
     const handlePaste = (event: ClipboardEvent) => {
@@ -115,6 +124,8 @@ export function ClipRegister() {
     setFileContent(null);
     setClipType("text");
     setTitle("");
+    setTextTab("edit");
+    setAnnotations([]);
     setPreviewUrl((current) => {
       if (current) {
         URL.revokeObjectURL(current);
@@ -140,9 +151,14 @@ export function ClipRegister() {
         formData.append("text", textContent);
       } else if (hasFileAttachment) {
         formData.append("file", fileContent, fileContent.name);
+
+        if (clipType === "image" && annotations.length > 0) {
+          formData.append("annotations", JSON.stringify(annotations));
+        }
       }
 
       await pb.collection("clips").create(formData);
+      queryClient.invalidateQueries({ queryKey: ["clips"] });
       resetState();
       setStatusKind("success");
       setStatusMessage("Clip saved.");
@@ -211,24 +227,56 @@ export function ClipRegister() {
             <Form.Label className="clip-field-label">Preview</Form.Label>
 
             {clipType === "text" ? (
-              <div className="clip-pad-wrap">
-                <Form.Control
-                  as="textarea"
-                  rows={7}
-                  className="clip-pad-textarea"
-                  value={textContent}
-                  onChange={(event) => setTextContent(event.target.value)}
-                  placeholder="Nothing pasted yet"
-                />
-              </div>
+              <>
+                <Nav
+                  variant="tabs"
+                  activeKey={textTab}
+                  onSelect={(k) => setTextTab((k ?? "edit") as "edit" | "preview")}
+                  className="clip-text-tabs"
+                >
+                  <Nav.Item>
+                    <Nav.Link eventKey="edit">
+                      <PenLineIcon size={14} />
+                      Edit
+                    </Nav.Link>
+                  </Nav.Item>
+                  <Nav.Item>
+                    <Nav.Link eventKey="preview">
+                      <EyeIcon size={14} />
+                      Preview
+                    </Nav.Link>
+                  </Nav.Item>
+                </Nav>
+
+                {textTab === "edit" ? (
+                  <div className="clip-pad-wrap">
+                    <Form.Control
+                      as="textarea"
+                      rows={7}
+                      className="clip-pad-textarea"
+                      value={textContent}
+                      onChange={(event) => setTextContent(event.target.value)}
+                      placeholder="Nothing pasted yet"
+                    />
+                  </div>
+                ) : (
+                  <div className="clip-pad-wrap clip-pad-preview">
+                    <div className="clip-markdown-body">
+                      <Markdown remarkPlugins={[remarkGfm]}>
+                        {textContent || "*Nothing pasted yet*"}
+                      </Markdown>
+                    </div>
+                  </div>
+                )}
+              </>
             ) : null}
 
             {clipType === "image" ? (
               <div className="clip-image-card">
-                <img
+                <ImageAnnotator
                   src={previewUrl}
-                  alt="Preview"
-                  style={{ maxWidth: "100%", maxHeight: "280px" }}
+                  annotations={annotations}
+                  onChange={setAnnotations}
                 />
               </div>
             ) : null}

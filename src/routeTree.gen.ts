@@ -14,7 +14,6 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedClipsIndexRouteImport } from './routes/_authenticated/clips/index'
-import { Route as AuthenticatedClipsClipIdRouteImport } from './routes/_authenticated/clips/$clipId'
 import { Route as AuthenticatedGtdIndexRouteImport } from './routes/_authenticated/gtd/index'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -41,12 +40,6 @@ const AuthenticatedClipsIndexRoute = AuthenticatedClipsIndexRouteImport.update({
   path: '/clips/',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedClipsClipIdRoute =
-  AuthenticatedClipsClipIdRouteImport.update({
-    id: '/clips/$clipId',
-    path: '/clips/$clipId',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
 const AuthenticatedGtdIndexRoute = AuthenticatedGtdIndexRouteImport.update({
   id: '/gtd/',
   path: '/gtd/',
@@ -57,7 +50,6 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
   '/settings': typeof AuthenticatedSettingsRoute
-  '/clips/$clipId': typeof AuthenticatedClipsClipIdRoute
   '/clips/': typeof AuthenticatedClipsIndexRoute
   '/gtd/': typeof AuthenticatedGtdIndexRoute
 }
@@ -65,7 +57,6 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/': typeof AuthenticatedIndexRoute
-  '/clips/$clipId': typeof AuthenticatedClipsClipIdRoute
   '/clips': typeof AuthenticatedClipsIndexRoute
   '/gtd': typeof AuthenticatedGtdIndexRoute
 }
@@ -75,23 +66,20 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
-  '/_authenticated/clips/$clipId': typeof AuthenticatedClipsClipIdRoute
   '/_authenticated/clips/': typeof AuthenticatedClipsIndexRoute
   '/_authenticated/gtd/': typeof AuthenticatedGtdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    '/' | '/login' | '/settings' | '/clips/$clipId' | '/clips/' | '/gtd/'
+  fullPaths: '/' | '/login' | '/settings' | '/clips/' | '/gtd/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/settings' | '/' | '/clips/$clipId' | '/clips' | '/gtd'
+  to: '/login' | '/settings' | '/' | '/clips' | '/gtd'
   id:
     | '__root__'
     | '/_authenticated'
     | '/login'
     | '/_authenticated/settings'
     | '/_authenticated/'
-    | '/_authenticated/clips/$clipId'
     | '/_authenticated/clips/'
     | '/_authenticated/gtd/'
   fileRoutesById: FileRoutesById
@@ -138,13 +126,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClipsIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/clips/$clipId': {
-      id: '/_authenticated/clips/$clipId'
-      path: '/clips/$clipId'
-      fullPath: '/clips/$clipId'
-      preLoaderRoute: typeof AuthenticatedClipsClipIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/gtd/': {
       id: '/_authenticated/gtd/'
       path: '/gtd'
@@ -158,7 +139,6 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
-  AuthenticatedClipsClipIdRoute: typeof AuthenticatedClipsClipIdRoute
   AuthenticatedClipsIndexRoute: typeof AuthenticatedClipsIndexRoute
   AuthenticatedGtdIndexRoute: typeof AuthenticatedGtdIndexRoute
 }
@@ -166,7 +146,6 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
-  AuthenticatedClipsClipIdRoute: AuthenticatedClipsClipIdRoute,
   AuthenticatedClipsIndexRoute: AuthenticatedClipsIndexRoute,
   AuthenticatedGtdIndexRoute: AuthenticatedGtdIndexRoute,
 }

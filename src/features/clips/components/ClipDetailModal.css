@@ -1,0 +1,39 @@
+/* ClipDetailModal — reuses the same design tokens as ClipRegister */
+.clip-detail-modal {
+  --clip-ink: #1b2a28;
+  --clip-teal: #146b62;
+  --clip-teal-soft: #e4f0ee;
+  --clip-margin: #c4564f;
+  --clip-paper: #f3f6ec;
+  --clip-line: #d8e2ce;
+  --clip-paper-white: #fcfdfa;
+}
+
+.clip-detail-info {
+  color: #5b6b64;
+  padding: 0.25rem 0;
+}
+
+/* Reuse styles from ClipRegister for shared class names */
+
+.clip-btn-delete.btn-outline-danger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  padding: 0.35rem 0.85rem;
+}
+
+.clip-btn-danger.btn {
+  background: #c4564f;
+  border: 1px solid #c4564f;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  padding: 0.45rem 1.15rem;
+}
+
+.clip-btn-danger.btn:hover {
+  background: #a83e37;
+  border-color: #a83e37;
+}

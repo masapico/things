@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Container, Row, Col, Spinner, Badge } from "react-bootstrap";
 import { useActiveProjects, useArchivedProjects } from "../hooks/useProjects";
 import "./ProjectList.css";
-import { ChevronRight, Play, Flag, FolderKanban, Archive } from "lucide-react";
+import { ChevronRight, Play, Flag, FolderKanban, Archive, Plus } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
 function formatDate(value?: string) {
@@ -18,7 +18,7 @@ function formatDate(value?: string) {
   });
 }
 
-export function ProjectList() {
+export function ProjectList({ onCreateClick }: { onCreateClick: () => void }) {
   const [showArchived, setShowArchived] = useState(false);
   const {
     data: activeProjects,
@@ -62,15 +62,25 @@ export function ProjectList() {
   return (
     <div className="project-list">
       <div className="project-list-header">
-        <div className="project-list-header-icon">
-          <FolderKanban size={22} />
+        <div className="project-list-header-left">
+          <div className="project-list-header-icon">
+            <FolderKanban size={22} />
+          </div>
+          <div>
+            <h1 className="project-list-header-title">Projects</h1>
+            <p className="project-list-header-sub">
+              {projects?.length ?? 0} 件の{label}なプロジェクト
+            </p>
+          </div>
         </div>
-        <div>
-          <h1 className="project-list-header-title">Projects</h1>
-          <p className="project-list-header-sub">
-            {projects?.length ?? 0} 件の{label}なプロジェクト
-          </p>
-        </div>
+        <button
+          type="button"
+          className="project-list-create-btn"
+          onClick={onCreateClick}
+        >
+          <Plus size={16} />
+          新規作成
+        </button>
       </div>
 
       {/* トグル */}

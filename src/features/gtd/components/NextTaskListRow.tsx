@@ -6,6 +6,7 @@ import {
   useChangeStatusInboxTask,
   useDeleteInboxTask,
 } from "../hooks/useTasks";
+import { TaskInfo } from "./TaskInfo";
 
 type NextTaskListRowProps = {
   task: TasksResponse;
@@ -49,9 +50,7 @@ export function NextTaskListRow({ task }: NextTaskListRowProps) {
   return (
     <ListGroup.Item className={`task-row ${task.status}`}>
       <Stack direction="horizontal" gap={1}>
-        <div
-          className={`task-title ${task.status === "completed" ? "task-title--completed" : ""}`}
-        >
+        <div className={`task-title ${task.status === "completed" ? "task-title--completed" : ""}`}>
           {task.title}
         </div>
         <div
@@ -109,6 +108,7 @@ export function NextTaskListRow({ task }: NextTaskListRowProps) {
           <Trash size={iconSize} />
         </div>
       </Stack>
+      <TaskInfo task={task} />
     </ListGroup.Item>
   );
 }

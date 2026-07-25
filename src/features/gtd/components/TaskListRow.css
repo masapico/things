@@ -100,3 +100,30 @@
   text-decoration: line-through;
   color: #6c757d;
 }
+
+/* ── Task info (subtitle) ── */
+
+.task-info {
+  font-size: 0.75rem;
+  color: #adb5bd;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-info-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.task-info-separator {
+  color: #dee2e6;
+  margin: 0 2px;
+  user-select: none;
+}
+
+.task-info--priority-high {
+  color: #dc3545;
+}

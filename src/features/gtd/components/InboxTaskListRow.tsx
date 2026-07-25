@@ -6,6 +6,7 @@ import {
   useChangeStatusInboxTask,
   useDeleteInboxTask,
 } from "../hooks/useTasks";
+import { TaskInfo } from "./TaskInfo";
 
 type InboxTaskListRowProps = {
   task: TasksResponse;
@@ -42,7 +43,8 @@ export function InboxTaskListRow({ task }: InboxTaskListRowProps) {
   return (
     <ListGroup.Item className={`task-row ${task.status}`}>
       <Stack direction="horizontal" gap={1}>
-        <div className="task-title">{task.title}</div>
+        <div className="task-title">
+          {task.title}</div>
         <div
           className={`task-action-btn task-action-btn--next ${isStatusPending ? "task-action-btn--loading" : ""}`}
           role="button"
@@ -80,6 +82,7 @@ export function InboxTaskListRow({ task }: InboxTaskListRowProps) {
           <Trash size={iconSize} />
         </div>
       </Stack>
+      <TaskInfo task={task} />
     </ListGroup.Item>
   );
 }

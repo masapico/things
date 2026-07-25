@@ -6,6 +6,7 @@ import {
   useChangeStatusInboxTask,
   useDeleteInboxTask,
 } from "../hooks/useTasks";
+import { TaskInfo } from "./TaskInfo";
 
 type WaitingTaskListRowProps = {
   task: TasksResponse;
@@ -82,6 +83,7 @@ export function WaitingTaskListRow({ task }: WaitingTaskListRowProps) {
           <Trash size={iconSize} />
         </div>
       </Stack>
+      <TaskInfo task={task} />
     </ListGroup.Item>
   );
 }

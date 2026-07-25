@@ -12,8 +12,22 @@
   background-color: #fffde7;
 }
 
+.someday {
+  background-color: #f3e8ff;
+}
+
 .completed {
   background-color: #e8f5e9;
+}
+
+/* ── Status dot indicator ── */
+
+.task-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-right: 2px;
 }
 
 /* ── Task row base ── */

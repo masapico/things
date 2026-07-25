@@ -46,6 +46,7 @@ export function NextTaskListRow({ task }: NextTaskListRowProps) {
         <div className={`task-title ${task.status === "completed" ? "task-title--completed" : ""}`}>
           {task.title}
         </div>
+        <TaskInfo task={task} />
         <div
           className={`task-action-btn ${task.status === "completed" ? "task-action-btn--undo" : "task-action-btn--complete"} ${isStatusPending ? "task-action-btn--loading" : ""}`}
           role="button"
@@ -101,7 +102,6 @@ export function NextTaskListRow({ task }: NextTaskListRowProps) {
           <Pencil size={iconSize} />
         </div>
       </Stack>
-      <TaskInfo task={task} />
       <TaskEditModal
         task={task}
         show={showEditModal}

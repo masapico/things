@@ -35,7 +35,10 @@ export function WaitingTaskListRow({ task }: WaitingTaskListRowProps) {
   return (
     <ListGroup.Item className={`task-row ${task.status}`}>
       <Stack direction="horizontal" gap={1}>
-        <div className="task-title">{task.title}</div>
+        <div className="task-title">
+          {task.title}
+        </div>
+        <TaskInfo task={task} />
         {task.project === "" ? (
           <div
             className={`task-action-btn task-action-btn--inbox ${isStatusPending ? "task-action-btn--loading" : ""}`}
@@ -75,7 +78,6 @@ export function WaitingTaskListRow({ task }: WaitingTaskListRowProps) {
           <Pencil size={iconSize} />
         </div>
       </Stack>
-      <TaskInfo task={task} />
       <TaskEditModal
         task={task}
         show={showEditModal}

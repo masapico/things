@@ -3,10 +3,7 @@ import { Container, Spinner, ListGroup, Badge, Stack } from "react-bootstrap";
 import { useProject, useToggleReview } from "../hooks/useProjects";
 import { useProjectTasks } from "../hooks/useProjectTasks";
 import { ProjectEditModal } from "../components/ProjectEditModal";
-import { InboxTaskListRow } from "../components/InboxTaskListRow";
-import { NextTaskListRow } from "../components/NextTaskListRow";
-import { WaitingTaskListRow } from "../components/WaitingTaskListRow";
-import { CompletedTaskListRow } from "../components/CompletedTaskListRow";
+import { UnifiedTaskListRow } from "../components/UnifiedTaskListRow";
 import { TaskAddForm } from "../components/TaskAddForm";
 import type { TasksResponse } from "../../../lib/pb_types";
 import {
@@ -77,13 +74,7 @@ function partitionTasks(tasks: TasksResponse[]) {
   return { inbox, next, waiting, completed, someday };
 }
 
-const STATUS_LABEL: Record<string, string> = {
-  inbox: "Inbox",
-  next: "Next",
-  waiting: "Waiting",
-  completed: "Done",
-  someday: "Someday",
-};
+
 
 export function ProjectDetailPage({ projectId }: ProjectDetailPageProps) {
   const {
@@ -135,6 +126,7 @@ export function ProjectDetailPage({ projectId }: ProjectDetailPageProps) {
   }
 
   const partitioned = partitionTasks(tasks ?? []);
+  const activeTasks = sortActiveTasks(tasks ?? []);
   const totalTasks = (tasks ?? []).length;
   const doneCount = partitioned.completed.length;
   const progressPct = totalTasks > 0 ? Math.round((doneCount / totalTasks) * 100) : 0;
@@ -288,10 +280,14 @@ export function ProjectDetailPage({ projectId }: ProjectDetailPageProps) {
           </div>
         ) : (
           <>
-            {renderSection("inbox", partitioned.inbox)}
-            {renderSection("next", partitioned.next)}
-            {renderSection("waiting", partitioned.waiting)}
-            {renderSection("someday", partitioned.someday)}
+            {/* 未完了タスク（統合リスト） */}
+            {activeTasks.length > 0 && (
+              <ListGroup variant="flush" className="project-detail-task-list">
+                {activeTasks.map((task) => (
+                  <UnifiedTaskListRow key={task.id} task={task} />
+                ))}
+              </ListGroup>
+            )}
 
             {/* 完了タスク（折りたたみ） */}
             {partitioned.completed.length > 0 && (
@@ -315,7 +311,7 @@ export function ProjectDetailPage({ projectId }: ProjectDetailPageProps) {
                 {showCompleted && (
                   <ListGroup variant="flush" className="project-detail-task-list">
                     {partitioned.completed.map((task) => (
-                      <CompletedTaskListRow key={task.id} task={task} />
+                      <UnifiedTaskListRow key={task.id} task={task} />
                     ))}
                   </ListGroup>
                 )}
@@ -335,32 +331,15 @@ export function ProjectDetailPage({ projectId }: ProjectDetailPageProps) {
   );
 }
 
-/** セクション描画ヘルパー */
-function renderSection(status: string, tasks: TasksResponse[]) {
-  if (tasks.length === 0) return null;
-
-  return (
-    <div className="project-detail-section">
-      <div className="project-detail-section-header">
-        <span className="project-detail-section-label">
-          {STATUS_LABEL[status] ?? status}
-        </span>
-        <span className="project-detail-section-count">{tasks.length}</span>
-      </div>
-      <ListGroup variant="flush" className="project-detail-task-list">
-        {tasks.map((task) => {
-          switch (status) {
-            case "inbox":
-              return <InboxTaskListRow key={task.id} task={task} />;
-            case "next":
-              return <NextTaskListRow key={task.id} task={task} />;
-            case "waiting":
-              return <WaitingTaskListRow key={task.id} task={task} />;
-            default:
-              return <InboxTaskListRow key={task.id} task={task} />;
-          }
-        })}
-      </ListGroup>
-    </div>
-  );
+/** 未完了タスクを sort 昇順 → created 降順でソート */
+function sortActiveTasks(tasks: TasksResponse[]): TasksResponse[] {
+  return tasks
+    .filter((t) => t.status !== "completed")
+    .sort((a, b) => {
+      const sortA = a.sort ?? 9999;
+      const sortB = b.sort ?? 9999;
+      if (sortA !== sortB) return sortA - sortB;
+      // sort が同値の場合は作成日時の降順（新しい順）
+      return new Date(b.created).getTime() - new Date(a.created).getTime();
+    });
 }

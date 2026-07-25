@@ -36,7 +36,9 @@ export function InboxTaskListRow({ task }: InboxTaskListRowProps) {
     <ListGroup.Item className={`task-row ${task.status}`}>
       <Stack direction="horizontal" gap={1}>
         <div className="task-title">
-          {task.title}</div>
+          {task.title}
+        </div>
+        <TaskInfo task={task} />
         <div
           className={`task-action-btn task-action-btn--next ${isStatusPending ? "task-action-btn--loading" : ""}`}
           role="button"
@@ -74,7 +76,6 @@ export function InboxTaskListRow({ task }: InboxTaskListRowProps) {
           <Pencil size={iconSize} />
         </div>
       </Stack>
-      <TaskInfo task={task} />
       <TaskEditModal
         task={task}
         show={showEditModal}

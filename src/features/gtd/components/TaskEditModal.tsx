@@ -24,6 +24,15 @@ const STATUS_LABELS: Record<string, string> = {
   someday: "Someday",
 };
 
+/** PocketBase の ISO 日付文字列を <input type="date"> 用の YYYY-MM-DD 形式に変換 */
+function toDateInputValue(isoString?: string): string {
+  if (!isoString) return "";
+  // PocketBase は "2024-01-15 00:00:00.000Z" または "2024-01-15T00:00:00.000Z" 形式で返す
+  // 先頭10文字が YYYY-MM-DD であればそれを返す
+  const match = isoString.match(/^(\d{4}-\d{2}-\d{2})/);
+  return match ? match[1] : "";
+}
+
 export function TaskEditModal({ task, show, onClose }: TaskEditModalProps) {
   const { data: projects = [] } = useActiveProjects();
   const { data: contexts = [] } = useContexts();
@@ -35,7 +44,7 @@ export function TaskEditModal({ task, show, onClose }: TaskEditModalProps) {
   const [priority, setPriority] = useState<TasksPriorityOptions | "">(
     task.priority ?? "",
   );
-  const [duedate, setDuedate] = useState(task.duedate ?? "");
+  const [duedate, setDuedate] = useState(toDateInputValue(task.duedate));
   const [project, setProject] = useState(task.project ?? "");
   const [selectedContexts, setSelectedContexts] = useState<string[]>(
     task.contexts ?? [],
@@ -55,7 +64,7 @@ export function TaskEditModal({ task, show, onClose }: TaskEditModalProps) {
         setTitle(task.title);
         setMemo(task.memo ?? "");
         setPriority(task.priority ?? "");
-        setDuedate(task.duedate ?? "");
+        setDuedate(toDateInputValue(task.duedate));
         setProject(task.project ?? "");
         setSelectedContexts(task.contexts ?? []);
         setSelectedClips(task.clips ?? []);
@@ -104,7 +113,7 @@ export function TaskEditModal({ task, show, onClose }: TaskEditModalProps) {
     title !== task.title ||
     memo !== (task.memo ?? "") ||
     priority !== (task.priority ?? "") ||
-    duedate !== (task.duedate ?? "") ||
+    duedate !== toDateInputValue(task.duedate) ||
     project !== (task.project ?? "") ||
     JSON.stringify(selectedContexts.sort()) !==
       JSON.stringify((task.contexts ?? []).sort()) ||

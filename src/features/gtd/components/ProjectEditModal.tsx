@@ -14,6 +14,13 @@ type ProjectEditModalProps = {
   onClose: () => void;
 };
 
+/** PocketBase の ISO 日付文字列を <input type="date"> 用の YYYY-MM-DD 形式に変換 */
+function toDateInputValue(isoString?: string): string {
+  if (!isoString) return "";
+  const match = isoString.match(/^(\d{4}-\d{2}-\d{2})/);
+  return match ? match[1] : "";
+}
+
 export function ProjectEditModal({
   project,
   show,
@@ -23,8 +30,8 @@ export function ProjectEditModal({
 
   const [name, setName] = useState(project.name);
   const [memo, setMemo] = useState(project.memo ?? "");
-  const [startDate, setStartDate] = useState(project.startDate ?? "");
-  const [endDate, setEndDate] = useState(project.endDate ?? "");
+  const [startDate, setStartDate] = useState(toDateInputValue(project.startDate));
+  const [endDate, setEndDate] = useState(toDateInputValue(project.endDate));
   const [isActive, setIsActive] = useState(project.isActive ?? true);
   const [selectedClips, setSelectedClips] = useState<string[]>(
     project.clips ?? [],
@@ -40,8 +47,8 @@ export function ProjectEditModal({
       Promise.resolve().then(() => {
         setName(project.name);
         setMemo(project.memo ?? "");
-        setStartDate(project.startDate ?? "");
-        setEndDate(project.endDate ?? "");
+        setStartDate(toDateInputValue(project.startDate));
+        setEndDate(toDateInputValue(project.endDate));
         setIsActive(project.isActive ?? true);
         setSelectedClips(project.clips ?? []);
       });
@@ -73,8 +80,8 @@ export function ProjectEditModal({
   const hasChanges =
     name !== project.name ||
     memo !== (project.memo ?? "") ||
-    startDate !== (project.startDate ?? "") ||
-    endDate !== (project.endDate ?? "") ||
+    startDate !== toDateInputValue(project.startDate) ||
+    endDate !== toDateInputValue(project.endDate) ||
     isActive !== (project.isActive ?? true) ||
     JSON.stringify(selectedClips.sort()) !==
       JSON.stringify((project.clips ?? []).sort());

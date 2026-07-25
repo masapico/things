@@ -310,13 +310,13 @@ export function ProjectDetailPage({ projectId }: ProjectDetailPageProps) {
           gap={2}
           className="project-detail-progress"
         >
-          <div className="project-detail-progress-bar w-50">
+          <div className="project-detail-progress-bar w-50 my-1">
             <div
               className="project-detail-progress-fill"
               style={{ width: `${progressPct}%` }}
             />
           </div>
-          <div className="project-detail-progress-info">
+          <div className="project-detail-progress-info my-1">
             <span className="project-detail-progress-pct">
               {progressPct}% 完了
             </span>

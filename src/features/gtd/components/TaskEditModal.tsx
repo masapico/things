@@ -80,8 +80,8 @@ export function TaskEditModal({ task, show, onClose }: TaskEditModalProps) {
         priority: priority || undefined,
         duedate: duedate || undefined,
         project: project || undefined,
-        contexts: selectedContexts.length > 0 ? selectedContexts : undefined,
-        clips: selectedClips.length > 0 ? selectedClips : undefined,
+        contexts: selectedContexts,
+        clips: selectedClips,
       },
       {
         onSuccess: () => {

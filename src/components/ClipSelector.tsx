@@ -53,12 +53,17 @@ export function ClipSelector({ selectedClipIds, onChange, onClipClick }: ClipSel
   // 初期表示: 直近 50 件を取得
   useEffect(() => {
     let cancelled = false;
-    getRecentClips(50).then((clips) => {
-      if (!cancelled) {
-        setRecentClips(clips);
-        setIsLoadingRecent(false);
-      }
-    });
+    getRecentClips(50)
+      .then((clips) => {
+        if (!cancelled) {
+          setRecentClips(clips);
+          setIsLoadingRecent(false);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load recent clips:", err);
+        if (!cancelled) setIsLoadingRecent(false);
+      });
     return () => { cancelled = true; };
   }, []);
 
@@ -66,12 +71,16 @@ export function ClipSelector({ selectedClipIds, onChange, onClipClick }: ClipSel
   useEffect(() => {
     let cancelled = false;
     if (selectedClipIds.length === 0) {
-      Promise.resolve().then(() => setSelectedClips([]));
+      setSelectedClips([]);
       return;
     }
-    getClipsByIds(selectedClipIds).then((clips) => {
-      if (!cancelled) setSelectedClips(clips);
-    });
+    getClipsByIds(selectedClipIds)
+      .then((clips) => {
+        if (!cancelled) setSelectedClips(clips);
+      })
+      .catch((err) => {
+        console.error("Failed to load clips by ids:", err);
+      });
     return () => { cancelled = true; };
   }, [selectedClipIds]);
 

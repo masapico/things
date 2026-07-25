@@ -84,9 +84,14 @@ export const useChangeStatusInboxTask = () => {
       targetTask: TasksResponse;
       newStatus: string;
     }) => {
+      const updateData: Record<string, unknown> = { status: newStatus };
+      // completed ステータスに変更する場合、completed フィールドに現在日時をセット
+      if (newStatus === "completed") {
+        updateData.completed = new Date().toISOString();
+      }
       return await pb
         .collection("tasks")
-        .update<TasksResponse>(targetTask.id, { status: newStatus });
+        .update<TasksResponse>(targetTask.id, updateData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [queryKeyIndexPage] });
@@ -142,6 +147,28 @@ export const useUpdateTask = () => {
     },
     onError: (error) => {
       console.error("タスクの更新に失敗しました:", error);
+    },
+  });
+};
+
+// batch update sort values
+export const useUpdateTaskSorts = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (updates: { id: string; sort: number }[]) => {
+      await Promise.all(
+        updates.map(({ id, sort }) =>
+          pb.collection("tasks").update(id, { sort }),
+        ),
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [queryKeyIndexPage] });
+      queryClient.invalidateQueries({ queryKey: ["projectTasks"] });
+    },
+    onError: (error) => {
+      console.error("タスクの並び替えに失敗しました:", error);
     },
   });
 };

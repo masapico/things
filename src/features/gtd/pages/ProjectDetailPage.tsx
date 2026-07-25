@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { Container, Spinner, ListGroup, Badge, Stack } from "react-bootstrap";
 import { useProject, useToggleReview } from "../hooks/useProjects";
 import { useProjectTasks } from "../hooks/useProjectTasks";
@@ -16,6 +16,10 @@ import {
   EyeOff,
 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { DragDropProvider } from "@dnd-kit/react";
+import { useSortable } from "@dnd-kit/react/sortable";
+import type { DragEndEvent } from "@dnd-kit/dom";
+import { useUpdateTaskSorts } from "../hooks/useTasks";
 import "./ProjectDetailPage.css";
 
 type ProjectDetailPageProps = {
@@ -72,7 +76,46 @@ function partitionTasks(tasks: TasksResponse[]) {
   return { inbox, next, waiting, completed, someday };
 }
 
+/** 全タスクを sort 昇順 → created 降順でソート */
+function sortAllTasks(tasks: TasksResponse[]): TasksResponse[] {
+  return [...tasks].sort((a, b) => {
+    const sortA = a.sort ?? 9999;
+    const sortB = b.sort ?? 9999;
+    if (sortA !== sortB) return sortA - sortB;
+    return new Date(b.created).getTime() - new Date(a.created).getTime();
+  });
+}
 
+/** 配列をイミュータブルに並び替える */
+function reorder<T>(list: T[], startIndex: number, endIndex: number): T[] {
+  const result = [...list];
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+  return result;
+}
+
+/** useSortable をラップした行コンポーネント */
+function SortableTaskRow({
+  task,
+  index,
+}: {
+  task: TasksResponse;
+  index: number;
+}) {
+  const { ref, handleRef, isDragSource } = useSortable({
+    id: task.id,
+    index,
+  });
+
+  return (
+    <UnifiedTaskListRow
+      task={task}
+      containerRef={ref}
+      handleRef={handleRef}
+      isDragging={isDragSource}
+    />
+  );
+}
 
 export function ProjectDetailPage({ projectId }: ProjectDetailPageProps) {
   const {
@@ -87,8 +130,45 @@ export function ProjectDetailPage({ projectId }: ProjectDetailPageProps) {
   } = useProjectTasks(projectId);
 
   const [showEditModal, setShowEditModal] = useState(false);
+  const [localTasks, setLocalTasks] = useState<TasksResponse[] | null>(null);
 
   const toggleReview = useToggleReview();
+  const updateSorts = useUpdateTaskSorts();
+
+  // サーバーデータが変わったらローカルステートをリセット
+  const displayTasks = useMemo(
+    () => localTasks ?? (tasks ? sortAllTasks(tasks) : []),
+    [localTasks, tasks],
+  );
+
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { operation } = event;
+      const source = operation.source;
+      const target = operation.target;
+      if (!source || !target) return;
+
+      const sourceIndex = (source as { index?: number }).index;
+      const targetIndex = (target as { index?: number }).index;
+      if (
+        sourceIndex === undefined ||
+        targetIndex === undefined ||
+        sourceIndex === targetIndex
+      )
+        return;
+
+      const reordered = reorder(displayTasks, sourceIndex, targetIndex);
+      setLocalTasks(reordered);
+
+      // 全タスクの sort 値を振り直して永続化
+      const sortUpdates = reordered.map((t, i) => ({
+        id: t.id,
+        sort: i * 100,
+      }));
+      updateSorts.mutate(sortUpdates);
+    },
+    [displayTasks, updateSorts],
+  );
 
   // ---- Loading ----
   if (projectLoading || tasksLoading) {
@@ -123,10 +203,10 @@ export function ProjectDetailPage({ projectId }: ProjectDetailPageProps) {
   }
 
   const partitioned = partitionTasks(tasks ?? []);
-  const sortedTasks = sortAllTasks(tasks ?? []);
   const totalTasks = (tasks ?? []).length;
   const doneCount = partitioned.completed.length;
-  const progressPct = totalTasks > 0 ? Math.round((doneCount / totalTasks) * 100) : 0;
+  const progressPct =
+    totalTasks > 0 ? Math.round((doneCount / totalTasks) * 100) : 0;
   const clipCount = project.clips?.length ?? 0;
   const daysSince = daysSinceUpdated(project.updated);
   const needsReview = daysSince > 5;
@@ -223,10 +303,13 @@ export function ProjectDetailPage({ projectId }: ProjectDetailPageProps) {
         )}
       </div>
 
-
       {/* ── 進捗サマリー ── */}
       {totalTasks > 0 && (
-        <Stack direction="horizontal" gap={2} className="project-detail-progress">
+        <Stack
+          direction="horizontal"
+          gap={2}
+          className="project-detail-progress"
+        >
           <div className="project-detail-progress-bar w-50">
             <div
               className="project-detail-progress-fill"
@@ -234,7 +317,9 @@ export function ProjectDetailPage({ projectId }: ProjectDetailPageProps) {
             />
           </div>
           <div className="project-detail-progress-info">
-            <span className="project-detail-progress-pct">{progressPct}% 完了</span>
+            <span className="project-detail-progress-pct">
+              {progressPct}% 完了
+            </span>
             <span className="project-detail-progress-counts">
               {doneCount}/{totalTasks} タスク
             </span>
@@ -276,11 +361,17 @@ export function ProjectDetailPage({ projectId }: ProjectDetailPageProps) {
             <p>このプロジェクトにタスクはまだありません。</p>
           </div>
         ) : (
-          <ListGroup variant="flush" className="project-detail-task-list">
-            {sortedTasks.map((task) => (
-              <UnifiedTaskListRow key={task.id} task={task} />
-            ))}
-          </ListGroup>
+          <DragDropProvider onDragEnd={handleDragEnd}>
+            <ListGroup variant="flush" className="project-detail-task-list">
+              {displayTasks.map((task, index) => (
+                <SortableTaskRow
+                  key={task.id}
+                  task={task}
+                  index={index}
+                />
+              ))}
+            </ListGroup>
+          </DragDropProvider>
         )}
       </div>
 
@@ -292,19 +383,4 @@ export function ProjectDetailPage({ projectId }: ProjectDetailPageProps) {
       />
     </div>
   );
-}
-
-/** 全タスクを sort 昇順 → created 降順でソート（完了は末尾） */
-function sortAllTasks(tasks: TasksResponse[]): TasksResponse[] {
-  return [...tasks].sort((a, b) => {
-    // 完了タスクは常に末尾
-    if (a.status === "completed" && b.status !== "completed") return 1;
-    if (a.status !== "completed" && b.status === "completed") return -1;
-
-    const sortA = a.sort ?? 9999;
-    const sortB = b.sort ?? 9999;
-    if (sortA !== sortB) return sortA - sortB;
-    // sort が同値の場合は作成日時の降順（新しい順）
-    return new Date(b.created).getTime() - new Date(a.created).getTime();
-  });
 }

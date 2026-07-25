@@ -57,7 +57,7 @@ export function ProjectEditModal({
         startDate: startDate || undefined,
         endDate: endDate || undefined,
         isActive,
-        clips: selectedClips.length > 0 ? selectedClips : undefined,
+        clips: selectedClips,
       });
       queryClient.invalidateQueries({ queryKey: ["activeProjects"] });
       queryClient.invalidateQueries({ queryKey: ["archivedProjects"] });

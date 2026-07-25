@@ -144,6 +144,7 @@ export const TasksPriorityOptions = {
 export type TasksPriorityOptions = typeof TasksPriorityOptions[keyof typeof TasksPriorityOptions]
 export type TasksRecord = {
 	clips?: RecordIdString[]
+	completed?: IsoDateString
 	contexts?: RecordIdString[]
 	created: IsoAutoDateString
 	duedate?: IsoDateString

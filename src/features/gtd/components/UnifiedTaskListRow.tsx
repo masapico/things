@@ -2,6 +2,8 @@ import { ListGroup, Stack } from "react-bootstrap";
 import type { TasksResponse } from "../../../lib/pb_types";
 import {
   Check,
+  CheckCircle2,
+  GripVertical,
   Inbox,
   Pencil,
   PhoneIncoming,
@@ -16,6 +18,12 @@ import { useState } from "react";
 
 type UnifiedTaskListRowProps = {
   task: TasksResponse;
+  /** useSortable から渡されるハンドル用 ref */
+  handleRef?: (element: Element | null) => void;
+  /** useSortable から渡されるコンテナ用 ref */
+  containerRef?: React.RefCallback<HTMLElement>;
+  /** ドラッグ中のスタイル */
+  isDragging?: boolean;
 };
 
 const STATUS_DOT_COLOR: Record<string, string> = {
@@ -28,7 +36,22 @@ const STATUS_DOT_COLOR: Record<string, string> = {
 
 const iconSize = 16;
 
-export function UnifiedTaskListRow({ task }: UnifiedTaskListRowProps) {
+/** 完了日を "M/D 完了" 形式で表示 */
+function formatCompletedDate(value?: string) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  return `${month}/${day} 完了`;
+}
+
+export function UnifiedTaskListRow({
+  task,
+  handleRef,
+  containerRef,
+  isDragging,
+}: UnifiedTaskListRowProps) {
   const [showEditModal, setShowEditModal] = useState(false);
 
   const { mutate: mutateStatus, isPending: isStatusPending } =
@@ -46,9 +69,15 @@ export function UnifiedTaskListRow({ task }: UnifiedTaskListRowProps) {
 
   return (
     <ListGroup.Item
-      className={`task-row ${task.status} ${isCompleted ? "task-row--completed" : ""}`}
+      ref={containerRef}
+      className={`task-row ${task.status} ${isCompleted ? "task-row--completed" : ""} ${isDragging ? "task-row--dragging" : ""}`}
     >
       <Stack direction="horizontal" gap={1}>
+        {/* ドラッグハンドル */}
+        <span className="task-drag-handle" ref={handleRef}>
+          <GripVertical size={14} />
+        </span>
+
         {/* ステータスインジケーター */}
         <span
           className="task-status-dot"
@@ -159,15 +188,23 @@ export function UnifiedTaskListRow({ task }: UnifiedTaskListRowProps) {
           </>
         )}
 
-        {/* completed: 戻す(Inbox) */}
+        {/* completed: 完了日 + 戻す(Inbox) */}
         {task.status === "completed" && (
-          <ActionBtn
-            icon={<Undo2 size={iconSize} />}
-            label="Inboxに戻す"
-            className="task-action-btn--undo"
-            disabled={isStatusPending}
-            onClick={() => changeStatus("inbox")}
-          />
+          <>
+            {task.completed && (
+              <span className="task-completed-date">
+                <CheckCircle2 size={12} />
+                {formatCompletedDate(task.completed)}
+              </span>
+            )}
+            <ActionBtn
+              icon={<Undo2 size={iconSize} />}
+              label="Inboxに戻す"
+              className="task-action-btn--undo"
+              disabled={isStatusPending}
+              onClick={() => changeStatus("inbox")}
+            />
+          </>
         )}
 
         {/* 編集（完了タスクでは非表示） */}

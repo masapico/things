@@ -33,11 +33,43 @@
 /* ── Task row base ── */
 
 .task-row {
-  transition: background-color 0.15s ease;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
 }
 
 .task-row:hover {
   filter: brightness(0.97);
+}
+
+/* ── Drag handle ── */
+
+.task-drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  cursor: grab;
+  color: #adb5bd;
+  flex-shrink: 0;
+  touch-action: none;
+  user-select: none;
+  transition: color 0.15s ease;
+}
+
+.task-drag-handle:hover {
+  color: #6c757d;
+}
+
+.task-drag-handle:active {
+  cursor: grabbing;
+}
+
+/* ── Dragging state ── */
+
+.task-row--dragging {
+  opacity: 0.5;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 10;
 }
 
 /* ── Completed task row (compact) ── */
@@ -163,4 +195,16 @@
 .task-info--overdue {
   color: #dc3545;
   font-weight: 600;
+}
+
+/* ── Completed date ── */
+
+.task-completed-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.72rem;
+  color: #6c757d;
+  white-space: nowrap;
+  flex-shrink: 0;
 }

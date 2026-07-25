@@ -40,6 +40,19 @@
   filter: brightness(0.97);
 }
 
+/* ── Completed task row (compact) ── */
+
+.task-row--completed {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  font-size: 0.85rem;
+  opacity: 0.65;
+}
+
+.task-row--completed:hover {
+  opacity: 0.85;
+}
+
 /* ── Action buttons ── */
 
 .task-action-btn {

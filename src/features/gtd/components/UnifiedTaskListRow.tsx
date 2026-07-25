@@ -45,9 +45,10 @@ export function UnifiedTaskListRow({ task }: UnifiedTaskListRowProps) {
   const dotColor = STATUS_DOT_COLOR[task.status] ?? "#9ca3af";
 
   return (
-    <ListGroup.Item className={`task-row ${task.status}`}>
+    <ListGroup.Item
+      className={`task-row ${task.status} ${isCompleted ? "task-row--completed" : ""}`}
+    >
       <Stack direction="horizontal" gap={1}>
-
         {/* ステータスインジケーター */}
         <span
           className="task-status-dot"
@@ -62,8 +63,8 @@ export function UnifiedTaskListRow({ task }: UnifiedTaskListRowProps) {
           {task.title}
         </div>
 
-        {/* タスク付随情報 */}
-        <TaskInfo task={task} />
+        {/* タスク付随情報（完了タスクでは非表示） */}
+        {!isCompleted && <TaskInfo task={task} />}
 
         {/* ── アクションボタン（ステータスに応じて出し分け）── */}
 
@@ -169,17 +170,17 @@ export function UnifiedTaskListRow({ task }: UnifiedTaskListRowProps) {
           />
         )}
 
-        {/* 編集（全ステータス共通） */}
-        <ActionBtn
-          icon={<Pencil size={iconSize} />}
-          label="Edit task"
-          className="task-action-btn--edit"
-          disabled={false}
-          onClick={() => setShowEditModal(true)}
-        />
-
+        {/* 編集（完了タスクでは非表示） */}
+        {!isCompleted && (
+          <ActionBtn
+            icon={<Pencil size={iconSize} />}
+            label="Edit task"
+            className="task-action-btn--edit"
+            disabled={false}
+            onClick={() => setShowEditModal(true)}
+          />
+        )}
       </Stack>
-
 
       <TaskEditModal
         task={task}

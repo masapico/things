@@ -11,8 +11,6 @@ import {
   Play,
   Flag,
   Pencil,
-  ChevronDown,
-  ChevronRight,
   FolderKanban,
   Eye,
   EyeOff,
@@ -89,7 +87,6 @@ export function ProjectDetailPage({ projectId }: ProjectDetailPageProps) {
   } = useProjectTasks(projectId);
 
   const [showEditModal, setShowEditModal] = useState(false);
-  const [showCompleted, setShowCompleted] = useState(false);
 
   const toggleReview = useToggleReview();
 
@@ -126,7 +123,7 @@ export function ProjectDetailPage({ projectId }: ProjectDetailPageProps) {
   }
 
   const partitioned = partitionTasks(tasks ?? []);
-  const activeTasks = sortActiveTasks(tasks ?? []);
+  const sortedTasks = sortAllTasks(tasks ?? []);
   const totalTasks = (tasks ?? []).length;
   const doneCount = partitioned.completed.length;
   const progressPct = totalTasks > 0 ? Math.round((doneCount / totalTasks) * 100) : 0;
@@ -279,45 +276,11 @@ export function ProjectDetailPage({ projectId }: ProjectDetailPageProps) {
             <p>このプロジェクトにタスクはまだありません。</p>
           </div>
         ) : (
-          <>
-            {/* 未完了タスク（統合リスト） */}
-            {activeTasks.length > 0 && (
-              <ListGroup variant="flush" className="project-detail-task-list">
-                {activeTasks.map((task) => (
-                  <UnifiedTaskListRow key={task.id} task={task} />
-                ))}
-              </ListGroup>
-            )}
-
-            {/* 完了タスク（折りたたみ） */}
-            {partitioned.completed.length > 0 && (
-              <div className="project-detail-section">
-                <button
-                  className="project-detail-section-toggle"
-                  onClick={() => setShowCompleted((v) => !v)}
-                >
-                  {showCompleted ? (
-                    <ChevronDown size={14} />
-                  ) : (
-                    <ChevronRight size={14} />
-                  )}
-                  <span className="project-detail-section-label">
-                    Done
-                  </span>
-                  <span className="project-detail-section-count">
-                    {partitioned.completed.length}
-                  </span>
-                </button>
-                {showCompleted && (
-                  <ListGroup variant="flush" className="project-detail-task-list">
-                    {partitioned.completed.map((task) => (
-                      <UnifiedTaskListRow key={task.id} task={task} />
-                    ))}
-                  </ListGroup>
-                )}
-              </div>
-            )}
-          </>
+          <ListGroup variant="flush" className="project-detail-task-list">
+            {sortedTasks.map((task) => (
+              <UnifiedTaskListRow key={task.id} task={task} />
+            ))}
+          </ListGroup>
         )}
       </div>
 
@@ -331,15 +294,17 @@ export function ProjectDetailPage({ projectId }: ProjectDetailPageProps) {
   );
 }
 
-/** 未完了タスクを sort 昇順 → created 降順でソート */
-function sortActiveTasks(tasks: TasksResponse[]): TasksResponse[] {
-  return tasks
-    .filter((t) => t.status !== "completed")
-    .sort((a, b) => {
-      const sortA = a.sort ?? 9999;
-      const sortB = b.sort ?? 9999;
-      if (sortA !== sortB) return sortA - sortB;
-      // sort が同値の場合は作成日時の降順（新しい順）
-      return new Date(b.created).getTime() - new Date(a.created).getTime();
-    });
+/** 全タスクを sort 昇順 → created 降順でソート（完了は末尾） */
+function sortAllTasks(tasks: TasksResponse[]): TasksResponse[] {
+  return [...tasks].sort((a, b) => {
+    // 完了タスクは常に末尾
+    if (a.status === "completed" && b.status !== "completed") return 1;
+    if (a.status !== "completed" && b.status === "completed") return -1;
+
+    const sortA = a.sort ?? 9999;
+    const sortB = b.sort ?? 9999;
+    if (sortA !== sortB) return sortA - sortB;
+    // sort が同値の場合は作成日時の降順（新しい順）
+    return new Date(b.created).getTime() - new Date(a.created).getTime();
+  });
 }

@@ -8,6 +8,30 @@ type TaskInfoProps = {
 
 const iconSize = 12;
 
+/** 日付文字列を人間にわかりやすいラベルに変換する */
+function formatDueDate(dateStr: string): { label: string; isOverdue: boolean } {
+  const d = new Date(dateStr);
+  const now = new Date();
+
+  // 時刻を無視して日付だけで比較（ローカルタイムゾーン）
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const target = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+  const diffDays = Math.round(
+    (target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+  );
+
+  if (diffDays < 0) return { label: "期限超過", isOverdue: true };
+  if (diffDays === 0) return { label: "今日", isOverdue: false };
+  if (diffDays === 1) return { label: "明日", isOverdue: false };
+  if (diffDays === 2) return { label: "明後日", isOverdue: false };
+  if (diffDays <= 7) return { label: `${diffDays}日後`, isOverdue: false };
+
+  const month = d.getMonth() + 1;
+  const day = d.getDate();
+  return { label: `${month}/${day}`, isOverdue: false };
+}
+
 export function TaskInfo({ task }: TaskInfoProps) {
   const expand = task.expand as { project?: { name: string }; contexts?: { name: string }[] } | undefined;
   const projectName = expand?.project?.name;
@@ -45,10 +69,14 @@ export function TaskInfo({ task }: TaskInfoProps) {
   }
 
   if (dueDate) {
+    const { label, isOverdue } = formatDueDate(dueDate);
     parts.push(
-      <span key="duedate" className="task-info-item">
+      <span
+        key="duedate"
+        className={`task-info-item ${isOverdue ? "task-info--overdue" : ""}`}
+      >
         <Calendar size={iconSize} />
-        {dueDate}
+        {label}
       </span>,
     );
   }

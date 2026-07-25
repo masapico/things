@@ -1,12 +1,11 @@
 import { ListGroup, Stack } from "react-bootstrap";
 import type { TasksResponse } from "../../../lib/pb_types";
-import { Check, Inbox, PhoneIncoming, Trash, Undo } from "lucide-react";
+import { Check, Inbox, Pencil, PhoneIncoming, Undo } from "lucide-react";
 import "./TaskListRow.css";
-import {
-  useChangeStatusInboxTask,
-  useDeleteInboxTask,
-} from "../hooks/useTasks";
+import { useChangeStatusInboxTask } from "../hooks/useTasks";
 import { TaskInfo } from "./TaskInfo";
+import { TaskEditModal } from "./TaskEditModal";
+import { useState } from "react";
 
 type NextTaskListRowProps = {
   task: TasksResponse;
@@ -14,15 +13,14 @@ type NextTaskListRowProps = {
 
 export function NextTaskListRow({ task }: NextTaskListRowProps) {
   const iconSize = 16;
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const { mutate: mutateStatus, isPending: isStatusPending } =
     useChangeStatusInboxTask();
-  const { mutate: mutateDelete, isPending: isDeletePending } =
-    useDeleteInboxTask();
 
   function handleComplete() {
     mutateStatus(
-      { targetTask: task, newStatus: "done" },
+      { targetTask: task, newStatus: "completed" },
       { onSuccess: () => console.log("task completed", task.id) },
     );
   }
@@ -39,12 +37,6 @@ export function NextTaskListRow({ task }: NextTaskListRowProps) {
       { targetTask: task, newStatus: "waiting" },
       { onSuccess: () => console.log("task waiting", task.id) },
     );
-  }
-
-  function handleDelete() {
-    mutateDelete(task, {
-      onSuccess: () => console.log("task delete", task.id),
-    });
   }
 
   return (
@@ -96,19 +88,24 @@ export function NextTaskListRow({ task }: NextTaskListRowProps) {
           <PhoneIncoming size={iconSize} />
         </div>
         <div
-          className={`task-action-btn task-action-btn--delete ${isDeletePending ? "task-action-btn--loading" : ""}`}
+          className="task-action-btn task-action-btn--edit"
           role="button"
-          title="Delete task"
+          title="Edit task"
           tabIndex={0}
-          onClick={!isDeletePending ? handleDelete : undefined}
+          onClick={() => setShowEditModal(true)}
           onKeyDown={(e) => {
-            if (e.key === "Enter" && !isDeletePending) handleDelete();
+            if (e.key === "Enter") setShowEditModal(true);
           }}
         >
-          <Trash size={iconSize} />
+          <Pencil size={iconSize} />
         </div>
       </Stack>
       <TaskInfo task={task} />
+      <TaskEditModal
+        task={task}
+        show={showEditModal}
+        onClose={() => setShowEditModal(false)}
+      />
     </ListGroup.Item>
   );
 }

@@ -87,3 +87,31 @@ export const useDeleteInboxTask = () => {
     },
   });
 };
+
+// update task
+export type UpdateTaskInput = {
+  id: string;
+  title?: string;
+  memo?: string;
+  priority?: string;
+  duedate?: string;
+  project?: string;
+  contexts?: string[];
+};
+
+export const useUpdateTask = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: UpdateTaskInput) => {
+      const { id, ...data } = input;
+      return await pb.collection("tasks").update<TasksResponse>(id, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [queryKeyIndexPage] });
+    },
+    onError: (error) => {
+      console.error("タスクの更新に失敗しました:", error);
+    },
+  });
+};

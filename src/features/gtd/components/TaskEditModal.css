@@ -1,0 +1,226 @@
+/* TaskEditModal — "steno pad" aesthetic (matching ClipRegister)
+   Palette:
+     --clip-ink:      #1B2A28
+     --clip-teal:      #146B62
+     --clip-teal-soft: #E4F0EE
+     --clip-margin:   #C4564F
+     --clip-paper:    #F3F6EC
+     --clip-line:     #D8E2CE
+     --clip-paper-white: #FCFDFA
+*/
+
+.task-edit-modal .modal-content {
+  border: none;
+  border-radius: 0.9rem;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(20, 40, 38, 0.28);
+}
+
+/* ---------- header ---------- */
+.task-edit-modal-header {
+  position: relative;
+  background: #fcfdfa;
+  border-bottom: 1px solid #d8e2ce;
+  padding: 1.1rem 1.4rem 1rem;
+}
+
+.task-edit-modal-header .btn-close {
+  margin-top: -0.2rem;
+}
+
+.task-edit-header-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.task-edit-header-icon {
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: 0.6rem;
+  background: #e4f0ee;
+  color: #146b62;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transform: rotate(-8deg);
+}
+
+.task-edit-title {
+  font-weight: 600;
+  font-size: 1.15rem;
+  margin: 0;
+  line-height: 1.2;
+  color: #1b2a28;
+}
+
+.task-edit-subtitle {
+  font-size: 0.8rem;
+  color: #5b6b64;
+  margin: 0.1rem 0 0;
+}
+
+.task-edit-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  background: #e4f0ee;
+  color: #146b62;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+/* ---------- body ---------- */
+.task-edit-modal .modal-body {
+  background: #fcfdfa;
+  padding: 1.25rem 1.4rem 0.5rem;
+}
+
+.task-edit-field-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #5b6b64;
+  margin-bottom: 0.35rem;
+}
+
+.task-edit-input.form-control,
+.task-edit-select.form-select {
+  font-weight: 500;
+  font-size: 1rem;
+  border: 1px solid #d8e2ce;
+  border-radius: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  color: #1b2a28;
+  background: #fcfdfa;
+}
+
+.task-edit-input.form-control:focus,
+.task-edit-select.form-select:focus {
+  border-color: #146b62;
+  box-shadow: 0 0 0 0.2rem rgba(20, 107, 98, 0.15);
+}
+
+.task-edit-textarea.form-control {
+  font-weight: 500;
+  font-size: 1rem;
+  border: 1px solid #d8e2ce;
+  border-radius: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  color: #1b2a28;
+  background: #fcfdfa;
+  resize: vertical;
+}
+
+.task-edit-textarea.form-control:focus {
+  border-color: #146b62;
+  box-shadow: 0 0 0 0.2rem rgba(20, 107, 98, 0.15);
+}
+
+.task-edit-input::placeholder,
+.task-edit-textarea::placeholder {
+  color: #93a396;
+  font-style: italic;
+}
+
+/* ---------- context checkboxes ---------- */
+.task-edit-contexts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.2rem;
+}
+
+.task-edit-contexts .form-check {
+  margin: 0;
+}
+
+.task-edit-contexts .form-check-input:checked {
+  background-color: #146b62;
+  border-color: #146b62;
+}
+
+.task-edit-contexts .form-check-input:focus {
+  border-color: #146b62;
+  box-shadow: 0 0 0 0.2rem rgba(20, 107, 98, 0.15);
+}
+
+.task-edit-contexts .form-check-label {
+  font-size: 0.9rem;
+  color: #1b2a28;
+}
+
+/* ---------- footer ---------- */
+.task-edit-modal .modal-footer {
+  background: #fcfdfa;
+  border-top: 1px solid #d8e2ce;
+  padding: 0.9rem 1.4rem 1.1rem;
+}
+
+.task-edit-btn-cancel.btn {
+  background: transparent;
+  border: 1px solid #d8e2ce;
+  color: #1b2a28;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  padding: 0.45rem 1rem;
+}
+
+.task-edit-btn-cancel.btn:hover {
+  background: #f3f6ec;
+  border-color: #d8e2ce;
+  color: #1b2a28;
+}
+
+.task-edit-btn-save.btn {
+  background: #146b62;
+  border: 1px solid #146b62;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  padding: 0.45rem 1.15rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.task-edit-btn-save.btn:hover,
+.task-edit-btn-save.btn:focus {
+  background: #0f544d;
+  border-color: #0f544d;
+}
+
+.task-edit-btn-save.btn:disabled {
+  background: #9fb6b2;
+  border-color: #9fb6b2;
+}
+
+.task-edit-btn-delete.btn {
+  background: transparent;
+  border: 1px solid #d8e2ce;
+  color: #c4564f;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  padding: 0.45rem 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.task-edit-btn-delete.btn:hover {
+  background: #fdecea;
+  border-color: #f0b3ac;
+  color: #8a2c25;
+}
+
+.task-edit-btn-delete.btn:disabled {
+  color: #c9a9a6;
+  border-color: #d8e2ce;
+  background: transparent;
+}

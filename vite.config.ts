@@ -11,4 +11,7 @@ export default defineConfig({
     }),
     react()
   ],
+  build: {
+    outDir: 'pocketbase/pb_public',
+  },
 })

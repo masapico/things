@@ -19,9 +19,10 @@ export function NextTaskListRow({ task }: NextTaskListRowProps) {
     useChangeStatusInboxTask();
 
   function handleComplete() {
+    const newStatus = task.status === "completed" ? "next" : "completed";
     mutateStatus(
-      { targetTask: task, newStatus: "completed" },
-      { onSuccess: () => console.log("task completed", task.id) },
+      { targetTask: task, newStatus },
+      { onSuccess: () => console.log(`task ${newStatus}`, task.id) },
     );
   }
 

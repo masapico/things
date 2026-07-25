@@ -70,10 +70,6 @@ export function ClipSelector({ selectedClipIds, onChange, onClipClick }: ClipSel
   // 選択済み ID が変わったら実データを取得
   useEffect(() => {
     let cancelled = false;
-    if (selectedClipIds.length === 0) {
-      setSelectedClips([]);
-      return;
-    }
     getClipsByIds(selectedClipIds)
       .then((clips) => {
         if (!cancelled) setSelectedClips(clips);

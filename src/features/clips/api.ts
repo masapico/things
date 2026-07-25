@@ -9,6 +9,24 @@ export async function getClips(): Promise<ClipsResponse[]> {
   return result;
 }
 
+export async function getClipsPage({
+  pageParam = 1,
+}: {
+  pageParam?: number;
+}): Promise<{ items: ClipsResponse[]; page: number; totalPages: number }> {
+  const perPage = 9;
+  const result = await pb
+    .collection("clips")
+    .getList<ClipsResponse>(pageParam, perPage, {
+      sort: "-created",
+    });
+  return {
+    items: result.items,
+    page: result.page,
+    totalPages: result.totalPages,
+  };
+}
+
 export async function getRecentClips(limit = 50): Promise<ClipsResponse[]> {
   const result = await pb.collection("clips").getList<ClipsResponse>(1, limit, {
     sort: "-created",

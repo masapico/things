@@ -220,7 +220,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
+  flex-wrap: wrap;
+  gap: 0.4rem;
   margin-top: auto;
   padding-top: 0.55rem;
   border-top: 1px solid var(--clip-line);

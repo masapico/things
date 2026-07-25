@@ -37,9 +37,13 @@ function getFileExtension(fileName?: string) {
   return match ? match[1].toUpperCase() : null;
 }
 
+function getDisplayFileName(clip: ClipsResponse) {
+  return clip.filename || clip.file;
+}
+
 export function ClipCard({ clip, onClick }: ClipCardProps) {
   const thumbnailUrl = getThumbnailUrl(clip);
-  const extension = getFileExtension(clip.file);
+  const extension = getFileExtension(getDisplayFileName(clip));
 
   return (
     <Card

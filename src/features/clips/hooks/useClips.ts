@@ -1,9 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
-import { getClips } from "../api";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { getClipsPage } from "../api";
 
 export function useClips() {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: ["clips"],
-    queryFn: getClips,
+    queryFn: getClipsPage,
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) =>
+      lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
   });
 }

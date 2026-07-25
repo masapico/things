@@ -1,0 +1,102 @@
+/* Login — minimal, clean design */
+
+.login-box {
+  width: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+/* ── アイコン ── */
+.login-icon {
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: 1rem;
+  background: #e4f0ee;
+  color: #146b62;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(-6deg);
+}
+
+/* ── エラー ── */
+.login-error {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border-radius: 0.5rem;
+  background: #fef0ef;
+  color: #c4564f;
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+/* ── フォーム ── */
+.login-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* ── 入力フィールド ── */
+.login-field {
+  position: relative;
+}
+
+.login-field-icon {
+  position: absolute;
+  top: 50%;
+  left: 0.75rem;
+  transform: translateY(-50%);
+  color: #93a396;
+  display: flex;
+  align-items: center;
+  z-index: 2;
+}
+
+.login-input {
+  padding-left: 2.4rem !important;
+  height: 2.7rem;
+  border: 1px solid #d8e2ce !important;
+  border-radius: 0.6rem !important;
+  background: #fcfdfa !important;
+  font-size: 0.9rem !important;
+  color: #1b2a28 !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.login-input:focus {
+  border-color: #146b62 !important;
+  box-shadow: 0 0 0 3px rgba(20, 107, 98, 0.12) !important;
+}
+
+.login-input::placeholder {
+  color: #b0bfb6;
+}
+
+/* ── ボタン ── */
+.login-btn {
+  width: 100%;
+  height: 2.7rem;
+  border: none !important;
+  border-radius: 0.6rem !important;
+  background: #146b62 !important;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+  color: #fff !important;
+  margin-top: 0.25rem;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.login-btn:hover:not(:disabled) {
+  background: #115a52 !important;
+}
+
+.login-btn:disabled {
+  opacity: 0.65;
+}

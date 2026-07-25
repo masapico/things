@@ -137,7 +137,6 @@ export function ClipRegister() {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const formData = new FormData();
       const safeTitle =
         title.trim() ||
         (clipType === "text"
@@ -145,19 +144,22 @@ export function ClipRegister() {
           : fileContent?.name || "Pasted clip");
       const hasFileAttachment = clipType !== "text" && fileContent !== null;
 
-      formData.append("name", safeTitle);
+      const data: Record<string, unknown> = {
+        name: safeTitle,
+      };
 
       if (clipType === "text") {
-        formData.append("text", textContent);
+        data.text = textContent;
       } else if (hasFileAttachment) {
-        formData.append("file", fileContent, fileContent.name);
+        data.file = fileContent;
+        data.filename = fileContent.name;
 
         if (clipType === "image" && annotations.length > 0) {
-          formData.append("annotations", JSON.stringify(annotations));
+          data.annotations = JSON.stringify(annotations);
         }
       }
 
-      await pb.collection("clips").create(formData);
+      await pb.collection("clips").create(data);
       queryClient.invalidateQueries({ queryKey: ["clips"] });
       resetState();
       setStatusKind("success");

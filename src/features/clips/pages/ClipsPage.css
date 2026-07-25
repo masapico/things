@@ -1,0 +1,42 @@
+/* ClipsPage — "steno pad" design language */
+
+.clips-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+}
+
+/* ── ヘッダー ── */
+.clips-page-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 1.75rem;
+}
+
+.clips-page-header-icon {
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 0.7rem;
+  background: #e4f0ee;
+  color: #146b62;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transform: rotate(-6deg);
+}
+
+.clips-page-header-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #1b2a28;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.clips-page-header-sub {
+  font-size: 0.82rem;
+  color: #5b6b64;
+  margin: 0.15rem 0 0;
+}

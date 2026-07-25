@@ -1,36 +1,61 @@
-import { useState } from "react";
-import { Container, Stack } from "react-bootstrap";
+import { useState, useMemo } from "react";
+import { Container } from "react-bootstrap";
 import { useClips } from "../hooks/useClips";
 import { ClipList } from "../components/ClipList";
 import { ClipDetailModal } from "../components/ClipDetailModal";
 import type { ClipsResponse } from "../../../lib/pb_types";
 import { Paperclip } from "lucide-react";
+import "./ClipsPage.css";
 
 export function ClipsPage() {
-  const { data: clips = [], isLoading, isError } = useClips();
+  const {
+    data,
+    isLoading,
+    isError,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = useClips();
+
+  const clips = useMemo(
+    () => data?.pages.flatMap((page) => page.items) ?? [],
+    [data],
+  );
+
   const [selectedClip, setSelectedClip] = useState<ClipsResponse | null>(null);
 
   return (
-    <Container className="py-4">
-      <Stack
-        direction="horizontal"
-        className="mb-3"
-      >
-        <div>
-          <h1 className="h5 mb-1"><Paperclip size={18} className="me-1" />Clips</h1>
+    <div className="clips-page">
+      <Container>
+        {/* ヘッダー */}
+        <div className="clips-page-header">
+          <div className="clips-page-header-icon">
+            <Paperclip size={22} />
+          </div>
+          <div>
+            <h1 className="clips-page-header-title">Clips</h1>
+            <p className="clips-page-header-sub">
+              {clips.length} 件のクリップ
+            </p>
+          </div>
         </div>
-        <div className="ms-3 pt-3">
-          <p className="text-muted">my clips inventory</p>
-        </div>
-      </Stack>
 
-      <ClipList clips={clips} isLoading={isLoading} isError={isError} onClipClick={setSelectedClip} />
+        <ClipList
+          clips={clips}
+          isLoading={isLoading}
+          isError={isError}
+          hasNextPage={hasNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+          onLoadMore={() => fetchNextPage()}
+          onClipClick={setSelectedClip}
+        />
 
-      <ClipDetailModal
-        clip={selectedClip}
-        show={selectedClip !== null}
-        onClose={() => setSelectedClip(null)}
-      />
-    </Container>
+        <ClipDetailModal
+          clip={selectedClip}
+          show={selectedClip !== null}
+          onClose={() => setSelectedClip(null)}
+        />
+      </Container>
+    </div>
   );
 }

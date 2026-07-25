@@ -97,7 +97,7 @@ export function ProjectList() {
           <p>{label}なプロジェクトはありません。</p>
         </div>
       ) : (
-        <Row xs={1} sm={2} lg={3} xl={4} className="g-3">
+        <Row xs={1} sm={1} md={2} lg={2} xl={3} className="g-3">
           {projects.map((project) => (
             <Col key={project.id}>
               <Link

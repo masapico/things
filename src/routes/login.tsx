@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Alert, Button, Card, Container, Form } from "react-bootstrap";
+import { Button, Container, Form } from "react-bootstrap";
 import { pb } from "../lib/pocketbase";
+import { LogIn, Mail, KeyRound, AlertCircle } from "lucide-react";
+import "./login.css";
 
 export const Route = createFileRoute("/login")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -43,43 +45,61 @@ function LoginPage() {
 
   return (
     <Container className="d-flex justify-content-center align-items-center vh-100">
-      <Card style={{ width: "360px" }}>
-        <Card.Body>
-          <h2 className="h5 text-secondary text-center mb-4">
-            Login to Things
-          </h2>
+      <div className="login-box">
+        {/* アイコン */}
+        <div className="login-icon">
+          <LogIn size={28} />
+        </div>
 
-          {error && <Alert variant="danger">{error}</Alert>}
+        {/* エラー */}
+        {error && (
+          <div className="login-error">
+            <AlertCircle size={14} />
+            <span>{error}</span>
+          </div>
+        )}
 
-          <Form onSubmit={handleSubmit}>
-            <Form.Group className="mb-3">
-              <Form.Label>MAIL</Form.Label>
-              <Form.Control
-                type="email"
-                value={email}
-                autoComplete="username"
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </Form.Group>
+        {/* フォーム */}
+        <Form onSubmit={handleSubmit} className="login-form">
+          <Form.Group className="login-field">
+            <div className="login-field-icon">
+              <Mail size={16} />
+            </div>
+            <Form.Control
+              type="email"
+              value={email}
+              autoComplete="username"
+              placeholder="メールアドレス"
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="login-input"
+            />
+          </Form.Group>
 
-            <Form.Group className="mb-4">
-              <Form.Label>PASSWORD</Form.Label>
-              <Form.Control
-                type="password"
-                value={password}
-                autoComplete="current-password"
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </Form.Group>
+          <Form.Group className="login-field">
+            <div className="login-field-icon">
+              <KeyRound size={16} />
+            </div>
+            <Form.Control
+              type="password"
+              value={password}
+              autoComplete="current-password"
+              placeholder="パスワード"
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="login-input"
+            />
+          </Form.Group>
 
-            <Button type="submit" className="w-100" disabled={loading}>
-              {loading ? "ログイン中..." : "ログイン"}
-            </Button>
-          </Form>
-        </Card.Body>
-      </Card>
+          <Button
+            type="submit"
+            className="login-btn"
+            disabled={loading}
+          >
+            {loading ? "ログイン中..." : "ログイン"}
+          </Button>
+        </Form>
+      </div>
     </Container>
   );
 }

@@ -1,0 +1,67 @@
+/* Header — "steno pad" design language */
+
+.app-header {
+  border-bottom: 1px solid #d8e2ce;
+  background: #fcfdfa;
+}
+
+.app-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0;
+}
+
+/* ── ナビゲーション ── */
+.app-header-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.app-header-nav-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #5b6b64;
+  text-decoration: none;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.app-header-nav-item:hover {
+  background: #e4f0ee;
+  color: #146b62;
+}
+
+.app-header-nav-item--active {
+  background: #e4f0ee;
+  color: #146b62;
+}
+
+/* ── 検索 ── */
+.app-header-search {
+  flex: 1;
+  max-width: 360px;
+}
+
+/* ── ログアウト ── */
+.app-header-logout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 0.45rem;
+  color: #c4564f;
+  transition: background 0.15s ease;
+}
+
+.app-header-logout:hover {
+  background: #fef0ef;
+  color: #c4564f;
+}

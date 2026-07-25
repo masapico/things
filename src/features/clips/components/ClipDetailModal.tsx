@@ -11,6 +11,8 @@ import {
   Trash2Icon,
   CheckCircle2Icon,
   AlertCircleIcon,
+  DownloadIcon,
+  ExternalLinkIcon,
 } from "lucide-react";
 import type { ClipsResponse } from "../../../lib/pb_types";
 import { pb } from "../../../lib/pocketbase";
@@ -44,9 +46,13 @@ function getFileExtension(fileName?: string) {
   return match ? match[1].toUpperCase() : null;
 }
 
+function getDisplayFileName(clip: ClipsResponse) {
+  return clip.filename || clip.file;
+}
+
 function getClipType(clip: ClipsResponse): "text" | "image" | "file" {
   if (clip.file) {
-    const ext = getFileExtension(clip.file);
+    const ext = getFileExtension(getDisplayFileName(clip));
     if (
       ext &&
       ["PNG", "JPG", "JPEG", "GIF", "WEBP", "BMP", "SVG"].includes(ext)
@@ -182,8 +188,29 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
     setIsEditing(false);
   };
 
-  const handleDownload = () => {
+  const handleOpen = () => {
     if (fullFileUrl) {
+      window.open(fullFileUrl, "_blank", "noopener,noreferrer");
+    }
+  };
+
+  const handleDownload = async () => {
+    if (!fullFileUrl) return;
+    try {
+      const response = await fetch(fullFileUrl);
+      if (!response.ok) throw new Error("Download failed");
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = getDisplayFileName(clip) || "download";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Failed to download file:", error);
+      // フォールバック: 直接開く
       window.open(fullFileUrl, "_blank", "noopener,noreferrer");
     }
   };
@@ -319,26 +346,31 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
               {clipType === "file" && clip.file ? (
                 <div className="mb-3">
                   <Form.Label className="clip-field-label">File</Form.Label>
-                  <div
-                    className="clip-file-card"
-                    role="button"
-                    tabIndex={0}
-                    onClick={handleDownload}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        handleDownload();
-                      }
-                    }}
-                    style={{ cursor: "pointer" }}
-                  >
+                  <div className="clip-file-card">
                     <div className="clip-file-icon">
                       <FileIcon size={20} />
                     </div>
-                    <div>
-                      <div className="clip-file-name">{clip.file}</div>
-                      <div className="clip-file-meta">
-                        Click to download or open
+                    <div className="flex-grow-1">
+                      <div className="clip-file-name">
+                        {getDisplayFileName(clip)}
+                      </div>
+                      <div className="d-flex gap-2 mt-2">
+                        <Button
+                          variant="outline-secondary"
+                          size="sm"
+                          onClick={handleOpen}
+                        >
+                          <ExternalLinkIcon size={14} className="me-1" />
+                          open
+                        </Button>
+                        <Button
+                          variant="outline-secondary"
+                          size="sm"
+                          onClick={handleDownload}
+                        >
+                          <DownloadIcon size={14} className="me-1" />
+                          download
+                        </Button>
                       </div>
                     </div>
                   </div>

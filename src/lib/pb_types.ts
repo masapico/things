@@ -101,6 +101,7 @@ export type ClipsRecord<Tannotations = unknown> = {
 	annotations?: null | Tannotations
 	created: IsoAutoDateString
 	file?: FileNameString
+	filename?: string
 	id: string
 	name: string
 	text?: string

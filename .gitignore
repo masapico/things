@@ -26,4 +26,3 @@ dist-ssr
 pocketbase/*
 !pocketbase/pb_migrations
 !pocketbase/pb_public
-pocketbase/pb_public/assets

@@ -22,3 +22,19 @@ export async function getProjectTasks(projectId: string): Promise<TasksResponse[
     sort: "sort",
   });
 }
+
+export async function searchTasks(query: string): Promise<TasksResponse[]> {
+  const escaped = query.replace(/"/g, '""');
+  return await pb.collection("tasks").getFullList<TasksResponse>({
+    filter: `title ~ "${escaped}"`,
+    sort: "-updated",
+  });
+}
+
+export async function searchProjects(query: string): Promise<ProjectsResponse[]> {
+  const escaped = query.replace(/"/g, '""');
+  return await pb.collection("projects").getFullList<ProjectsResponse>({
+    filter: `name ~ "${escaped}"`,
+    sort: "-updated",
+  });
+}

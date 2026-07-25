@@ -9,6 +9,31 @@ export async function getClips(): Promise<ClipsResponse[]> {
   return result;
 }
 
+export async function getRecentClips(limit = 50): Promise<ClipsResponse[]> {
+  const result = await pb.collection("clips").getList<ClipsResponse>(1, limit, {
+    sort: "-created",
+    fields: "id,name,created,updated",
+  });
+  return result.items;
+}
+
+export async function getClipsByIds(ids: string[]): Promise<ClipsResponse[]> {
+  if (ids.length === 0) return [];
+  const filter = ids.map((id) => `id = "${id}"`).join(" || ");
+  return await pb.collection("clips").getFullList<ClipsResponse>({
+    filter,
+    sort: "-created",
+  });
+}
+
+export async function searchClips(query: string): Promise<ClipsResponse[]> {
+  const escaped = query.replace(/"/g, '""');
+  return await pb.collection("clips").getFullList<ClipsResponse>({
+    filter: `name ~ "${escaped}" || text ~ "${escaped}"`,
+    sort: "-created",
+  });
+}
+
 export async function updateClip(
   id: string,
   data: { name?: string; text?: string },

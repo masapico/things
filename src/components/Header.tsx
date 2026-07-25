@@ -1,10 +1,40 @@
+import { useState } from "react";
 import { Link, useLocation } from "@tanstack/react-router"
-import { Container, Form, InputGroup, Stack } from "react-bootstrap"
-import { LogOut, Paperclip , ScanSearch, ListTodo } from 'lucide-react'
+import { Container, Stack } from "react-bootstrap"
+import { LogOut, Paperclip , ListTodo } from 'lucide-react'
 import { ClipRegister } from '../features/clips/components/ClipRegister'
+import { ClipDetailModal } from '../features/clips/components/ClipDetailModal'
+import { TaskEditModal } from '../features/gtd/components/TaskEditModal'
+import { ProjectEditModal } from '../features/gtd/components/ProjectEditModal'
+import { OmniSearch, type OmniSearchResult } from './OmniSearch'
+import type { ClipsResponse, TasksResponse, ProjectsResponse } from '../lib/pb_types'
 
 export function Header() {
     const { pathname } = useLocation()
+
+    const [selectedClip, setSelectedClip] = useState<ClipsResponse | null>(null)
+    const [showClipModal, setShowClipModal] = useState(false)
+    const [selectedTask, setSelectedTask] = useState<TasksResponse | null>(null)
+    const [showTaskModal, setShowTaskModal] = useState(false)
+    const [selectedProject, setSelectedProject] = useState<ProjectsResponse | null>(null)
+    const [showProjectModal, setShowProjectModal] = useState(false)
+
+    function handleOmniSelect(result: OmniSearchResult) {
+        switch (result.type) {
+            case "clip":
+                setSelectedClip(result.data)
+                setShowClipModal(true)
+                break
+            case "task":
+                setSelectedTask(result.data)
+                setShowTaskModal(true)
+                break
+            case "project":
+                setSelectedProject(result.data)
+                setShowProjectModal(true)
+                break
+        }
+    }
 
     return (
         <>
@@ -17,16 +47,7 @@ export function Header() {
                 <ListTodo size={21} />
               </Link>
               <div className="">
-                  <InputGroup size="sm" className="flex-grow-1">
-                      <InputGroup.Text id="omniSearch">
-                          <ScanSearch size={16} />
-                      </InputGroup.Text>
-                      <Form.Control
-                        aria-label="omniSearch"
-                        aria-describedby="omniSearch"
-                        tabIndex={1}
-                      />
-                  </InputGroup>
+                  <OmniSearch onSelect={handleOmniSelect} />
               </div>
               <Link to="/" className={pathname === '/' ? 'active_menu' : ''}>HOME</Link>
               <Link to="/clips" className={pathname === '/clips' ? 'active_menu' : ''}>
@@ -44,6 +65,33 @@ export function Header() {
             </Stack>
             <ClipRegister />
           </Container>
+
+          {/* Clip Detail Modal */}
+          {selectedClip && (
+            <ClipDetailModal
+              clip={selectedClip}
+              show={showClipModal}
+              onClose={() => setShowClipModal(false)}
+            />
+          )}
+
+          {/* Task Edit Modal */}
+          {selectedTask && (
+            <TaskEditModal
+              task={selectedTask}
+              show={showTaskModal}
+              onClose={() => setShowTaskModal(false)}
+            />
+          )}
+
+          {/* Project Edit Modal */}
+          {selectedProject && (
+            <ProjectEditModal
+              project={selectedProject}
+              show={showProjectModal}
+              onClose={() => setShowProjectModal(false)}
+            />
+          )}
         </>
     )
 }

@@ -13,7 +13,33 @@ export function useIndexPageTasks() {
   });
 }
 
-// create inbox task
+// create task (汎用: project 指定可能)
+export type CreateTaskInput = Omit<
+  TasksRecord,
+  "id" | "created" | "updated" | "sort"
+>;
+
+export const useCreateTask = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (newTask: CreateTaskInput) => {
+      const record = await pb
+        .collection("tasks")
+        .create<TasksResponse>(newTask);
+      return record;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [queryKeyIndexPage] });
+      queryClient.invalidateQueries({ queryKey: ["projectTasks"] });
+    },
+    onError: (error) => {
+      console.error("タスクの作成に失敗しました:", error);
+    },
+  });
+};
+
+// create inbox task（project 指定不要な簡易版）
 export type CreateInboxTaskInput = Omit<
   TasksRecord,
   | "id"
@@ -36,9 +62,9 @@ export const useCreateInboxTask = () => {
         .create<TasksResponse>(newTask);
       return record;
     },
-    // 作成が成功したら 'tasks' のキャッシュを無効化して自動再取得させる
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [queryKeyIndexPage] });
+      queryClient.invalidateQueries({ queryKey: ["projectTasks"] });
     },
     onError: (error) => {
       console.error("タスクの作成に失敗しました:", error);
@@ -64,6 +90,7 @@ export const useChangeStatusInboxTask = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [queryKeyIndexPage] });
+      queryClient.invalidateQueries({ queryKey: ["projectTasks"] });
     },
     onError: (error) => {
       console.error("タスクのステータス変更に失敗しました:", error);
@@ -81,6 +108,7 @@ export const useDeleteInboxTask = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [queryKeyIndexPage] });
+      queryClient.invalidateQueries({ queryKey: ["projectTasks"] });
     },
     onError: (error) => {
       console.error("タスクの削除に失敗しました:", error);
@@ -110,6 +138,7 @@ export const useUpdateTask = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [queryKeyIndexPage] });
+      queryClient.invalidateQueries({ queryKey: ["projectTasks"] });
     },
     onError: (error) => {
       console.error("タスクの更新に失敗しました:", error);

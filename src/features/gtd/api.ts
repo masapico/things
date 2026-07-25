@@ -16,6 +16,17 @@ export async function getActiveProjects(): Promise<ProjectsResponse[]> {
   });
 }
 
+export async function getArchivedProjects(): Promise<ProjectsResponse[]> {
+  return await pb.collection("projects").getFullList<ProjectsResponse>({
+    filter: "isActive = false",
+    sort: "-updated",
+  });
+}
+
+export async function getProject(id: string): Promise<ProjectsResponse> {
+  return await pb.collection("projects").getOne<ProjectsResponse>(id);
+}
+
 export async function getProjectTasks(projectId: string): Promise<TasksResponse[]> {
   return await pb.collection("tasks").getFullList<TasksResponse>({
     filter: `project = "${projectId}"`,

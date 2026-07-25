@@ -1,58 +1,191 @@
-/* ProjectList — shares the "steno pad" design language with ClipCard. */
+/* ProjectList — "steno pad" design language */
 
-.project-list-card {
+.project-list {
   --clip-ink: #1b2a28;
+  --clip-teal: #146b62;
   --clip-teal-soft: #e4f0ee;
   --clip-margin: #c4564f;
   --clip-paper: #f3f6ec;
   --clip-line: #d8e2ce;
   --clip-paper-white: #fcfdfa;
 
-  background: var(--clip-paper-white) !important;
-  border: 1px solid var(--clip-line) !important;
-  border-radius: 0.7rem !important;
-  color: var(--clip-ink);
-  box-shadow: 0 3px 10px rgba(27, 42, 40, 0.06) !important;
-  transition:
-    box-shadow 0.15s ease,
-    transform 0.15s ease;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
 }
 
-.project-list-card:hover {
-  box-shadow: 0 10px 24px rgba(27, 42, 40, 0.14) !important;
+/* ── ヘッダー ── */
+.project-list-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 1.75rem;
+}
+
+.project-list-header-icon {
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 0.7rem;
+  background: var(--clip-teal-soft);
+  color: var(--clip-teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transform: rotate(-6deg);
+}
+
+.project-list-header-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--clip-ink);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.project-list-header-sub {
+  font-size: 0.82rem;
+  color: #5b6b64;
+  margin: 0.15rem 0 0;
+}
+
+/* ── トグル ── */
+.project-list-toggle {
+  display: flex;
+  gap: 0.35rem;
+  margin-bottom: 1.5rem;
+}
+
+.project-list-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--clip-line);
+  border-radius: 0.5rem;
+  background: var(--clip-paper-white);
+  color: #5b6b64;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.project-list-toggle-btn:hover {
+  background: var(--clip-teal-soft);
+  color: var(--clip-teal);
+}
+
+.project-list-toggle-btn--active {
+  background: var(--clip-teal-soft);
+  color: var(--clip-teal);
+  border-color: var(--clip-teal);
+}
+
+/* ── 空状態 ── */
+.project-list-empty {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: #5b6b64;
+  font-size: 0.95rem;
+}
+
+/* ── カードリンク（a タグのネスト回避） ── */
+.project-list-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.project-list-card-link:hover {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ── カード ── */
+.project-list-card {
+  background: var(--clip-paper-white);
+  border: 1px solid var(--clip-line);
+  border-radius: 0.75rem;
+  color: var(--clip-ink);
+  box-shadow: 0 2px 8px rgba(27, 42, 40, 0.05);
+  transition:
+    box-shadow 0.18s ease,
+    transform 0.18s ease,
+    border-color 0.18s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 1rem 1.1rem 0.85rem;
+  cursor: pointer;
+}
+
+.project-list-card-link:hover .project-list-card {
+  box-shadow: 0 10px 28px rgba(27, 42, 40, 0.13);
   transform: translateY(-2px);
+  border-color: #bdd4c8;
+}
+
+/* ── カード ヘッダー ── */
+.project-list-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+}
+
+.project-list-card-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--clip-teal);
+  flex-shrink: 0;
+  margin-top: 0.45rem;
 }
 
 .project-list-card-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.95rem;
+  font-weight: 650;
   color: var(--clip-ink);
-  font-weight: 600;
+  margin: 0;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.project-list-card-badge {
-  background: var(--clip-teal-soft) !important;
-  color: #146b62 !important;
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  padding: 0.32rem 0.55rem !important;
+.project-list-card-chevron {
+  flex-shrink: 0;
+  color: #93a396;
+  margin-top: 0.2rem;
+  transition: transform 0.2s ease, color 0.2s ease;
 }
 
-/* ---------- memo preview (ruled note) ---------- */
+.project-list-card-link:hover .project-list-card-chevron {
+  transform: translateX(2px);
+  color: var(--clip-teal);
+}
+
+/* ── メモ ── */
 .project-list-card-memo {
   position: relative;
+  margin-top: 0.65rem;
   border: 1px solid var(--clip-line);
-  border-radius: 0.5rem;
+  border-radius: 0.45rem;
   background: repeating-linear-gradient(
     to bottom,
     transparent 0,
-    transparent 1.3rem,
-    var(--clip-line) 1.3rem,
-    var(--clip-line) calc(1.3rem + 1px)
+    transparent 1.25rem,
+    var(--clip-line) 1.25rem,
+    var(--clip-line) calc(1.25rem + 1px)
   );
-  background-position: 0 0.35rem;
-  padding: 0.35rem 0.6rem 0.35rem 1.4rem;
+  background-position: 0 0.3rem;
+  padding: 0.3rem 0.55rem 0.3rem 1.3rem;
   overflow: hidden;
-  max-height: 4.3rem;
+  max-height: 4rem;
+  flex-shrink: 0;
 }
 
 .project-list-card-memo::before {
@@ -60,46 +193,72 @@
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 0.85rem;
+  left: 0.8rem;
   width: 1px;
   background: var(--clip-margin);
-  opacity: 0.55;
+  opacity: 0.5;
 }
 
 .project-list-card-memo-text {
-  color: var(--clip-ink) !important;
-  font-size: 0.85rem;
-  line-height: 1.3rem;
+  color: var(--clip-ink);
+  font-size: 0.8rem;
+  line-height: 1.25rem;
+  margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-/* ---------- footer / meta ---------- */
-.project-list-card-meta {
+.project-list-card-memo-placeholder {
+  flex: 1;
+  min-height: 0.5rem;
+}
+
+/* ── フッター ── */
+.project-list-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 0.55rem;
   border-top: 1px solid var(--clip-line);
-  padding-top: 0.45rem;
-  color: #5b6b64 !important;
-  font-size: 0.8rem;
 }
 
-/* ---------- active indicator ---------- */
-.project-list-card-active-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #146b62;
-  flex-shrink: 0;
+.project-list-card-footer-dates {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
-/* ---------- header ---------- */
-.project-list-header {
-  color: var(--clip-ink, #1b2a28);
-  font-weight: 700;
-}
-
-.project-list-empty {
+.project-list-card-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.72rem;
   color: #5b6b64;
+  white-space: nowrap;
+}
+
+.project-list-card-badge {
+  background: var(--clip-teal-soft) !important;
+  color: var(--clip-teal) !important;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.25rem 0.5rem !important;
+}
+
+/* ── アーカイブカード ── */
+.project-list-card--archived {
+  opacity: 0.65;
+}
+
+.project-list-card--archived:hover {
+  opacity: 0.85;
+}
+
+.project-list-card-dot--archived {
+  background: var(--clip-margin);
 }

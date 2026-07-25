@@ -1,12 +1,9 @@
-import { Card, Container, Row, Col, Spinner, Badge } from "react-bootstrap";
-import { useActiveProjects } from "../hooks/useProjects";
-import type { ProjectsResponse } from "../../../lib/pb_types";
+import { useState } from "react";
+import { Container, Row, Col, Spinner, Badge } from "react-bootstrap";
+import { useActiveProjects, useArchivedProjects } from "../hooks/useProjects";
 import "./ProjectList.css";
-import { ChevronRight, Play, Flag } from "lucide-react";
-
-type ProjectListProps = {
-  onSelectProject?: (project: ProjectsResponse) => void;
-};
+import { ChevronRight, Play, Flag, FolderKanban, Archive } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 function formatDate(value?: string) {
   if (!value) return "";
@@ -21,8 +18,26 @@ function formatDate(value?: string) {
   });
 }
 
-export function ProjectList({ onSelectProject }: ProjectListProps) {
-  const { data: projects, isLoading, isError, error } = useActiveProjects();
+export function ProjectList() {
+  const [showArchived, setShowArchived] = useState(false);
+  const {
+    data: activeProjects,
+    isLoading: activeLoading,
+    isError: activeError,
+    error: activeErr,
+  } = useActiveProjects();
+  const {
+    data: archivedProjects,
+    isLoading: archivedLoading,
+    isError: archivedError,
+    error: archivedErr,
+  } = useArchivedProjects();
+
+  const isLoading = showArchived ? archivedLoading : activeLoading;
+  const isError = showArchived ? archivedError : activeError;
+  const error = showArchived ? archivedErr : activeErr;
+  const projects = showArchived ? archivedProjects : activeProjects;
+  const label = showArchived ? "アーカイブ" : "アクティブ";
 
   if (isLoading) {
     return (
@@ -45,84 +60,101 @@ export function ProjectList({ onSelectProject }: ProjectListProps) {
   }
 
   return (
-    <Container className="mt-4">
-      <h1 className="project-list-header mb-4">Projects</h1>
+    <div className="project-list">
+      <div className="project-list-header">
+        <div className="project-list-header-icon">
+          <FolderKanban size={22} />
+        </div>
+        <div>
+          <h1 className="project-list-header-title">Projects</h1>
+          <p className="project-list-header-sub">
+            {projects?.length ?? 0} 件の{label}なプロジェクト
+          </p>
+        </div>
+      </div>
+
+      {/* トグル */}
+      <div className="project-list-toggle">
+        <button
+          type="button"
+          className={`project-list-toggle-btn${!showArchived ? " project-list-toggle-btn--active" : ""}`}
+          onClick={() => setShowArchived(false)}
+        >
+          アクティブ
+        </button>
+        <button
+          type="button"
+          className={`project-list-toggle-btn${showArchived ? " project-list-toggle-btn--active" : ""}`}
+          onClick={() => setShowArchived(true)}
+        >
+          <Archive size={14} />
+          アーカイブ
+        </button>
+      </div>
 
       {!projects || projects.length === 0 ? (
-        <p className="project-list-empty">
-          No projects found in the workspace.
-        </p>
+        <div className="project-list-empty">
+          <p>{label}なプロジェクトはありません。</p>
+        </div>
       ) : (
         <Row xs={1} sm={2} lg={3} xl={4} className="g-3">
           {projects.map((project) => (
             <Col key={project.id}>
-              <Card
-                as="a"
-                className="project-list-card h-100 text-decoration-none text-reset"
-                role="button"
-                onClick={() => onSelectProject?.(project)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    onSelectProject?.(project);
-                  }
-                }}
-                tabIndex={onSelectProject ? 0 : undefined}
+              <Link
+                to="/gtd/$projectid"
+                params={{ projectid: project.id }}
+                className="project-list-card-link"
               >
-                <Card.Body className="d-flex flex-column gap-2">
-                  {/* header row */}
-                  <div className="d-flex justify-content-between align-items-start gap-2">
-                    <div className="d-flex align-items-center gap-2 min-w-0">
-                      <span className="project-list-card-active-dot" />
-                      <Card.Title
-                        as="h2"
-                        className="project-list-card-title h6 mb-0 text-truncate"
-                      >
-                        {project.name}
-                      </Card.Title>
-                    </div>
+                <div className={`project-list-card${showArchived ? " project-list-card--archived" : ""}`}>
+                  {/* header */}
+                  <div className="project-list-card-header">
+                    <span className={`project-list-card-dot${showArchived ? " project-list-card-dot--archived" : ""}`} />
+                    <h2 className="project-list-card-title">{project.name}</h2>
                     <ChevronRight
-                      size={14}
-                      className="flex-shrink-0"
-                      style={{ color: "#5b6b64", marginTop: 2 }}
+                      size={15}
+                      className="project-list-card-chevron"
                     />
                   </div>
 
-                  {/* memo preview */}
+                  {/* memo */}
                   {project.memo ? (
                     <div className="project-list-card-memo">
-                      <Card.Text className="project-list-card-memo-text mb-0">
+                      <p className="project-list-card-memo-text">
                         {project.memo}
-                      </Card.Text>
+                      </p>
                     </div>
-                  ) : null}
+                  ) : (
+                    <div className="project-list-card-memo-placeholder" />
+                  )}
 
-                  {/* footer meta */}
-                  <div className="project-list-card-meta d-flex align-items-center gap-3 mt-auto">
-                    {project.startDate ? (
-                      <span className="d-flex align-items-center gap-1 text-nowrap">
-                        <Play size={12} className="text-success" />
-                        {formatDate(project.startDate)}
-                      </span>
-                    ) : null}
-                    {project.endDate ? (
-                      <span className="d-flex align-items-center gap-1 text-nowrap">
-                        <Flag size={12} className="text-danger"/>
-                        {formatDate(project.endDate)}
-                      </span>
-                    ) : null}
+                  {/* footer */}
+                  <div className="project-list-card-footer">
+                    <div className="project-list-card-footer-dates">
+                      {project.startDate ? (
+                        <span className="project-list-card-date">
+                          <Play size={11} />
+                          {formatDate(project.startDate)}
+                        </span>
+                      ) : null}
+                      {project.endDate ? (
+                        <span className="project-list-card-date">
+                          <Flag size={11} />
+                          {formatDate(project.endDate)}
+                        </span>
+                      ) : null}
+                    </div>
                     {project.clips && project.clips.length > 0 ? (
-                      <Badge className="project-list-card-badge ms-auto" pill>
+                      <Badge className="project-list-card-badge" pill>
                         {project.clips.length} clips
                       </Badge>
                     ) : null}
                   </div>
-                </Card.Body>
-              </Card>
+                </div>
+              </Link>
             </Col>
           ))}
         </Row>
       )}
-    </Container>
+    </div>
   );
 }

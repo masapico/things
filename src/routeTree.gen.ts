@@ -15,6 +15,7 @@ import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedClipsIndexRouteImport } from './routes/_authenticated/clips/index'
 import { Route as AuthenticatedGtdIndexRouteImport } from './routes/_authenticated/gtd/index'
+import { Route as AuthenticatedGtdProjectidRouteImport } from './routes/_authenticated/gtd/$projectid'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
@@ -45,11 +46,18 @@ const AuthenticatedGtdIndexRoute = AuthenticatedGtdIndexRouteImport.update({
   path: '/gtd/',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedGtdProjectidRoute =
+  AuthenticatedGtdProjectidRouteImport.update({
+    id: '/gtd/$projectid',
+    path: '/gtd/$projectid',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/gtd/$projectid': typeof AuthenticatedGtdProjectidRoute
   '/clips/': typeof AuthenticatedClipsIndexRoute
   '/gtd/': typeof AuthenticatedGtdIndexRoute
 }
@@ -57,6 +65,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/': typeof AuthenticatedIndexRoute
+  '/gtd/$projectid': typeof AuthenticatedGtdProjectidRoute
   '/clips': typeof AuthenticatedClipsIndexRoute
   '/gtd': typeof AuthenticatedGtdIndexRoute
 }
@@ -66,20 +75,23 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/gtd/$projectid': typeof AuthenticatedGtdProjectidRoute
   '/_authenticated/clips/': typeof AuthenticatedClipsIndexRoute
   '/_authenticated/gtd/': typeof AuthenticatedGtdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/settings' | '/clips/' | '/gtd/'
+  fullPaths:
+    '/' | '/login' | '/settings' | '/gtd/$projectid' | '/clips/' | '/gtd/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/settings' | '/' | '/clips' | '/gtd'
+  to: '/login' | '/settings' | '/' | '/gtd/$projectid' | '/clips' | '/gtd'
   id:
     | '__root__'
     | '/_authenticated'
     | '/login'
     | '/_authenticated/settings'
     | '/_authenticated/'
+    | '/_authenticated/gtd/$projectid'
     | '/_authenticated/clips/'
     | '/_authenticated/gtd/'
   fileRoutesById: FileRoutesById
@@ -133,12 +145,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedGtdIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/gtd/$projectid': {
+      id: '/_authenticated/gtd/$projectid'
+      path: '/gtd/$projectid'
+      fullPath: '/gtd/$projectid'
+      preLoaderRoute: typeof AuthenticatedGtdProjectidRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedGtdProjectidRoute: typeof AuthenticatedGtdProjectidRoute
   AuthenticatedClipsIndexRoute: typeof AuthenticatedClipsIndexRoute
   AuthenticatedGtdIndexRoute: typeof AuthenticatedGtdIndexRoute
 }
@@ -146,6 +166,7 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedGtdProjectidRoute: AuthenticatedGtdProjectidRoute,
   AuthenticatedClipsIndexRoute: AuthenticatedClipsIndexRoute,
   AuthenticatedGtdIndexRoute: AuthenticatedGtdIndexRoute,
 }

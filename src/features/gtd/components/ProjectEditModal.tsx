@@ -60,6 +60,8 @@ export function ProjectEditModal({
         clips: selectedClips.length > 0 ? selectedClips : undefined,
       });
       queryClient.invalidateQueries({ queryKey: ["activeProjects"] });
+      queryClient.invalidateQueries({ queryKey: ["archivedProjects"] });
+      queryClient.invalidateQueries({ queryKey: ["project", project.id] });
       onClose();
     } catch (err) {
       console.error("Failed to update project:", err);

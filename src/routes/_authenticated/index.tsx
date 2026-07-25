@@ -1,78 +1,25 @@
 // src/routes/index.tsx
-import { useRef } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Inbox, ListPlus, PhoneIncoming, Smile, Target } from "lucide-react";
-import {
-  Button,
-  Container,
-  Form,
-  InputGroup,
-  ListGroup,
-  Row,
-} from "react-bootstrap";
-import {
-  useIndexPageTasks,
-  useCreateInboxTask,
-} from "../../features/gtd/hooks/useTasks";
+import { Inbox, PhoneIncoming, Smile, Target } from "lucide-react";
+import { Container, ListGroup, Row } from "react-bootstrap";
+import { useIndexPageTasks } from "../../features/gtd/hooks/useTasks";
 import { InboxTaskListRow } from "../../features/gtd/components/InboxTaskListRow";
 import { NextTaskListRow } from "../../features/gtd/components/NextTaskListRow";
 import { WaitingTaskListRow } from "../../features/gtd/components/WaitingTaskListRow";
+import { TaskAddForm } from "../../features/gtd/components/TaskAddForm";
 
 export const Route = createFileRoute("/_authenticated/")({
   component: Index,
 });
 
 function Index() {
-  const taskTitleInput = useRef<HTMLInputElement>(null);
-
   const { data: indexPageTasks } = useIndexPageTasks();
-
-  const { mutate, isPending } = useCreateInboxTask();
-
-  function handleAddTask(e: React.SubmitEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    const taskTitle = taskTitleInput.current
-      ? taskTitleInput.current.value
-      : "";
-    if (taskTitle.trim() === "") return;
-
-    mutate(
-      { title: taskTitle, status: "inbox" },
-      {
-        onSuccess: () => {
-          if (taskTitleInput.current) taskTitleInput.current.value = "";
-        },
-      },
-    );
-  }
 
   return (
     <Container>
       <Row className="mt-5 mb-3 justify-content-center">
         <div className="w-75">
-          <Form onSubmit={handleAddTask} id="inboxTaskInput">
-            <InputGroup>
-              <Form.Control
-                aria-label="input-task"
-                aria-describedby="input-task"
-                autoComplete="off"
-                tabIndex={2}
-                ref={taskTitleInput}
-              />
-              <Button
-                size="sm"
-                variant="outline-secondary"
-                id="button-add-task"
-                tabIndex={3}
-                type="submit"
-                style={{ borderColor: "#ddd" }}
-                disabled={isPending}
-              >
-                {isPending ? "..." : <ListPlus />}
-              </Button>
-            </InputGroup>
-          </Form>
+          <TaskAddForm />
         </div>
       </Row>
 

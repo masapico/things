@@ -1,23 +1,21 @@
 import { useState } from "react";
-import { Link, useLocation } from "@tanstack/react-router"
+import { Link, useLocation, useNavigate } from "@tanstack/react-router"
 import { Container, Stack } from "react-bootstrap"
 import { LogOut, Paperclip , ListTodo } from 'lucide-react'
 import { ClipRegister } from '../features/clips/components/ClipRegister'
 import { ClipDetailModal } from '../features/clips/components/ClipDetailModal'
 import { TaskEditModal } from '../features/gtd/components/TaskEditModal'
-import { ProjectEditModal } from '../features/gtd/components/ProjectEditModal'
 import { OmniSearch, type OmniSearchResult } from './OmniSearch'
-import type { ClipsResponse, TasksResponse, ProjectsResponse } from '../lib/pb_types'
+import type { ClipsResponse, TasksResponse } from '../lib/pb_types'
 
 export function Header() {
     const { pathname } = useLocation()
+    const navigate = useNavigate()
 
     const [selectedClip, setSelectedClip] = useState<ClipsResponse | null>(null)
     const [showClipModal, setShowClipModal] = useState(false)
     const [selectedTask, setSelectedTask] = useState<TasksResponse | null>(null)
     const [showTaskModal, setShowTaskModal] = useState(false)
-    const [selectedProject, setSelectedProject] = useState<ProjectsResponse | null>(null)
-    const [showProjectModal, setShowProjectModal] = useState(false)
 
     function handleOmniSelect(result: OmniSearchResult) {
         switch (result.type) {
@@ -30,8 +28,7 @@ export function Header() {
                 setShowTaskModal(true)
                 break
             case "project":
-                setSelectedProject(result.data)
-                setShowProjectModal(true)
+                navigate({ to: "/gtd/$projectid", params: { projectid: result.data.id } })
                 break
         }
     }
@@ -84,14 +81,7 @@ export function Header() {
             />
           )}
 
-          {/* Project Edit Modal */}
-          {selectedProject && (
-            <ProjectEditModal
-              project={selectedProject}
-              show={showProjectModal}
-              onClose={() => setShowProjectModal(false)}
-            />
-          )}
+
         </>
     )
 }

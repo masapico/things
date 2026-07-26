@@ -1,10 +1,16 @@
 - 応答は日本語で行います。
 - packege.json を読んで、利用しているライブラリを確認します。
-
 - このアプリケーションは私の個人用アプリケーションです。
-- clips
-  - pasteイベントを監視しており、テキスト・画像・ファイルのペーストがあればそれを保存します。
-- gtd
-  - 一般的な Getting Things Done の手法を支援する機能です。
+- 修正・機能追加にあたっては軽快な操作感を大事にします。
+- JSX記述時、react-bootstrap に定義されている component を優先して利用します。
+- データの型情報は src/lib/pb_types.ts で定義しています。
 
-- 毎日職場で利用する想定なので、軽快な操作感を大事にします。
+- Functions and Collections
+  - clips (collection: clips)
+    - ユーザーの pasteイベントを監視して、テキスト・画像・ファイルのペーストがあればそれを preview し保存します。
+  - gtd (collection: projects, tasks)
+    - 一般的な Getting Things Done の手法を支援する機能です。
+    - projects と tasks は 1:N の関係です。
+    - projects と clips は 1:N の関係です。
+    - tasks と clips は 1:N の関係です。
+    - tasks と contexts は N:N の関係です。

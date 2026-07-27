@@ -135,21 +135,23 @@ export function ClipCard({ clip, onClick }: ClipCardProps) {
           </Button>
         ) : null}
 
-        {/* ファイルタイプ: ファイル情報 + 開く/ダウンロード ボタン */}
+        {/* ファイルタイプ: PDFは開く + ダウンロード、それ以外はダウンロードのみ */}
         {clipType === "file" && fullFileUrl ? (
           <div className="d-flex gap-2">
-            <Button
-              variant="outline-secondary"
-              size="sm"
-              className="clip-card-action-btn"
-              onClick={(e) => {
-                e.stopPropagation();
-                window.open(fullFileUrl, "_blank", "noopener,noreferrer");
-              }}
-            >
-              <ExternalLinkIcon size={13} className="me-1" />
-              開く
-            </Button>
+            {extension === "PDF" ? (
+              <Button
+                variant="outline-secondary"
+                size="sm"
+                className="clip-card-action-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.open(fullFileUrl, "_blank", "noopener,noreferrer");
+                }}
+              >
+                <ExternalLinkIcon size={13} className="me-1" />
+                開く
+              </Button>
+            ) : null}
             <Button
               variant="outline-secondary"
               size="sm"

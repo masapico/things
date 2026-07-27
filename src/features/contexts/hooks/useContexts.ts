@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getContexts, createContext, updateContext, deleteContext } from "../api";
+import { getContexts, createContext, updateContext, deleteContext, getTasksByContext } from "../api";
 import type { ContextsRecord } from "../../../lib/pb_types";
 
 const queryKey = "contexts";
@@ -62,5 +62,13 @@ export function useDeleteContext() {
     onError: (error) => {
       console.error("Context deletion failed:", error);
     },
+  });
+}
+
+export function useTasksByContext(contextId: string) {
+  return useQuery({
+    queryKey: ["tasksByContext", contextId],
+    queryFn: () => getTasksByContext(contextId),
+    enabled: !!contextId,
   });
 }

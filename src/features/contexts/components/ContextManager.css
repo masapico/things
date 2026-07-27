@@ -1,0 +1,190 @@
+/* ContextManager — "steno pad" design language */
+
+/* ── Context list items ── */
+.context-manager .list-group-item {
+  border-color: #d8e2ce;
+  background: #fcfdfa;
+  transition: background 0.15s ease;
+}
+
+.context-manager .list-group-item:hover {
+  background: #f3f6ec;
+}
+
+.context-manager .list-group-item.context-selected {
+  background: #e4f0ee;
+  color: #146b62;
+  font-weight: 600;
+}
+
+/* ── Action buttons (edit / delete) ── */
+.context-manager .btn-context-edit {
+  background: transparent;
+  border: 1px solid #d8e2ce;
+  color: #5b6b64;
+  border-radius: 0.5rem;
+  padding: 0.2rem 0.45rem;
+  font-size: 0.8rem;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.context-manager .btn-context-edit:hover {
+  background: #e4f0ee;
+  border-color: #146b62;
+  color: #146b62;
+}
+
+.context-manager .btn-context-delete {
+  background: transparent;
+  border: 1px solid #d8e2ce;
+  color: #5b6b64;
+  border-radius: 0.5rem;
+  padding: 0.2rem 0.45rem;
+  font-size: 0.8rem;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.context-manager .btn-context-delete:hover {
+  background: #fdecea;
+  border-color: #f0b3ac;
+  color: #c4564f;
+}
+
+/* ── Add button ── */
+.context-manager .btn-context-add {
+  background: #146b62;
+  border: 1px solid #146b62;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.8rem;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.context-manager .btn-context-add:hover {
+  background: #0f544d;
+  border-color: #0f544d;
+  color: #fff;
+}
+
+/* ── Sort arrow buttons ── */
+.context-manager .btn-sort {
+  color: #8a9e95;
+  padding: 0;
+  border: none;
+  background: none;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 14px;
+  transition: color 0.15s ease;
+}
+
+.context-manager .btn-sort:hover:not(:disabled) {
+  color: #146b62;
+}
+
+.context-manager .btn-sort:disabled {
+  color: #d8e2ce;
+  opacity: 0.5;
+}
+
+/* ── Modal — steno pad style ── */
+.context-manager .modal-content {
+  border: none;
+  border-radius: 0.9rem;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(20, 40, 38, 0.28);
+}
+
+.context-manager .modal-header {
+  background: #fcfdfa;
+  border-bottom: 1px solid #d8e2ce;
+  padding: 1rem 1.4rem 0.9rem;
+}
+
+.context-manager .modal-title {
+  color: #1b2a28;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.context-manager .modal-body {
+  background: #fcfdfa;
+  padding: 1.25rem 1.4rem 0.5rem;
+}
+
+.context-manager .modal-body .form-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #5b6b64;
+  margin-bottom: 0.35rem;
+}
+
+.context-manager .modal-body .form-control {
+  font-weight: 500;
+  font-size: 1rem;
+  border: 1px solid #d8e2ce;
+  border-radius: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  color: #1b2a28;
+  background: #fcfdfa;
+}
+
+.context-manager .modal-body .form-control:focus {
+  border-color: #146b62;
+  box-shadow: 0 0 0 0.2rem rgba(20, 107, 98, 0.15);
+}
+
+.context-manager .modal-body .form-control::placeholder {
+  color: #93a396;
+  font-style: italic;
+}
+
+.context-manager .modal-footer {
+  background: #fcfdfa;
+  border-top: 1px solid #d8e2ce;
+  padding: 0.9rem 1.4rem 1.1rem;
+}
+
+.context-manager .btn-modal-cancel {
+  background: transparent;
+  border: 1px solid #d8e2ce;
+  color: #1b2a28;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  padding: 0.45rem 1rem;
+}
+
+.context-manager .btn-modal-cancel:hover {
+  background: #f3f6ec;
+  border-color: #d8e2ce;
+  color: #1b2a28;
+}
+
+.context-manager .btn-modal-primary {
+  background: #146b62;
+  border: 1px solid #146b62;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  padding: 0.45rem 1.15rem;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.context-manager .btn-modal-primary:hover {
+  background: #0f544d;
+  border-color: #0f544d;
+  color: #fff;
+}
+
+.context-manager .btn-modal-primary:disabled {
+  background: #9fb6b2;
+  border-color: #9fb6b2;
+  opacity: 1;
+}

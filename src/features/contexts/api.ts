@@ -1,5 +1,5 @@
-import { pb } from "../../../lib/pocketbase";
-import type { ContextsResponse, ContextsRecord } from "../../../lib/pb_types";
+import { pb } from "../../lib/pocketbase";
+import type { ContextsResponse, ContextsRecord, TasksResponse } from "../../lib/pb_types";
 
 export async function getContexts(): Promise<ContextsResponse[]> {
   return await pb.collection("contexts").getFullList<ContextsResponse>({
@@ -22,4 +22,12 @@ export async function updateContext(
 
 export async function deleteContext(id: string): Promise<void> {
   await pb.collection("contexts").delete(id);
+}
+
+export async function getTasksByContext(contextId: string): Promise<TasksResponse[]> {
+  return await pb.collection("tasks").getFullList<TasksResponse>({
+    filter: `contexts ?~ "${contextId}"`,
+    sort: "sort",
+    expand: "project,contexts",
+  });
 }

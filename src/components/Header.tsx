@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { Container } from "react-bootstrap";
-import { LogOut, Paperclip, ListTodo, Home, Settings, Clock } from "lucide-react";
+import { LogOut, Paperclip, ListTodo, Home, Layers, Clock } from "lucide-react";
 import { ClipRegister } from "../features/clips/components/ClipRegister";
 import { ClipDetailModal } from "../features/clips/components/ClipDetailModal";
 import { TaskEditModal } from "../features/gtd/components/TaskEditModal";
@@ -55,7 +55,7 @@ export function Header() {
     { to: "/", icon: Home, label: "HOME" },
     { to: "/gtd", icon: ListTodo, label: "GTD" },
     { to: "/clips", icon: Paperclip, label: "CLIPS" },
-    { to: "/settings", icon: Settings, label: "SETTINGS" },
+    { to: "/contexts", icon: Layers, label: "CONTEXTS" },
   ];
 
   return (

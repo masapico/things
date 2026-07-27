@@ -1,10 +1,16 @@
 import { useState } from "react";
-import { Button, Form, ListGroup, Modal, Spinner, Stack } from "react-bootstrap";
+import { Form, ListGroup, Modal, Spinner, Stack } from "react-bootstrap";
 import { Pencil, Trash2, Plus, X, ArrowUp, ArrowDown } from "lucide-react";
 import { useContexts, useCreateContext, useUpdateContext, useDeleteContext } from "../hooks/useContexts";
 import type { ContextsResponse } from "../../../lib/pb_types";
+import "./ContextManager.css";
 
-export function ContextManager() {
+type ContextManagerProps = {
+  selectedId?: string | null;
+  onSelect?: (id: string, name: string) => void;
+};
+
+export function ContextManager({ selectedId, onSelect }: ContextManagerProps = {}) {
   const { data: contexts = [], isLoading, isError } = useContexts();
   const createMutation = useCreateContext();
   const updateMutation = useUpdateContext();
@@ -86,74 +92,77 @@ export function ContextManager() {
   }
 
   return (
-    <div>
+    <div className="context-manager">
       <Stack direction="horizontal" className="justify-content-between align-items-center mb-3">
         <h5 className="mb-0">コンテキスト</h5>
-        <Button size="sm" onClick={handleOpenCreate}>
-          <Plus size={16} className="me-1" />
-          追加
-        </Button>
+        <button className="btn-context-add" onClick={handleOpenCreate}>
+          <Plus size={16} />
+        </button>
       </Stack>
 
       {contexts.length === 0 ? (
         <p className="text-muted">コンテキストが登録されていません。</p>
       ) : (
         <ListGroup>
-          {contexts.map((ctx, index) => (
-            <ListGroup.Item
-              key={ctx.id}
-              className="d-flex justify-content-between align-items-center py-2"
-            >
-              <Stack direction="horizontal" gap={2} className="align-items-center">
-                <Stack direction="vertical" gap={0} className="d-flex align-items-center">
-                  <Button
-                    variant="link"
-                    size="sm"
-                    className="p-0 text-muted lh-1"
-                    disabled={index === 0}
-                    onClick={() => moveItem(index, -1)}
-                    title="上に移動"
-                  >
-                    <ArrowUp size={12} />
-                  </Button>
-                  <Button
-                    variant="link"
-                    size="sm"
-                    className="p-0 text-muted lh-1"
-                    disabled={index === contexts.length - 1}
-                    onClick={() => moveItem(index, 1)}
-                    title="下に移動"
-                  >
-                    <ArrowDown size={12} />
-                  </Button>
+          {contexts.map((ctx, index) => {
+            const isSelected = selectedId === ctx.id;
+            return (
+              <ListGroup.Item
+                key={ctx.id}
+                className={`d-flex justify-content-between align-items-center py-2${isSelected ? " context-selected" : ""}`}
+                role={onSelect ? "button" : undefined}
+                style={onSelect ? { cursor: "pointer" } : undefined}
+                onClick={() => onSelect?.(ctx.id, ctx.name)}
+              >
+                <Stack direction="horizontal" gap={2} className="align-items-center">
+                  <Stack direction="vertical" gap={0} className="d-flex align-items-center">
+                    <button
+                      className="btn-sort"
+                      disabled={index === 0}
+                      onClick={(e) => { e.stopPropagation(); moveItem(index, -1); }}
+                      title="上に移動"
+                    >
+                      <ArrowUp size={12} />
+                    </button>
+                    <button
+                      className="btn-sort"
+                      disabled={index === contexts.length - 1}
+                      onClick={(e) => { e.stopPropagation(); moveItem(index, 1); }}
+                      title="下に移動"
+                    >
+                      <ArrowDown size={12} />
+                    </button>
+                  </Stack>
+                  <span className="ms-1">{ctx.name}</span>
                 </Stack>
-                <span className="ms-1">{ctx.name}</span>
-              </Stack>
-              <div className="d-flex gap-1">
-                <Button
-                  variant="outline-secondary"
-                  size="sm"
-                  onClick={() => handleOpenEdit(ctx)}
-                  title="編集"
-                >
-                  <Pencil size={14} />
-                </Button>
-                <Button
-                  variant="outline-danger"
-                  size="sm"
-                  onClick={() => handleDelete(ctx)}
-                  title="削除"
-                >
-                  <Trash2 size={14} />
-                </Button>
-              </div>
-            </ListGroup.Item>
-          ))}
+                <div className="d-flex gap-1">
+                  <button
+                    className="btn-context-edit"
+                    onClick={(e) => { e.stopPropagation(); handleOpenEdit(ctx); }}
+                    title="編集"
+                  >
+                    <Pencil size={14} />
+                  </button>
+                  <button
+                    className="btn-context-delete"
+                    onClick={(e) => { e.stopPropagation(); handleDelete(ctx); }}
+                    title="削除"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              </ListGroup.Item>
+            );
+          })}
         </ListGroup>
       )}
 
       {/* Create Modal */}
-      <Modal show={showCreateModal} onHide={() => setShowCreateModal(false)}>
+      <Modal
+        show={showCreateModal}
+        onHide={() => setShowCreateModal(false)}
+        dialogClassName="context-manager"
+      >
         <Modal.Header closeButton>
           <Modal.Title>コンテキストを追加</Modal.Title>
         </Modal.Header>
@@ -177,26 +186,32 @@ export function ContextManager() {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowCreateModal(false)}>
+          <button
+            className="btn-modal-cancel"
+            onClick={() => setShowCreateModal(false)}
+          >
             キャンセル
-          </Button>
-          <Button
-            variant="primary"
+          </button>
+          <button
+            className="btn-modal-primary"
             onClick={handleCreate}
             disabled={!newName.trim() || createMutation.isPending}
           >
             {createMutation.isPending ? (
               <Spinner size="sm" animation="border" />
             ) : (
-              <Plus size={16} className="me-1" />
+              <Plus size={16} />
             )}
-            追加
-          </Button>
+          </button>
         </Modal.Footer>
       </Modal>
 
       {/* Edit Modal */}
-      <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+      <Modal
+        show={showEditModal}
+        onHide={() => setShowEditModal(false)}
+        dialogClassName="context-manager"
+      >
         <Modal.Header closeButton>
           <Modal.Title>コンテキストを編集</Modal.Title>
         </Modal.Header>
@@ -220,21 +235,24 @@ export function ContextManager() {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowEditModal(false)}>
+          <button
+            className="btn-modal-cancel"
+            onClick={() => setShowEditModal(false)}
+          >
             キャンセル
-          </Button>
-          <Button
-            variant="primary"
+          </button>
+          <button
+            className="btn-modal-primary"
             onClick={handleUpdate}
             disabled={!editName.trim() || updateMutation.isPending}
           >
             {updateMutation.isPending ? (
               <Spinner size="sm" animation="border" />
             ) : (
-              <X size={16} className="me-1" />
+              <X size={16} />
             )}
             更新
-          </Button>
+          </button>
         </Modal.Footer>
       </Modal>
     </div>

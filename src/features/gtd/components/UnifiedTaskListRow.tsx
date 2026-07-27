@@ -141,15 +141,13 @@ export function UnifiedTaskListRow({
               disabled={isStatusPending}
               onClick={() => changeStatus("completed")}
             />
-            {task.project === "" && (
-              <ActionBtn
-                icon={<Inbox size={iconSize} />}
-                label="Move to Inbox"
-                className="task-action-btn--inbox"
-                disabled={isStatusPending}
-                onClick={() => changeStatus("inbox")}
-              />
-            )}
+            <ActionBtn
+              icon={<Inbox size={iconSize} />}
+              label="Move to Inbox"
+              className="task-action-btn--inbox"
+              disabled={isStatusPending}
+              onClick={() => changeStatus("inbox")}
+            />
             <ActionBtn
               icon={<PhoneIncoming size={iconSize} />}
               label="Move to Waiting"

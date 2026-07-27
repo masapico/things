@@ -1,10 +1,11 @@
 import { ListGroup, Stack } from "react-bootstrap";
 import type { TasksResponse } from "../../../lib/pb_types";
-import { Calendar } from "lucide-react";
+import { Calendar, FolderKanban } from "lucide-react";
 import "./TaskListRow.css";
 
 type DeadlineTaskListRowProps = {
   task: TasksResponse;
+  projectName?: string;
 };
 
 /** 日付文字列を人間にわかりやすいラベルに変換する */
@@ -40,7 +41,7 @@ const STATUS_LABEL: Record<string, { label: string; color: string }> = {
   someday: { label: "Someday", color: "#8b5cf6" },
 };
 
-export function DeadlineTaskListRow({ task }: DeadlineTaskListRowProps) {
+export function DeadlineTaskListRow({ task, projectName }: DeadlineTaskListRowProps) {
 
   const { label: dueLabel, isOverdue } = formatDueDate(task.duedate ?? "");
   const statusInfo = STATUS_LABEL[task.status] ?? {
@@ -64,6 +65,14 @@ export function DeadlineTaskListRow({ task }: DeadlineTaskListRowProps) {
         <div className="task-title" title={task.memo ? task.memo : ""}>
           {task.title}
         </div>
+
+        {/* プロジェクト名 */}
+        {projectName && (
+          <span className="task-info-item" style={{ fontSize: ".72rem", color:"#aaa"}}>
+            <FolderKanban size={12} />
+            {projectName}
+          </span>
+        )}
 
         {/* 現在のステータス（小さく） */}
         <span

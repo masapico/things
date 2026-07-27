@@ -124,10 +124,10 @@ export const useDeleteInboxTask = () => {
 export type UpdateTaskInput = {
   id: string;
   title?: string;
-  memo?: string;
-  priority?: string;
-  duedate?: string;
-  project?: string;
+  memo?: string | null;
+  priority?: string | null;
+  duedate?: string | null;
+  project?: string | null;
   contexts?: string[];
   clips?: string[];
 };

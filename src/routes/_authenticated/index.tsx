@@ -6,7 +6,7 @@ import { useIndexPageTasks } from "../../features/gtd/hooks/useTasks";
 import { UnifiedTaskListRow } from "../../features/gtd/components/UnifiedTaskListRow";
 import { DeadlineTaskListRow } from "../../features/gtd/components/DeadlineTaskListRow";
 import { TaskAddForm } from "../../features/gtd/components/TaskAddForm";
-import type { TasksResponse } from "../../lib/pb_types";
+import type { TasksResponse, ProjectsResponse } from "../../lib/pb_types";
 
 export const Route = createFileRoute("/_authenticated/")({
   component: Index,
@@ -27,7 +27,7 @@ function Index() {
       key: "inbox",
       icon: <Inbox size={16} />,
       label: "Inbox",
-      filter: (t) => t.status === "inbox",
+      filter: (t) => t.status === "inbox" && t.project === "",
     },
     {
       key: "next",
@@ -77,7 +77,13 @@ function Index() {
                   )}
                   {section.key === "duedate"
                     ? tasks.map((task) => (
-                        <DeadlineTaskListRow key={task.id} task={task} />
+                        <DeadlineTaskListRow
+                          key={task.id}
+                          task={task}
+                          projectName={
+                            (task.expand as { project?: ProjectsResponse } | undefined)?.project?.name
+                          }
+                        />
                       ))
                     : tasks.map((task) => (
                         <UnifiedTaskListRow key={task.id} task={task} />

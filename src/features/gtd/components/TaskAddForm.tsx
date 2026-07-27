@@ -23,6 +23,7 @@ export function TaskAddForm({ projectId, onCreated }: TaskAddFormProps) {
     const input: CreateTaskInput = {
       title,
       status: "inbox",
+      sort: 0,
     };
     if (projectId) {
       input.project = projectId;

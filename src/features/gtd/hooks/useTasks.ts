@@ -16,7 +16,7 @@ export function useIndexPageTasks() {
 // create task (汎用: project 指定可能)
 export type CreateTaskInput = Omit<
   TasksRecord,
-  "id" | "created" | "updated" | "sort"
+  "id" | "created" | "updated"
 >;
 
 export const useCreateTask = () => {
@@ -49,7 +49,6 @@ export type CreateInboxTaskInput = Omit<
   | "memo"
   | "priority"
   | "project"
-  | "sort"
 >;
 
 export const useCreateInboxTask = () => {
@@ -157,11 +156,10 @@ export const useUpdateTaskSorts = () => {
 
   return useMutation({
     mutationFn: async (updates: { id: string; sort: number }[]) => {
-      await Promise.all(
-        updates.map(({ id, sort }) =>
-          pb.collection("tasks").update(id, { sort }),
-        ),
-      );
+      // 同時更新の制約回避のため直列で更新する
+      for (const { id, sort } of updates) {
+        await pb.collection("tasks").update(id, { sort });
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [queryKeyIndexPage] });

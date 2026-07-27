@@ -1,6 +1,6 @@
 // src/routes/index.tsx
 import { createFileRoute } from "@tanstack/react-router";
-import { Calendar, Divide, Inbox, PhoneIncoming, Smile, SquareKanban, Target } from "lucide-react";
+import { Calendar, Inbox, PhoneIncoming, Smile, Target } from "lucide-react";
 import { Container, ListGroup, Row } from "react-bootstrap";
 import { useIndexPageTasks } from "../../features/gtd/hooks/useTasks";
 import { UnifiedTaskListRow } from "../../features/gtd/components/UnifiedTaskListRow";

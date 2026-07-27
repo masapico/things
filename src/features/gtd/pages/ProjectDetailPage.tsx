@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { DragDropProvider } from "@dnd-kit/react";
-import { useSortable } from "@dnd-kit/react/sortable";
+import { useSortable, isSortable } from "@dnd-kit/react/sortable";
 import type { DragEndEvent } from "@dnd-kit/dom";
 import { useUpdateTaskSorts } from "../hooks/useTasks";
 import "./ProjectDetailPage.css";
@@ -143,29 +143,28 @@ export function ProjectDetailPage({ projectId }: ProjectDetailPageProps) {
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
-      const { operation } = event;
-      const source = operation.source;
-      const target = operation.target;
-      if (!source || !target) return;
+      if (event.canceled) return;
+      const { source } = event.operation;
+      if (!isSortable(source)) return;
 
-      const sourceIndex = (source as { index?: number }).index;
-      const targetIndex = (target as { index?: number }).index;
-      if (
-        sourceIndex === undefined ||
-        targetIndex === undefined ||
-        sourceIndex === targetIndex
-      )
-        return;
+      const from = source.initialIndex;
+      const to = source.index;
+      if (from === to) return;
 
-      const reordered = reorder(displayTasks, sourceIndex, targetIndex);
+      // 現在の表示順から並び替え後の配列を計算
+      const reordered = reorder(displayTasks, from, to);
+
+      // 楽観的UI更新: 即座にローカルステートを更新
       setLocalTasks(reordered);
 
-      // 全タスクの sort 値を振り直して永続化
+      // 全タスクの sort 値を振り直してサーバーに永続化
       const sortUpdates = reordered.map((t, i) => ({
         id: t.id,
         sort: i * 100,
       }));
-      updateSorts.mutate(sortUpdates);
+      updateSorts.mutate(sortUpdates, {
+        onSettled: () => setLocalTasks(null),
+      });
     },
     [displayTasks, updateSorts],
   );

@@ -67,7 +67,7 @@ export function ContextTaskList({ contextId, contextName }: ContextTaskListProps
 
   return (
     <div>
-      <h5 className="mb-3">{contextName} のタスク</h5>
+      <h5 className="mb-3" style={{fontSize:".8rem", color:"#aaa"}}>{contextName} のタスク</h5>
 
       {tasks.length === 0 ? (
         <p className="text-muted">このコンテキストに属するタスクはありません。</p>

@@ -14,8 +14,6 @@ function ContextsPage() {
 
   return (
     <Container className="py-4">
-      <h4>コンテキスト</h4>
-      <hr />
       <Row>
         <Col md={5} lg={4}>
           <ContextManager
@@ -33,7 +31,7 @@ function ContextsPage() {
               contextName={selectedContextName}
             />
           ) : (
-            <p className="text-muted">左のコンテキストを選択してください</p>
+            <p className="text-muted" style={{fontSize:".7rem", color:"#aaa"}}>コンテキストを選択</p>
           )}
         </Col>
       </Row>

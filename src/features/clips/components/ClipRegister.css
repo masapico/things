@@ -215,6 +215,19 @@
   margin-bottom: 0;
 }
 
+.clip-markdown-body h1 {
+  font-size: 1.25rem;
+}
+.clip-markdown-body h2 {
+  font-size: 1.15rem;
+  text-decoration: underline;
+}
+.clip-markdown-body h3 {
+  font-size: 1.0rem;
+  color: #555;
+  text-decoration: underline;
+}
+
 .clip-markdown-body p {
   margin: 0 0 0.5rem;
 }

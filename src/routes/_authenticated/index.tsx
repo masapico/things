@@ -4,6 +4,7 @@ import { Calendar, Inbox, PhoneIncoming, Smile, Target } from "lucide-react";
 import { Container, ListGroup, Row } from "react-bootstrap";
 import { useIndexPageTasks } from "../../features/gtd/hooks/useTasks";
 import { UnifiedTaskListRow } from "../../features/gtd/components/UnifiedTaskListRow";
+import { DeadlineTaskListRow } from "../../features/gtd/components/DeadlineTaskListRow";
 import { TaskAddForm } from "../../features/gtd/components/TaskAddForm";
 import type { TasksResponse } from "../../lib/pb_types";
 
@@ -74,9 +75,13 @@ function Index() {
                       <Smile size={12} />
                     </ListGroup.Item>
                   )}
-                  {tasks.map((task) => (
-                    <UnifiedTaskListRow key={task.id} task={task} />
-                  ))}
+                  {section.key === "duedate"
+                    ? tasks.map((task) => (
+                        <DeadlineTaskListRow key={task.id} task={task} />
+                      ))
+                    : tasks.map((task) => (
+                        <UnifiedTaskListRow key={task.id} task={task} />
+                      ))}
                 </ListGroup>
               </div>
             </Row>

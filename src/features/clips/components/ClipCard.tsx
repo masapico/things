@@ -1,5 +1,5 @@
 import { Badge, Button, Card, Image } from "react-bootstrap";
-import { DownloadIcon, ExternalLinkIcon, FileIcon } from "lucide-react";
+import { DownloadIcon, ExternalLinkIcon } from "lucide-react";
 import type { ClipsResponse } from "../../../lib/pb_types";
 import { pb } from "../../../lib/pocketbase";
 import "./ClipCard.css";

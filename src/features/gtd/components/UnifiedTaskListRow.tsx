@@ -5,8 +5,8 @@ import {
   CheckCircle2,
   GripVertical,
   Inbox,
-  Pencil,
   PhoneIncoming,
+  SquarePen,
   Target,
   Undo2,
 } from "lucide-react";
@@ -73,10 +73,12 @@ export function UnifiedTaskListRow({
       className={`task-row ${task.status} ${isCompleted ? "task-row--completed" : ""} ${isDragging ? "task-row--dragging" : ""}`}
     >
       <Stack direction="horizontal" gap={1}>
-        {/* ドラッグハンドル */}
-        <span className="task-drag-handle" ref={handleRef}>
-          <GripVertical size={14} />
-        </span>
+        {/* ドラッグハンドル（handleRef が渡された場合のみ表示） */}
+        {handleRef && (
+          <span className="task-drag-handle" ref={handleRef}>
+            <GripVertical size={14} />
+          </span>
+        )}
 
         {/* ステータスインジケーター */}
         <span
@@ -89,7 +91,19 @@ export function UnifiedTaskListRow({
         <div
           className={`task-title ${isCompleted ? "task-title--completed" : ""}`}
         >
-          {task.title}
+          <span title={task.memo ? task.memo : ""}>
+            {task.title}
+          </span>
+          {/* 編集（完了タスクでは非表示） */}
+          {!isCompleted && (
+            <ActionBtn
+              icon={<SquarePen size={iconSize} />}
+              label="Edit task"
+              className="task-action-btn--edit"
+              disabled={false}
+              onClick={() => setShowEditModal(true)}
+            />
+          )}
         </div>
 
         {/* タスク付随情報（完了タスクでは非表示） */}
@@ -207,16 +221,6 @@ export function UnifiedTaskListRow({
           </>
         )}
 
-        {/* 編集（完了タスクでは非表示） */}
-        {!isCompleted && (
-          <ActionBtn
-            icon={<Pencil size={iconSize} />}
-            label="Edit task"
-            className="task-action-btn--edit"
-            disabled={false}
-            onClick={() => setShowEditModal(true)}
-          />
-        )}
       </Stack>
 
       <TaskEditModal

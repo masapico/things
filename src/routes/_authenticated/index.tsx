@@ -1,19 +1,53 @@
 // src/routes/index.tsx
 import { createFileRoute } from "@tanstack/react-router";
-import { Inbox, PhoneIncoming, Smile, Target } from "lucide-react";
+import { Calendar, Divide, Inbox, PhoneIncoming, Smile, SquareKanban, Target } from "lucide-react";
 import { Container, ListGroup, Row } from "react-bootstrap";
 import { useIndexPageTasks } from "../../features/gtd/hooks/useTasks";
-import { InboxTaskListRow } from "../../features/gtd/components/InboxTaskListRow";
-import { NextTaskListRow } from "../../features/gtd/components/NextTaskListRow";
-import { WaitingTaskListRow } from "../../features/gtd/components/WaitingTaskListRow";
+import { UnifiedTaskListRow } from "../../features/gtd/components/UnifiedTaskListRow";
 import { TaskAddForm } from "../../features/gtd/components/TaskAddForm";
+import type { TasksResponse } from "../../lib/pb_types";
 
 export const Route = createFileRoute("/_authenticated/")({
   component: Index,
 });
 
+type Section = {
+  key: string;
+  icon: React.ReactNode;
+  label: string;
+  filter: (task: TasksResponse) => boolean;
+};
+
 function Index() {
   const { data: indexPageTasks } = useIndexPageTasks();
+
+  const sections: Section[] = [
+    {
+      key: "inbox",
+      icon: <Inbox size={16} />,
+      label: "Inbox",
+      filter: (t) => t.status === "inbox",
+    },
+    {
+      key: "next",
+      icon: <Target size={16} />,
+      label: "Next",
+      filter: (t) => t.status === "next",
+    },
+    {
+      key: "waiting",
+      icon: <PhoneIncoming size={16} />,
+      label: "Waiting",
+      filter: (t) => t.status === "waiting",
+    },
+    {
+      key: "duedate",
+      icon: <Calendar size={16} />,
+      label: "Deadlines",
+      filter: (t) =>
+        t.duedate != null && t.duedate !== "" && t.status !== "completed",
+    },
+  ];
 
   return (
     <Container>
@@ -23,71 +57,32 @@ function Index() {
         </div>
       </Row>
 
-      <Row className="mb-3 justify-content-center">
-        <div className="w-75">
-          <div className="p-2">
-            <Inbox size={16} className="me-2" />
-            Inbox
-          </div>
-          <ListGroup>
-            {indexPageTasks?.filter((t) => t.status === "inbox").length ===
-              0 && (
-              <ListGroup.Item className="text-muted py-1 bg-light">
-                <Smile size={12} />
-              </ListGroup.Item>
-            )}
-            {indexPageTasks
-              ?.filter((t) => t.status === "inbox")
-              .map((task) => (
-                <InboxTaskListRow key={task.id} task={task} />
-              ))}
-          </ListGroup>
-        </div>
-      </Row>
-
-      <Row className="mb-3 justify-content-center">
-        <div className="w-75">
-          <div className="p-2">
-            <Target size={16} className="me-2" />
-            Next
-          </div>
-          <ListGroup>
-            {indexPageTasks?.filter((t) => t.status === "next").length ===
-              0 && (
-              <ListGroup.Item className="text-muted py-1 bg-light">
-                <Smile size={12} />
-              </ListGroup.Item>
-            )}
-            {indexPageTasks
-              ?.filter((t) => t.status === "next")
-              .map((task) => (
-                <NextTaskListRow key={task.id} task={task} />
-              ))}
-          </ListGroup>
-        </div>
-      </Row>
-
-      <Row className="mb-3 justify-content-center">
-        <div className="w-75">
-          <div className="p-2">
-            <PhoneIncoming size={16} className="me-2" />
-            Waiting
-          </div>
-          <ListGroup>
-            {indexPageTasks?.filter((t) => t.status === "waiting").length ===
-              0 && (
-              <ListGroup.Item className="text-muted py-1 bg-light">
-                <Smile size={12} />
-              </ListGroup.Item>
-            )}
-            {indexPageTasks
-              ?.filter((t) => t.status === "waiting")
-              .map((task) => (
-                <WaitingTaskListRow key={task.id} task={task} />
-              ))}
-          </ListGroup>
-        </div>
-      </Row>
+      {sections.map((section) => {
+        const tasks = indexPageTasks?.filter(section.filter) ?? [];
+        return (
+          <>
+            {section.key === "duedate" ? <div className="mt-3"></div> : null}
+            <Row key={section.key} className="mb-3 justify-content-center">
+              <div className="w-75">
+                <div className="p-2">
+                  {section.icon}
+                  <span className="ms-2">{section.label}</span>
+                </div>
+                <ListGroup>
+                  {tasks.length === 0 && (
+                    <ListGroup.Item className="text-muted py-1 bg-light">
+                      <Smile size={12} />
+                    </ListGroup.Item>
+                  )}
+                  {tasks.map((task) => (
+                    <UnifiedTaskListRow key={task.id} task={task} />
+                  ))}
+                </ListGroup>
+              </div>
+            </Row>
+          </>
+        );
+      })}
     </Container>
   );
 }

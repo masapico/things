@@ -53,8 +53,8 @@ export function Header() {
 
   const navItems = [
     { to: "/", icon: Home, label: "HOME" },
-    { to: "/clips", icon: Paperclip, label: "CLIPS" },
     { to: "/gtd", icon: ListTodo, label: "GTD" },
+    { to: "/clips", icon: Paperclip, label: "CLIPS" },
     { to: "/settings", icon: Settings, label: "SETTINGS" },
   ];
 

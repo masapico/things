@@ -1,5 +1,5 @@
 import type { TasksResponse } from "../../../lib/pb_types";
-import { Calendar, Flag, FolderKanban, Notebook, Paperclip, Tag } from "lucide-react";
+import { Calendar, Flag, FolderKanban, Paperclip, Tag } from "lucide-react";
 import "./TaskListRow.css";
 
 type TaskInfoProps = {
@@ -38,18 +38,9 @@ export function TaskInfo({ task }: TaskInfoProps) {
   const contexts = expand?.contexts;
   const dueDate = task.duedate;
   const priority = task.priority;
-  const memo = task.memo;
   const clipCount = (task.clips ?? []).length;
 
   const parts: React.ReactNode[] = [];
-
-  if (memo !== "") {
-    parts.push(
-      <span key="memo" className="task-info-item" title={memo}>
-        <Notebook size={iconSize} />
-      </span>,
-    );
-  }
 
   if (projectName) {
     parts.push(

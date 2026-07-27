@@ -161,46 +161,33 @@
   box-shadow: 0 0 0 0.2rem rgba(20, 107, 98, 0.15);
 }
 
-/* ---------- markdown edit/preview tabs ---------- */
-.clip-text-tabs {
-  border-bottom: 1px solid var(--clip-line);
-  margin-bottom: 0;
+/* ---------- split-pane layout (edit | preview side by side) ---------- */
+.clip-split-pane {
+  display: flex;
+  gap: 1rem;
 }
 
-.clip-text-tabs .nav-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 0.78rem;
-  font-weight: 500;
-  color: #5b6b64;
-  border: none;
-  padding: 0.4rem 0.75rem;
-  border-radius: 0;
-  background: transparent;
-  transition: none;
+.clip-split-pane-half {
+  flex: 1 1 50%;
+  min-width: 0;
 }
 
-.clip-text-tabs .nav-link.active {
-  color: #146b62;
-  background: var(--clip-paper);
-  border: 1px solid var(--clip-line);
-  border-bottom-color: var(--clip-paper);
-  border-radius: 0.35rem 0.35rem 0 0;
+.clip-split-pane-half .clip-pad-wrap {
+  height: 100%;
 }
 
-.clip-text-tabs .nav-link:hover:not(.active) {
-  color: var(--clip-ink);
-  background: rgba(20, 107, 98, 0.05);
+.clip-split-pane-half .clip-pad-textarea.form-control {
+  min-height: calc(1.68rem * 14 + 0.8rem);
 }
 
-.clip-pad-preview {
-  border-top-left-radius: 0;
+.clip-split-pane-half .clip-markdown-body {
+  min-height: calc(1.68rem * 14 + 0.8rem);
 }
+
+/* ---------- markdown body ---------- */
 
 .clip-markdown-body {
   padding: 0.6rem 0.9rem 0.6rem 3.1rem;
-  min-height: calc(1.68rem * 7 + 0.8rem);
   line-height: 1.68rem;
   font-size: 0.95rem;
   color: var(--clip-ink);
@@ -223,7 +210,7 @@
   text-decoration: underline;
 }
 .clip-markdown-body h3 {
-  font-size: 1.0rem;
+  font-size: 1rem;
   color: #555;
   text-decoration: underline;
 }

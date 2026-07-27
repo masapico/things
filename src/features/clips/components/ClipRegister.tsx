@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Button, Form, Modal, Nav } from "react-bootstrap";
+import { Button, Form, Modal } from "react-bootstrap";
 import { pb } from "../../../lib/pocketbase";
 import {
   ClipboardPlusIcon,
@@ -9,8 +9,6 @@ import {
   FileIcon,
   CheckCircle2Icon,
   AlertCircleIcon,
-  EyeIcon,
-  PenLineIcon,
 } from "lucide-react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -39,7 +37,6 @@ export function ClipRegister() {
   const [statusKind, setStatusKind] = useState<"success" | "error">("success");
   const queryClient = useQueryClient();
   const [isSaving, setIsSaving] = useState(false);
-  const [textTab, setTextTab] = useState<"edit" | "preview">("edit");
   const [annotations, setAnnotations] = useState<Annotation[]>([]);
 
   useEffect(() => {
@@ -124,7 +121,6 @@ export function ClipRegister() {
     setFileContent(null);
     setClipType("text");
     setTitle("");
-    setTextTab("edit");
     setAnnotations([]);
     setPreviewUrl((current) => {
       if (current) {
@@ -226,42 +222,25 @@ export function ClipRegister() {
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label className="clip-field-label">Preview</Form.Label>
+            <Form.Label className="clip-field-label">Content</Form.Label>
 
             {clipType === "text" ? (
-              <>
-                <Nav
-                  variant="tabs"
-                  activeKey={textTab}
-                  onSelect={(k) => setTextTab((k ?? "edit") as "edit" | "preview")}
-                  className="clip-text-tabs"
-                >
-                  <Nav.Item>
-                    <Nav.Link eventKey="edit">
-                      <PenLineIcon size={14} />
-                      Edit
-                    </Nav.Link>
-                  </Nav.Item>
-                  <Nav.Item>
-                    <Nav.Link eventKey="preview">
-                      <EyeIcon size={14} />
-                      Preview
-                    </Nav.Link>
-                  </Nav.Item>
-                </Nav>
-
-                {textTab === "edit" ? (
+              <div className="clip-split-pane">
+                <div className="clip-split-pane-half">
+                  <div className="clip-field-label">Edit</div>
                   <div className="clip-pad-wrap">
                     <Form.Control
                       as="textarea"
-                      rows={7}
+                      rows={14}
                       className="clip-pad-textarea"
                       value={textContent}
                       onChange={(event) => setTextContent(event.target.value)}
                       placeholder="Nothing pasted yet"
                     />
                   </div>
-                ) : (
+                </div>
+                <div className="clip-split-pane-half">
+                  <div className="clip-field-label">Preview</div>
                   <div className="clip-pad-wrap clip-pad-preview">
                     <div className="clip-markdown-body">
                       <Markdown remarkPlugins={[remarkGfm]}>
@@ -269,8 +248,8 @@ export function ClipRegister() {
                       </Markdown>
                     </div>
                   </div>
-                )}
-              </>
+                </div>
+              </div>
             ) : null}
 
             {clipType === "image" ? (

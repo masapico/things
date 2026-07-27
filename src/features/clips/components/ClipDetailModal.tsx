@@ -282,15 +282,29 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
 
               {clipType === "text" ? (
                 <Form.Group className="mb-3">
-                  <Form.Label className="clip-field-label">Content</Form.Label>
-                  <div className="clip-pad-wrap">
-                    <Form.Control
-                      as="textarea"
-                      rows={10}
-                      className="clip-pad-textarea"
-                      value={editText}
-                      onChange={(e) => setEditText(e.target.value)}
-                    />
+                  <div className="clip-split-pane">
+                    <div className="clip-split-pane-half">
+                      <div className="clip-field-label">Edit</div>
+                      <div className="clip-pad-wrap">
+                        <Form.Control
+                          as="textarea"
+                          rows={14}
+                          className="clip-pad-textarea"
+                          value={editText}
+                          onChange={(e) => setEditText(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    <div className="clip-split-pane-half">
+                      <div className="clip-field-label">Preview</div>
+                      <div className="clip-pad-wrap clip-pad-preview">
+                        <div className="clip-markdown-body">
+                          <Markdown remarkPlugins={[remarkGfm]}>
+                            {editText || "*Nothing yet*"}
+                          </Markdown>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </Form.Group>
               ) : null}

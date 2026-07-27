@@ -1,4 +1,5 @@
-import { Badge, Card, Image } from "react-bootstrap";
+import { Badge, Button, Card, Image } from "react-bootstrap";
+import { DownloadIcon, ExternalLinkIcon, FileIcon } from "lucide-react";
 import type { ClipsResponse } from "../../../lib/pb_types";
 import { pb } from "../../../lib/pocketbase";
 import "./ClipCard.css";
@@ -23,11 +24,18 @@ function formatDate(value?: string) {
   });
 }
 
-function getThumbnailUrl(clip: ClipsResponse) {
+function getImageUrl(clip: ClipsResponse) {
   const fileName = clip.file;
   if (!fileName) return null;
 
-  return `${pb.baseURL}/api/files/${clip.collectionId}/${clip.id}/${fileName}?thumb=100x100`;
+  return `${pb.baseURL}/api/files/${clip.collectionId}/${clip.id}/${fileName}`;
+}
+
+function getThumbnailUrl(clip: ClipsResponse, size = "100x100") {
+  const baseUrl = getImageUrl(clip);
+  if (!baseUrl) return null;
+
+  return `${baseUrl}?thumb=${size}`;
 }
 
 function getFileExtension(fileName?: string) {
@@ -41,8 +49,29 @@ function getDisplayFileName(clip: ClipsResponse) {
   return clip.filename || clip.file;
 }
 
+function getClipType(clip: ClipsResponse): "text" | "image" | "file" {
+  if (clip.file) {
+    const ext = getFileExtension(getDisplayFileName(clip));
+    if (
+      ext &&
+      ["PNG", "JPG", "JPEG", "GIF", "WEBP", "BMP", "SVG"].includes(ext)
+    ) {
+      return "image";
+    }
+    return "file";
+  }
+  return "text";
+}
+
 export function ClipCard({ clip, onClick }: ClipCardProps) {
-  const thumbnailUrl = getThumbnailUrl(clip);
+  const clipType = getClipType(clip);
+  // 画像タイプは大きめのサムネイル、それ以外は小さめ
+  const thumbnailSize = clipType === "image" ? "400x300" : "100x100";
+  const thumbnailUrl = getThumbnailUrl(clip, thumbnailSize);
+  const fullFileUrl = clip.file
+    ? `${pb.baseURL}/api/files/${clip.collectionId}/${clip.id}/${clip.file}`
+    : null;
+  const fullImageUrl = clipType === "image" ? fullFileUrl : null;
   const extension = getFileExtension(getDisplayFileName(clip));
 
   return (
@@ -73,15 +102,80 @@ export function ClipCard({ clip, onClick }: ClipCardProps) {
         {thumbnailUrl ? (
           <div
             className="clip-card-thumb d-flex justify-content-center align-items-center p-2"
-            style={{ minHeight: 120 }}
+            style={{ minHeight: clipType === "image" ? 180 : 120 }}
           >
             <Image
               src={thumbnailUrl}
               alt={clip.name}
               rounded
               className="img-fluid"
-              style={{ maxHeight: 100, width: "auto", objectFit: "contain" }}
+              style={{
+                maxHeight: clipType === "image" ? 260 : 100,
+                width: "auto",
+                objectFit: "contain",
+              }}
             />
+          </div>
+        ) : null}
+
+        {/* 画像タイプ: 「元画像を開く」ボタン */}
+        {fullImageUrl ? (
+          <Button
+            variant="outline-secondary"
+            size="sm"
+            className="clip-card-action-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              window.open(fullImageUrl, "_blank", "noopener,noreferrer");
+            }}
+            title="元画像を開く"
+          >
+            <ExternalLinkIcon size={13} className="me-1" />
+            元画像を開く
+          </Button>
+        ) : null}
+
+        {/* ファイルタイプ: ファイル情報 + 開く/ダウンロード ボタン */}
+        {clipType === "file" && fullFileUrl ? (
+          <div className="d-flex gap-2">
+            <Button
+              variant="outline-secondary"
+              size="sm"
+              className="clip-card-action-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                window.open(fullFileUrl, "_blank", "noopener,noreferrer");
+              }}
+            >
+              <ExternalLinkIcon size={13} className="me-1" />
+              開く
+            </Button>
+            <Button
+              variant="outline-secondary"
+              size="sm"
+              className="clip-card-action-btn"
+              onClick={async (e) => {
+                e.stopPropagation();
+                try {
+                  const response = await fetch(fullFileUrl);
+                  if (!response.ok) throw new Error("Download failed");
+                  const blob = await response.blob();
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = getDisplayFileName(clip) || "download";
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  URL.revokeObjectURL(url);
+                } catch {
+                  window.open(fullFileUrl, "_blank", "noopener,noreferrer");
+                }
+              }}
+            >
+              <DownloadIcon size={13} className="me-1" />
+              ダウンロード
+            </Button>
           </div>
         ) : null}
 

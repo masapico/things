@@ -52,6 +52,32 @@
   box-shadow: 0 2px 8px rgba(27, 42, 40, 0.12);
 }
 
+/* ---------- action button (open / download) ---------- */
+.clip-card-action-btn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 0.25rem 0.7rem;
+}
+
+/* ---------- file type info ---------- */
+.clip-card-file-info {
+  border: 1px solid var(--clip-line);
+  border-radius: 0.5rem;
+  padding: 0.55rem 0.7rem;
+  background: var(--clip-paper);
+}
+
+.clip-card-file-name {
+  font-size: 0.8rem;
+  color: var(--clip-ink);
+  word-break: break-all;
+}
+
 /* ---------- text preview, mini ruled note ---------- */
 .clip-card-note {
   position: relative;
@@ -67,7 +93,7 @@
   background-position: 0 0.35rem;
   padding: 0.35rem 0.6rem 0.35rem 1.4rem;
   overflow: hidden;
-  max-height: 4.3rem;
+  max-height: 6.9rem;
 }
 
 .clip-card-note::before {
@@ -86,7 +112,8 @@
   font-size: 0.85rem;
   line-height: 1.3rem;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 5;
+  line-clamp: 5;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

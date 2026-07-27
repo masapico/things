@@ -338,6 +338,16 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
                       onChange={() => {}}
                       readonly
                     />
+                    <div className="mt-2">
+                      <Button
+                        variant="outline-secondary"
+                        size="sm"
+                        onClick={handleOpen}
+                      >
+                        <ExternalLinkIcon size={14} className="me-1" />
+                        元画像を開く
+                      </Button>
+                    </div>
                   </div>
                 </div>
               ) : null}

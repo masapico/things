@@ -3,32 +3,61 @@
    #146b62 wherever it's used as a value (kept consistent with ClipComposer.css).
 */
 
+@keyframes clip-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .clip-card {
   --clip-ink: #1b2a28;
+  --clip-ink-soft: #4a5a55;
+  --clip-ink-faint: #7d8c85;
   --clip-teal-soft: #e4f0ee;
   --clip-margin: #c4564f;
   --clip-paper: #f3f6ec;
   --clip-line: #d8e2ce;
+  --clip-line-strong: #b8c9b4;
   --clip-paper-white: #fcfdfa;
 
   background: var(--clip-paper-white) !important;
-  border: 1px solid var(--clip-line) !important;
+  border: 1px solid var(--clip-line-strong) !important;
   border-radius: 0.7rem !important;
   color: var(--clip-ink);
-  box-shadow: 0 3px 10px rgba(27, 42, 40, 0.06) !important;
+  box-shadow: 0 3px 10px rgba(27, 42, 40, 0.08) !important;
   transition:
     box-shadow 0.15s ease,
-    transform 0.15s ease;
+    transform 0.15s ease,
+    border-color 0.15s ease;
+  animation: clip-card-in 150ms ease-out;
 }
 
 .clip-card:hover {
-  box-shadow: 0 10px 24px rgba(27, 42, 40, 0.14) !important;
+  border-color: #146b62 !important;
+  box-shadow: 0 10px 24px rgba(27, 42, 40, 0.16) !important;
   transform: translateY(-2px);
+}
+
+.clip-card:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(27, 42, 40, 0.12) !important;
+}
+
+.clip-card:focus-visible {
+  outline: 2px solid #146b62;
+  outline-offset: 2px;
+  border-color: #146b62 !important;
 }
 
 .clip-card-title {
   color: var(--clip-ink);
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .clip-card-badge {
@@ -44,8 +73,11 @@
 .clip-card-thumb {
   border: 1px solid var(--clip-line);
   border-radius: 0.5rem;
-  background: repeating-conic-gradient(#eef2ea 0% 25%, #f7faf3 0% 50%) 0 0/14px
-    14px;
+  background: repeating-conic-gradient(
+      rgba(238, 242, 234, 0.55) 0% 25%,
+      rgba(247, 250, 243, 0.55) 0% 50%
+    )
+    0 0/14px 14px;
 }
 
 .clip-card-thumb img {
@@ -122,5 +154,6 @@
 .clip-card-meta {
   border-top: 1px solid var(--clip-line);
   padding-top: 0.45rem;
-  color: #5b6b64 !important;
+  color: var(--clip-ink-faint) !important;
+  font-size: 0.72rem;
 }

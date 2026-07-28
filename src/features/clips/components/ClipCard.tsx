@@ -24,6 +24,28 @@ function formatDate(value?: string) {
   });
 }
 
+function formatRelativeDate(value?: string) {
+  if (!value) return "";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+
+  const diffMs = Date.now() - date.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  if (diffMin < 1) return "たった今";
+  if (diffMin < 60) return `${diffMin}分前`;
+  const diffHour = Math.floor(diffMin / 60);
+  if (diffHour < 24) return `${diffHour}時間前`;
+  const diffDay = Math.floor(diffHour / 24);
+  if (diffDay < 7) return `${diffDay}日前`;
+
+  return date.toLocaleDateString("ja-JP", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
 function getImageUrl(clip: ClipsResponse) {
   const fileName = clip.file;
   if (!fileName) return null;
@@ -190,7 +212,9 @@ export function ClipCard({ clip, onClick }: ClipCardProps) {
         ) : null}
 
         <div className="clip-card-meta small mt-auto">
-          {formatDate(clip.created)}
+          <time dateTime={clip.created} title={formatDate(clip.created)}>
+            {formatRelativeDate(clip.created)}
+          </time>
         </div>
       </Card.Body>
     </Card>

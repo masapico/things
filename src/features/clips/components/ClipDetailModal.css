@@ -10,8 +10,26 @@
 }
 
 .clip-detail-info {
-  color: #5b6b64;
+  color: #7d8c85;
   padding: 0.25rem 0;
+  font-size: 0.78rem;
+}
+
+/* モーダル内ボタンの操作フィードバック */
+.clip-btn-save:active,
+.clip-btn-cancel:active,
+.clip-btn-delete:active,
+.clip-btn-danger:active {
+  transform: translateY(1px);
+}
+
+.clip-btn-save:focus-visible,
+.clip-btn-cancel:focus-visible,
+.clip-btn-delete:focus-visible,
+.clip-btn-danger:focus-visible {
+  outline: 2px solid #146b62;
+  outline-offset: 2px;
+  box-shadow: none;
 }
 
 /* Reuse styles from ClipRegister for shared class names */

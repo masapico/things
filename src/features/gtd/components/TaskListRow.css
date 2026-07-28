@@ -1,23 +1,97 @@
-/* ── Status background colors ── */
+/* ── Index page layout ── */
 
-.inbox {
-  background-color: white;
+.gtd-index {
+  max-width: 720px;
+  margin: 0 auto;
 }
 
-.next {
-  background-color: #e8f0fe;
+.gtd-section {
+  margin-bottom: 1.75rem;
 }
 
-.waiting {
-  background-color: #fffde7;
+.gtd-section-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 2px 6px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid #e9ecef;
+  color: #495057;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
-.someday {
-  background-color: #f3e8ff;
+.gtd-section-label {
+  flex: 0 0 auto;
 }
 
-.completed {
-  background-color: #e8f5e9;
+.gtd-section-count {
+  margin-left: auto;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #6c757d;
+  background-color: #f1f3f5;
+  border-radius: 999px;
+  padding: 1px 9px;
+  min-width: 24px;
+  text-align: center;
+}
+
+.gtd-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0.5rem;
+  font-size: 0.78rem;
+  color: #adb5bd;
+  background-color: #f8f9fa;
+}
+
+/* ── Deadline section (differentiated container) ── */
+
+.gtd-section--deadline {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+  padding: 12px 12px 10px;
+}
+
+.gtd-section--deadline .gtd-section-header {
+  border-bottom: none;
+  margin-bottom: 8px;
+  padding-bottom: 0;
+}
+
+.gtd-section--deadline .list-group {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* ── Task row base ── */
+
+.task-row {
+  transition: background-color 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease, transform 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+.task-row:hover {
+  background-color: #f8f9fa;
+}
+
+/* ステータスは左ボーダーで表現（背景色は使わない） */
+.task-row.inbox { border-left-color: #9ca3af; }
+.task-row.next { border-left-color: #3b82f6; }
+.task-row.waiting { border-left-color: #f59e0b; }
+.task-row.someday { border-left-color: #8b5cf6; }
+.task-row.completed { border-left-color: #22c55e; }
+
+/* 完了時のフェードアウト */
+.task-row--leaving {
+  opacity: 0;
+  transform: translateX(12px);
 }
 
 /* ── Status dot indicator ── */
@@ -28,16 +102,6 @@
   border-radius: 50%;
   flex-shrink: 0;
   margin-right: 2px;
-}
-
-/* ── Task row base ── */
-
-.task-row {
-  transition: background-color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
-}
-
-.task-row:hover {
-  filter: brightness(0.97);
 }
 
 /* ── Drag handle ── */
@@ -97,16 +161,33 @@
   cursor: pointer;
   transition: background-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
   color: #6c757d;
-  opacity: 0.6;
+  opacity: 0;
+}
+
+/* 行 hover / キーボードフォーカス時に表示 */
+.task-row:hover .task-action-btn,
+.task-row:focus-within .task-action-btn {
+  opacity: 0.7;
 }
 
 .task-action-btn:hover {
-  opacity: 1;
+  opacity: 1 !important;
   background-color: rgba(0, 0, 0, 0.06);
+}
+
+.task-action-btn:focus-visible {
+  opacity: 1;
+  outline: 2px solid rgba(13, 110, 253, 0.5);
+  outline-offset: 1px;
 }
 
 .task-action-btn:active {
   background-color: rgba(0, 0, 0, 0.12);
+}
+
+/* 完了ボタンは常時表示 */
+.task-action-btn--complete {
+  opacity: 0.7;
 }
 
 .task-action-btn--next:hover {
@@ -145,7 +226,7 @@
 }
 
 .task-action-btn--loading {
-  opacity: 0.4;
+  opacity: 0.4 !important;
   pointer-events: none;
 }
 
@@ -221,15 +302,34 @@
   font-weight: 600;
   white-space: nowrap;
   flex-shrink: 0;
-  background-color: #e8f0fe;
-  color: #3b82f6;
+  background-color: #f1f3f5;
+  color: #6c757d;
   min-width: 72px;
   justify-content: center;
 }
 
-.deadline-date-badge[data-overdue="true"] {
+/* 期限の緊急度で色分け */
+.deadline-date-badge[data-urgency="overdue"] {
   background-color: #fde8e8;
   color: #dc3545;
+}
+
+.deadline-date-badge[data-urgency="today"] {
+  background-color: #fde8e8;
+  color: #dc3545;
+}
+
+.deadline-date-badge[data-urgency="soon"] {
+  background-color: #fff4d6;
+  color: #b08800;
+}
+
+.task-row[data-overdue="true"] {
+  background-color: #fff5f5;
+}
+
+.task-row[data-overdue="true"]:hover {
+  background-color: #ffecec;
 }
 
 .deadline-status-tag {
@@ -250,4 +350,77 @@
   color: #6c757d;
   white-space: nowrap;
   flex-shrink: 0;
+}
+
+/* クリックで完了日を編集できる */
+.task-completed-date--editable {
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 1px 5px;
+  border-bottom: 1px dashed #ced4da;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.task-completed-date--editable:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #495057;
+}
+
+.task-completed-date-input {
+  font-size: 0.72rem;
+  padding: 1px 4px;
+  border: 1px solid #86b7fe;
+  border-radius: 4px;
+  color: #495057;
+  flex-shrink: 0;
+}
+
+.task-completed-date-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.15);
+}
+
+/* ── TaskAddForm ── */
+
+.task-add-form .input-group {
+  border-radius: 8px;
+  transition: box-shadow 0.15s ease;
+}
+
+.task-add-form .input-group:focus-within {
+  box-shadow: 0 2px 12px rgba(13, 110, 253, 0.12);
+}
+
+.task-add-form .form-control {
+  border-color: #dee2e6;
+  border-right: none;
+  border-radius: 8px 0 0 8px;
+  padding: 0.5rem 0.9rem;
+}
+
+.task-add-form .form-control:focus {
+  border-color: #86b7fe;
+  box-shadow: none;
+}
+
+.task-add-form .btn {
+  border-color: #dee2e6;
+  border-radius: 0 8px 8px 0;
+  display: inline-flex;
+  align-items: center;
+}
+
+.task-add-form .form-control:focus + .btn,
+.task-add-form .input-group:focus-within .btn {
+  border-color: #86b7fe;
+}
+
+/* 追加成功時のフィードバック */
+.task-add-form--success .form-control {
+  border-color: #198754;
+}
+
+.task-add-form--success .btn {
+  border-color: #198754;
+  color: #198754;
 }

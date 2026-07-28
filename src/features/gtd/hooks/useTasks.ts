@@ -129,6 +129,7 @@ export type UpdateTaskInput = {
   duedate?: string | null;
   project?: string | null;
   clips?: string[];
+  completed?: string | null;
 };
 
 export const useUpdateTask = () => {

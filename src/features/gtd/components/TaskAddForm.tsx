@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Button, Form, InputGroup } from "react-bootstrap";
 import { ListPlus } from "lucide-react";
 import { useCreateTask, type CreateTaskInput } from "../hooks/useTasks";
@@ -13,6 +13,14 @@ type TaskAddFormProps = {
 export function TaskAddForm({ projectId, onCreated }: TaskAddFormProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const { mutate, isPending } = useCreateTask();
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  // 成功フィードバックを短時間だけ表示
+  useEffect(() => {
+    if (!showSuccess) return;
+    const timer = setTimeout(() => setShowSuccess(false), 600);
+    return () => clearTimeout(timer);
+  }, [showSuccess]);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -32,13 +40,17 @@ export function TaskAddForm({ projectId, onCreated }: TaskAddFormProps) {
     mutate(input, {
       onSuccess: () => {
         if (inputRef.current) inputRef.current.value = "";
+        setShowSuccess(true);
         onCreated?.();
       },
     });
   }
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form
+      onSubmit={handleSubmit}
+      className={`task-add-form ${showSuccess ? "task-add-form--success" : ""}`}
+    >
       <InputGroup>
         <Form.Control
           aria-label="input-task"
@@ -51,7 +63,6 @@ export function TaskAddForm({ projectId, onCreated }: TaskAddFormProps) {
           size="sm"
           variant="outline-secondary"
           type="submit"
-          style={{ borderColor: "#ddd" }}
           disabled={isPending}
           tabIndex={2}
         >

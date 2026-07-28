@@ -8,10 +8,12 @@ type DeadlineTaskListRowProps = {
   projectName?: string;
 };
 
+type Urgency = "overdue" | "today" | "soon" | "later";
+
 /** 日付文字列を人間にわかりやすいラベルに変換する */
 function formatDueDate(dateStr: string): {
   label: string;
-  isOverdue: boolean;
+  urgency: Urgency;
 } {
   const d = new Date(dateStr);
   const now = new Date();
@@ -23,15 +25,16 @@ function formatDueDate(dateStr: string): {
     (target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
   );
 
-  if (diffDays < 0) return { label: "期限超過", isOverdue: true };
-  if (diffDays === 0) return { label: "今日", isOverdue: false };
-  if (diffDays === 1) return { label: "明日", isOverdue: false };
-  if (diffDays === 2) return { label: "明後日", isOverdue: false };
-  if (diffDays <= 7) return { label: `${diffDays}日後`, isOverdue: false };
+  if (diffDays < 0) return { label: "期限超過", urgency: "overdue" };
+  if (diffDays === 0) return { label: "今日", urgency: "today" };
+  if (diffDays === 1) return { label: "明日", urgency: "soon" };
+  if (diffDays === 2) return { label: "明後日", urgency: "soon" };
+  if (diffDays <= 3) return { label: `${diffDays}日後`, urgency: "soon" };
+  if (diffDays <= 7) return { label: `${diffDays}日後`, urgency: "later" };
 
   const month = d.getMonth() + 1;
   const day = d.getDate();
-  return { label: `${month}/${day}`, isOverdue: false };
+  return { label: `${month}/${day}`, urgency: "later" };
 }
 
 const STATUS_LABEL: Record<string, { label: string; color: string }> = {
@@ -43,19 +46,22 @@ const STATUS_LABEL: Record<string, { label: string; color: string }> = {
 
 export function DeadlineTaskListRow({ task, projectName }: DeadlineTaskListRowProps) {
 
-  const { label: dueLabel, isOverdue } = formatDueDate(task.duedate ?? "");
+  const { label: dueLabel, urgency } = formatDueDate(task.duedate ?? "");
   const statusInfo = STATUS_LABEL[task.status] ?? {
     label: task.status,
     color: "#9ca3af",
   };
 
   return (
-    <ListGroup.Item className="task-row">
+    <ListGroup.Item
+      className="task-row"
+      data-overdue={urgency === "overdue" ? "true" : undefined}
+    >
       <Stack direction="horizontal" gap={2} className="align-items-center">
         {/* duedate ラベル */}
         <span
           className="deadline-date-badge"
-          data-overdue={isOverdue ? "true" : undefined}
+          data-urgency={urgency}
         >
           <Calendar size={12} />
           {dueLabel}

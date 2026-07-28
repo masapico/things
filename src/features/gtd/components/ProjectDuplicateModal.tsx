@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button, Form, Modal, Stack } from "react-bootstrap";
 import { Copy } from "lucide-react";
 import type { ProjectsResponse } from "../../../lib/pb_types";
@@ -27,14 +27,18 @@ export function ProjectDuplicateModal({
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  useEffect(() => {
-    if (show) {
-      setName(`${project.name} のコピー`);
-      setMemo(project.memo ?? "");
-      setStartDate("");
-      setEndDate("");
-    }
-  }, [show, project]);
+  // モーダルが開かれたタイミングでフォームを初期化する
+  // （レンダー中の状態調整: useEffect での setState を避ける React 推奨パターン）
+  const [prevShow, setPrevShow] = useState(false);
+  if (show && !prevShow) {
+    setPrevShow(true);
+    setName(`${project.name} のコピー`);
+    setMemo(project.memo ?? "");
+    setStartDate("");
+    setEndDate("");
+  } else if (!show && prevShow) {
+    setPrevShow(false);
+  }
 
   function handleSave() {
     if (!name.trim()) return;

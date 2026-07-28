@@ -1,7 +1,8 @@
 // src/routes/index.tsx
 import { createFileRoute } from "@tanstack/react-router";
 import { Calendar, Inbox, PhoneIncoming, Smile, Target } from "lucide-react";
-import { Container, ListGroup, Row } from "react-bootstrap";
+import { Container, ListGroup } from "react-bootstrap";
+import { Fragment } from "react";
 import { useIndexPageTasks } from "../../features/gtd/hooks/useTasks";
 import { UnifiedTaskListRow } from "../../features/gtd/components/UnifiedTaskListRow";
 import { DeadlineTaskListRow } from "../../features/gtd/components/DeadlineTaskListRow";
@@ -51,31 +52,33 @@ function Index() {
   ];
 
   return (
-    <Container>
-      <Row className="mt-5 mb-3 justify-content-center">
-        <div className="w-75">
+    <Container className="py-4">
+      <div className="gtd-index">
+        <div className="mb-4">
           <TaskAddForm />
         </div>
-      </Row>
 
-      {sections.map((section) => {
-        const tasks = indexPageTasks?.filter(section.filter) ?? [];
-        return (
-          <>
-            {section.key === "duedate" ? <div className="mt-3"></div> : null}
-            <Row key={section.key} className="mb-3 justify-content-center">
-              <div className="w-75">
-                <div className="p-2">
+        {sections.map((section) => {
+          const tasks = indexPageTasks?.filter(section.filter) ?? [];
+          const isDeadline = section.key === "duedate";
+          return (
+            <Fragment key={section.key}>
+              <section
+                className={`gtd-section ${isDeadline ? "gtd-section--deadline" : ""}`}
+              >
+                <div className="gtd-section-header">
                   {section.icon}
-                  <span className="ms-2">{section.label}</span>
+                  <span className="gtd-section-label">{section.label}</span>
+                  <span className="gtd-section-count">{tasks.length}</span>
                 </div>
                 <ListGroup>
                   {tasks.length === 0 && (
-                    <ListGroup.Item className="text-muted py-1 bg-light">
-                      <Smile size={12} />
+                    <ListGroup.Item className="gtd-empty">
+                      <Smile size={13} />
+                      <span>{section.label} は空です</span>
                     </ListGroup.Item>
                   )}
-                  {section.key === "duedate"
+                  {isDeadline
                     ? tasks.map((task) => (
                         <DeadlineTaskListRow
                           key={task.id}
@@ -89,11 +92,11 @@ function Index() {
                         <UnifiedTaskListRow key={task.id} task={task} />
                       ))}
                 </ListGroup>
-              </div>
-            </Row>
-          </>
-        );
-      })}
+              </section>
+            </Fragment>
+          );
+        })}
+      </div>
     </Container>
   );
 }

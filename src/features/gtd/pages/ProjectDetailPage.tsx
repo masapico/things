@@ -16,6 +16,7 @@ import {
   EyeOff,
 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { ClipsPopover } from "../../clips/components/ClipsPopover";
 import { DragDropProvider } from "@dnd-kit/react";
 import { useSortable, isSortable } from "@dnd-kit/react/sortable";
 import type { DragEndEvent } from "@dnd-kit/dom";
@@ -259,9 +260,16 @@ export function ProjectDetailPage({ projectId }: ProjectDetailPageProps) {
             )}
             {clipCount > 0 && (
               <span className="project-detail-meta-item">
-                <Badge className="project-detail-clip-badge" pill>
-                  {clipCount} clips
-                </Badge>
+                <ClipsPopover clipIds={project.clips ?? []}>
+                  <Badge
+                    className="project-detail-clip-badge project-detail-clip-badge--clickable"
+                    pill
+                    role="button"
+                    title="クリップを表示"
+                  >
+                    {clipCount} clips
+                  </Badge>
+                </ClipsPopover>
               </span>
             )}
           </div>

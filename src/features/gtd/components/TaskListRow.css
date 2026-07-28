@@ -182,6 +182,18 @@
   gap: 2px;
 }
 
+.task-info-item--clips {
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 0 2px;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.task-info-item--clips:hover {
+  background-color: rgba(0, 0, 0, 0.06);
+  color: #6c757d;
+}
+
 .task-info-separator {
   color: #dee2e6;
   margin: 0 2px;

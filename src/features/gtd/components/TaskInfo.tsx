@@ -1,5 +1,6 @@
 import type { TasksResponse } from "../../../lib/pb_types";
 import { Calendar, Flag, FolderKanban, Paperclip } from "lucide-react";
+import { ClipsPopover } from "../../clips/components/ClipsPopover";
 import "./TaskListRow.css";
 
 type TaskInfoProps = {
@@ -54,10 +55,16 @@ export function TaskInfo({ task }: TaskInfoProps) {
 
   if (clipCount > 0) {
     parts.push(
-      <span key="clips" className="task-info-item" title={`${clipCount}件のクリップ`}>
-        <Paperclip size={iconSize} />
-        {clipCount}
-      </span>,
+      <ClipsPopover key="clips" clipIds={task.clips ?? []}>
+        <span
+          className="task-info-item task-info-item--clips"
+          role="button"
+          title={`${clipCount}件のクリップを表示`}
+        >
+          <Paperclip size={iconSize} />
+          {clipCount}
+        </span>
+      </ClipsPopover>,
     );
   }
 

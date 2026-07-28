@@ -142,6 +142,15 @@
   padding: 0.28rem 0.5rem !important;
 }
 
+.project-detail-clip-badge--clickable {
+  cursor: pointer;
+  transition: filter 0.12s ease;
+}
+
+.project-detail-clip-badge--clickable:hover {
+  filter: brightness(0.95);
+}
+
 /* ── メモ ── */
 .project-detail-memo {
   position: relative;

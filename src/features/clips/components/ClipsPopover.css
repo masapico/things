@@ -1,0 +1,71 @@
+/* ClipsPopover — 紐づく clips の一覧ポップオーバー */
+
+.clips-popover {
+  max-width: 280px;
+}
+
+.clips-popover-body {
+  padding: 0.25rem;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.clips-popover-loading {
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.clips-popover-empty {
+  margin: 0;
+  padding: 0.75rem;
+  font-size: 0.8rem;
+  color: #6c757d;
+  text-align: center;
+}
+
+.clips-popover-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.375rem 0.5rem;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  text-align: left;
+  font-size: 0.85rem;
+  color: #212529;
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+.clips-popover-item:hover {
+  background-color: #f1f3f5;
+}
+
+.clips-popover-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  background-color: #f1f3f5;
+  color: #6c757d;
+  flex-shrink: 0;
+}
+
+.clips-popover-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.clips-popover-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -1,5 +1,5 @@
 import type { TasksResponse } from "../../../lib/pb_types";
-import { Calendar, Flag, FolderKanban, Paperclip, Tag } from "lucide-react";
+import { Calendar, Flag, FolderKanban, Paperclip } from "lucide-react";
 import "./TaskListRow.css";
 
 type TaskInfoProps = {
@@ -33,9 +33,8 @@ function formatDueDate(dateStr: string): { label: string; isOverdue: boolean } {
 }
 
 export function TaskInfo({ task }: TaskInfoProps) {
-  const expand = task.expand as { project?: { name: string }; contexts?: { name: string }[] } | undefined;
+  const expand = task.expand as { project?: { name: string } } | undefined;
   const projectName = expand?.project?.name;
-  const contexts = expand?.contexts;
   const dueDate = task.duedate;
   const priority = task.priority;
   const clipCount = (task.clips ?? []).length;
@@ -51,14 +50,7 @@ export function TaskInfo({ task }: TaskInfoProps) {
     );
   }
 
-  if (contexts && contexts.length > 0) {
-    parts.push(
-      <span key="contexts" className="task-info-item">
-        <Tag size={iconSize} />
-        {contexts.map((c) => c.name).join(", ")}
-      </span>,
-    );
-  }
+
 
   if (clipCount > 0) {
     parts.push(

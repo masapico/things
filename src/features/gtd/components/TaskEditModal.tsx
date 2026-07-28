@@ -3,7 +3,6 @@ import { Button, Form, Modal, Stack } from "react-bootstrap";
 import type { TasksResponse, ClipsResponse } from "../../../lib/pb_types";
 import { useUpdateTask, useDeleteInboxTask } from "../hooks/useTasks";
 import { useActiveProjects } from "../hooks/useProjects";
-import { useContexts } from "../../contexts/hooks/useContexts";
 import type { TasksPriorityOptions } from "../../../lib/pb_types";
 import { PenLineIcon, Trash2Icon } from "lucide-react";
 import { ClipSelector } from "../../../components/ClipSelector";
@@ -35,7 +34,6 @@ function toDateInputValue(isoString?: string): string {
 
 export function TaskEditModal({ task, show, onClose }: TaskEditModalProps) {
   const { data: projects = [] } = useActiveProjects();
-  const { data: contexts = [] } = useContexts();
   const updateMutation = useUpdateTask();
   const deleteMutation = useDeleteInboxTask();
 
@@ -46,9 +44,6 @@ export function TaskEditModal({ task, show, onClose }: TaskEditModalProps) {
   );
   const [duedate, setDuedate] = useState(toDateInputValue(task.duedate));
   const [project, setProject] = useState(task.project ?? "");
-  const [selectedContexts, setSelectedContexts] = useState<string[]>(
-    task.contexts ?? [],
-  );
   const [selectedClips, setSelectedClips] = useState<string[]>(
     task.clips ?? [],
   );
@@ -66,19 +61,10 @@ export function TaskEditModal({ task, show, onClose }: TaskEditModalProps) {
         setPriority(task.priority ?? "");
         setDuedate(toDateInputValue(task.duedate));
         setProject(task.project ?? "");
-        setSelectedContexts(task.contexts ?? []);
         setSelectedClips(task.clips ?? []);
       });
     }
   }, [show, task]);
-
-  function handleContextToggle(contextId: string) {
-    setSelectedContexts((prev) =>
-      prev.includes(contextId)
-        ? prev.filter((id) => id !== contextId)
-        : [...prev, contextId],
-    );
-  }
 
   function handleSave() {
     updateMutation.mutate(
@@ -89,7 +75,6 @@ export function TaskEditModal({ task, show, onClose }: TaskEditModalProps) {
         priority: priority || null,
         duedate: duedate || null,
         project: project || null,
-        contexts: selectedContexts,
         clips: selectedClips,
       },
       {
@@ -115,8 +100,6 @@ export function TaskEditModal({ task, show, onClose }: TaskEditModalProps) {
     priority !== (task.priority ?? "") ||
     duedate !== toDateInputValue(task.duedate) ||
     project !== (task.project ?? "") ||
-    JSON.stringify(selectedContexts.sort()) !==
-      JSON.stringify((task.contexts ?? []).sort()) ||
     JSON.stringify(selectedClips.sort()) !==
       JSON.stringify((task.clips ?? []).sort());
 
@@ -222,31 +205,6 @@ export function TaskEditModal({ task, show, onClose }: TaskEditModalProps) {
                   </option>
                 ))}
               </Form.Select>
-            </Form.Group>
-
-            {/* コンテキスト */}
-            <Form.Group className="mb-3">
-              <Form.Label className="task-edit-field-label">
-                コンテキスト
-              </Form.Label>
-              <div className="task-edit-contexts">
-                {contexts.length === 0 ? (
-                  <p className="text-muted small mb-0">
-                    コンテキストが登録されていません
-                  </p>
-                ) : (
-                  contexts.map((ctx) => (
-                    <Form.Check
-                      key={ctx.id}
-                      type="checkbox"
-                      id={`edit-context-${ctx.id}`}
-                      label={ctx.name}
-                      checked={selectedContexts.includes(ctx.id)}
-                      onChange={() => handleContextToggle(ctx.id)}
-                    />
-                  ))
-                )}
-              </div>
             </Form.Group>
 
             {/* クリップ */}

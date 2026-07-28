@@ -12,7 +12,6 @@ export const Collections = {
 	Otps: "_otps",
 	Superusers: "_superusers",
 	Clips: "clips",
-	Contexts: "contexts",
 	Projects: "projects",
 	Tasks: "tasks",
 	Users: "users",
@@ -108,14 +107,6 @@ export type ClipsRecord<Tannotations = unknown> = {
 	updated: IsoAutoDateString
 }
 
-export type ContextsRecord = {
-	created: IsoAutoDateString
-	id: string
-	name: string
-	sort?: number
-	updated: IsoAutoDateString
-}
-
 export type ProjectsRecord = {
 	clips?: RecordIdString[]
 	created: IsoAutoDateString
@@ -146,7 +137,6 @@ export type TasksPriorityOptions = typeof TasksPriorityOptions[keyof typeof Task
 export type TasksRecord = {
 	clips?: RecordIdString[]
 	completed?: IsoDateString
-	contexts?: RecordIdString[]
 	created: IsoAutoDateString
 	duedate?: IsoDateString
 	id: string
@@ -179,7 +169,6 @@ export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemF
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
 export type ClipsResponse<Tannotations = unknown, Texpand = unknown> = Required<ClipsRecord<Tannotations>> & BaseSystemFields<Texpand>
-export type ContextsResponse<Texpand = unknown> = Required<ContextsRecord> & BaseSystemFields<Texpand>
 export type ProjectsResponse<Texpand = unknown> = Required<ProjectsRecord> & BaseSystemFields<Texpand>
 export type TasksResponse<Texpand = unknown> = Required<TasksRecord> & BaseSystemFields<Texpand>
 export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
@@ -193,7 +182,6 @@ export type CollectionRecords = {
 	_otps: OtpsRecord
 	_superusers: SuperusersRecord
 	clips: ClipsRecord
-	contexts: ContextsRecord
 	projects: ProjectsRecord
 	tasks: TasksRecord
 	users: UsersRecord
@@ -206,7 +194,6 @@ export type CollectionResponses = {
 	_otps: OtpsResponse
 	_superusers: SuperusersResponse
 	clips: ClipsResponse
-	contexts: ContextsResponse
 	projects: ProjectsResponse
 	tasks: TasksResponse
 	users: UsersResponse

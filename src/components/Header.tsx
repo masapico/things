@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { Container } from "react-bootstrap";
-import { LogOut, Paperclip, ListTodo, Home, Layers, Clock } from "lucide-react";
+import { LogOut, Paperclip, ListTodo, Home, Clock } from "lucide-react";
 import { ClipRegister } from "../features/clips/components/ClipRegister";
 import { ClipDetailModal } from "../features/clips/components/ClipDetailModal";
 import { TaskEditModal } from "../features/gtd/components/TaskEditModal";
@@ -54,7 +54,6 @@ export function Header() {
   const navItems = [
     { to: "/", icon: Home, label: "HOME" },
     { to: "/gtd", icon: ListTodo, label: "GTD" },
-    { to: "/contexts", icon: Layers, label: "CONTEXTS" },
     { to: "/clips", icon: Paperclip, label: "CLIPS" },
   ];
 
@@ -98,7 +97,7 @@ export function Header() {
               </div>
               <Link
                 to="/login"
-                search={{ redirect: window.location.pathname }}
+                search={{ redirect: pathname }}
                 className="app-header-logout"
                 title="ログアウト"
               >
@@ -115,7 +114,10 @@ export function Header() {
         <ClipDetailModal
           clip={selectedClip}
           show={showClipModal}
-          onClose={() => setShowClipModal(false)}
+          onClose={() => {
+            setShowClipModal(false);
+            setSelectedClip(null);
+          }}
         />
       )}
 
@@ -124,7 +126,10 @@ export function Header() {
         <TaskEditModal
           task={selectedTask}
           show={showTaskModal}
-          onClose={() => setShowTaskModal(false)}
+          onClose={() => {
+            setShowTaskModal(false);
+            setSelectedTask(null);
+          }}
         />
       )}
     </>

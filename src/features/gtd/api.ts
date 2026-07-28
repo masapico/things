@@ -5,7 +5,7 @@ export async function getIndexPageTasks(): Promise<TasksResponse[]> {
   return await pb.collection("tasks").getFullList<TasksResponse>({
     filter: '(status="inbox"&&project="" )||status="next"||status="waiting" ||duedate!=""',
     sort: "duedate,created",
-    expand: "project,contexts",
+    expand: "project",
   });
 }
 

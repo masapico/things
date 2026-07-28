@@ -128,7 +128,6 @@ export type UpdateTaskInput = {
   priority?: string | null;
   duedate?: string | null;
   project?: string | null;
-  contexts?: string[];
   clips?: string[];
 };
 

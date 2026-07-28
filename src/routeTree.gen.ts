@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
-import { Route as AuthenticatedContextsRouteImport } from './routes/_authenticated/contexts'
 import { Route as AuthenticatedClipsIndexRouteImport } from './routes/_authenticated/clips/index'
 import { Route as AuthenticatedGtdIndexRouteImport } from './routes/_authenticated/gtd/index'
 import { Route as AuthenticatedGtdProjectidRouteImport } from './routes/_authenticated/gtd/$projectid'
@@ -29,11 +28,6 @@ const LoginRoute = LoginRouteImport.update({
 const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedContextsRoute = AuthenticatedContextsRouteImport.update({
-  id: '/contexts',
-  path: '/contexts',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedClipsIndexRoute = AuthenticatedClipsIndexRouteImport.update({
@@ -56,14 +50,12 @@ const AuthenticatedGtdProjectidRoute =
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
-  '/contexts': typeof AuthenticatedContextsRoute
   '/gtd/$projectid': typeof AuthenticatedGtdProjectidRoute
   '/clips/': typeof AuthenticatedClipsIndexRoute
   '/gtd/': typeof AuthenticatedGtdIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
-  '/contexts': typeof AuthenticatedContextsRoute
   '/': typeof AuthenticatedIndexRoute
   '/gtd/$projectid': typeof AuthenticatedGtdProjectidRoute
   '/clips': typeof AuthenticatedClipsIndexRoute
@@ -73,7 +65,6 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
-  '/_authenticated/contexts': typeof AuthenticatedContextsRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/gtd/$projectid': typeof AuthenticatedGtdProjectidRoute
   '/_authenticated/clips/': typeof AuthenticatedClipsIndexRoute
@@ -81,15 +72,13 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    '/' | '/login' | '/contexts' | '/gtd/$projectid' | '/clips/' | '/gtd/'
+  fullPaths: '/' | '/login' | '/gtd/$projectid' | '/clips/' | '/gtd/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/contexts' | '/' | '/gtd/$projectid' | '/clips' | '/gtd'
+  to: '/login' | '/' | '/gtd/$projectid' | '/clips' | '/gtd'
   id:
     | '__root__'
     | '/_authenticated'
     | '/login'
-    | '/_authenticated/contexts'
     | '/_authenticated/'
     | '/_authenticated/gtd/$projectid'
     | '/_authenticated/clips/'
@@ -124,13 +113,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/contexts': {
-      id: '/_authenticated/contexts'
-      path: '/contexts'
-      fullPath: '/contexts'
-      preLoaderRoute: typeof AuthenticatedContextsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/clips/': {
       id: '/_authenticated/clips/'
       path: '/clips'
@@ -156,7 +138,6 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteChildren {
-  AuthenticatedContextsRoute: typeof AuthenticatedContextsRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedGtdProjectidRoute: typeof AuthenticatedGtdProjectidRoute
   AuthenticatedClipsIndexRoute: typeof AuthenticatedClipsIndexRoute
@@ -164,7 +145,6 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedContextsRoute: AuthenticatedContextsRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedGtdProjectidRoute: AuthenticatedGtdProjectidRoute,
   AuthenticatedClipsIndexRoute: AuthenticatedClipsIndexRoute,

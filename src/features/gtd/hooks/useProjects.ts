@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getActiveProjects, getArchivedProjects, getProject } from "../api";
+import { getActiveProjects, getArchivedProjects, getProject, getProjectTaskCounts } from "../api";
 import { pb } from "../../../lib/pocketbase";
 import type { ProjectsResponse } from "../../../lib/pb_types";
 
@@ -17,6 +17,13 @@ export function useArchivedProjects() {
   return useQuery({
     queryKey: [queryKeyArchivedProjects],
     queryFn: getArchivedProjects,
+  });
+}
+
+export function useProjectTaskCounts() {
+  return useQuery({
+    queryKey: ["projectTaskCounts"],
+    queryFn: getProjectTaskCounts,
   });
 }
 

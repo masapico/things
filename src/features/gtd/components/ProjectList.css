@@ -148,10 +148,30 @@
 
 /* ── 空状態 ── */
 .project-list-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
   text-align: center;
   padding: 4rem 1rem;
   color: var(--clip-ink-faint);
   font-size: 0.95rem;
+}
+
+.project-list-empty-icon {
+  width: 3.4rem;
+  height: 3.4rem;
+  border-radius: 0.9rem;
+  background: var(--clip-teal-soft);
+  color: var(--clip-teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.project-list-empty-text {
+  margin: 0;
+  color: var(--clip-ink-soft);
 }
 
 /* ── カードリンク（a タグのネスト回避） ── */
@@ -319,6 +339,35 @@
   white-space: nowrap;
 }
 
+/* ── 進捗バー ── */
+.project-list-card-progress {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.project-list-card-progress-track {
+  width: 64px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--clip-line);
+  overflow: hidden;
+}
+
+.project-list-card-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--clip-teal);
+  transition: width 0.3s ease;
+}
+
+.project-list-card-progress-text {
+  font-size: 0.72rem;
+  color: var(--clip-ink-soft);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 .project-list-card-badge {
   background: var(--clip-teal-soft) !important;
   color: var(--clip-teal) !important;
@@ -330,11 +379,15 @@
 
 /* ── アーカイブカード ── */
 .project-list-card--archived {
-  opacity: 0.65;
+  background: var(--clip-paper);
+  border-style: dashed;
+  border-color: var(--clip-line-strong);
+  box-shadow: none;
 }
 
-.project-list-card--archived:hover {
-  opacity: 0.85;
+.project-list-card--archived .project-list-card-title,
+.project-list-card--archived .project-list-card-memo-text {
+  color: var(--clip-ink-soft);
 }
 
 .project-list-card-dot--archived {

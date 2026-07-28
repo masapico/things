@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Container, Row, Col, Spinner, Badge } from "react-bootstrap";
-import { useActiveProjects, useArchivedProjects } from "../hooks/useProjects";
+import { useActiveProjects, useArchivedProjects, useProjectTaskCounts } from "../hooks/useProjects";
 import "./ProjectList.css";
 import { ChevronRight, Play, Flag, FolderKanban, Archive, Plus } from "lucide-react";
 import { Link } from "@tanstack/react-router";
@@ -32,6 +32,7 @@ export function ProjectList({ onCreateClick }: { onCreateClick: () => void }) {
     isError: archivedError,
     error: archivedErr,
   } = useArchivedProjects();
+  const { data: taskCounts } = useProjectTaskCounts();
 
   const isLoading = showArchived ? archivedLoading : activeLoading;
   const isError = showArchived ? archivedError : activeError;
@@ -104,7 +105,22 @@ export function ProjectList({ onCreateClick }: { onCreateClick: () => void }) {
 
       {!projects || projects.length === 0 ? (
         <div className="project-list-empty">
-          <p>{label}なプロジェクトはありません。</p>
+          <div className="project-list-empty-icon">
+            <FolderKanban size={28} />
+          </div>
+          <p className="project-list-empty-text">
+            {label}なプロジェクトはありません。
+          </p>
+          {!showArchived ? (
+            <button
+              type="button"
+              className="project-list-create-btn"
+              onClick={onCreateClick}
+            >
+              <Plus size={16} />
+              最初のプロジェクトを作成
+            </button>
+          ) : null}
         </div>
       ) : (
         <Row xs={1} sm={1} md={2} lg={2} xl={3} className="g-3">
@@ -153,6 +169,26 @@ export function ProjectList({ onCreateClick }: { onCreateClick: () => void }) {
                         </span>
                       ) : null}
                     </div>
+                    {(() => {
+                      const counts = taskCounts?.get(project.id);
+                      if (!counts || counts.total === 0) return null;
+                      const percent = Math.round(
+                        (counts.completed / counts.total) * 100,
+                      );
+                      return (
+                        <div className="project-list-card-progress">
+                          <div className="project-list-card-progress-track">
+                            <div
+                              className="project-list-card-progress-fill"
+                              style={{ width: `${percent}%` }}
+                            />
+                          </div>
+                          <span className="project-list-card-progress-text">
+                            {counts.completed}/{counts.total}
+                          </span>
+                        </div>
+                      );
+                    })()}
                     {project.clips && project.clips.length > 0 ? (
                       <Badge className="project-list-card-badge" pill>
                         {project.clips.length} clips

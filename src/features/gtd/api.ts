@@ -23,6 +23,25 @@ export async function getArchivedProjects(): Promise<ProjectsResponse[]> {
   });
 }
 
+/** プロジェクトごとのタスク進捗（完了数 / 総数）を一括取得 */
+export async function getProjectTaskCounts(): Promise<
+  Map<string, { total: number; completed: number }>
+> {
+  const tasks = await pb.collection("tasks").getFullList<TasksResponse>({
+    filter: 'project != ""',
+    fields: "project,status",
+  });
+  const counts = new Map<string, { total: number; completed: number }>();
+  for (const task of tasks) {
+    if (!task.project) continue;
+    const entry = counts.get(task.project) ?? { total: 0, completed: 0 };
+    entry.total += 1;
+    if (task.status === "completed") entry.completed += 1;
+    counts.set(task.project, entry);
+  }
+  return counts;
+}
+
 export async function getProject(id: string): Promise<ProjectsResponse> {
   return await pb.collection("projects").getOne<ProjectsResponse>(id);
 }

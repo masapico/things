@@ -114,7 +114,7 @@ export function ClipCard({ clip, onClick }: ClipCardProps) {
           <Card.Title as="h2" className="clip-card-title h6 mb-0 flex-grow-1">
             {clip.name}
           </Card.Title>
-          {extension ? (
+          {extension && clipType !== "image" ? (
             <Badge className="clip-card-badge" pill>
               {extension}
             </Badge>
@@ -140,8 +140,9 @@ export function ClipCard({ clip, onClick }: ClipCardProps) {
           </div>
         ) : null}
 
-        {/* 画像タイプ: 「元画像を開く」ボタン */}
-        {fullImageUrl ? (
+        <div className="clip-card-actions">
+          {/* 画像タイプ: 「元画像を開く」ボタン */}
+          {fullImageUrl ? (
           <Button
             variant="outline-secondary"
             size="sm"
@@ -158,7 +159,7 @@ export function ClipCard({ clip, onClick }: ClipCardProps) {
         ) : null}
 
         {/* ファイルタイプ: PDFは開く + ダウンロード、それ以外はダウンロードのみ */}
-        {clipType === "file" && fullFileUrl ? (
+          {clipType === "file" && fullFileUrl ? (
           <div className="d-flex gap-2">
             {extension === "PDF" ? (
               <Button
@@ -202,6 +203,7 @@ export function ClipCard({ clip, onClick }: ClipCardProps) {
             </Button>
           </div>
         ) : null}
+        </div>
 
         {clip.text ? (
           <div className="clip-card-note">

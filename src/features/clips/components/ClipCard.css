@@ -84,7 +84,31 @@
   box-shadow: 0 2px 8px rgba(27, 42, 40, 0.12);
 }
 
-/* ---------- action button (open / download) ---------- */
+/* ---------- action buttons (open / download) ----------
+   常時表示だと一覧が賑やかなので hover / focus 時のみ表示。 */
+.clip-card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  align-items: flex-start;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+.clip-card-actions:empty {
+  display: none;
+}
+
+.clip-card:hover .clip-card-actions,
+.clip-card:focus-within .clip-card-actions {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .clip-card-actions {
+    opacity: 1;
+  }
+}
 .clip-card-action-btn {
   align-self: flex-start;
   display: inline-flex;
@@ -110,7 +134,9 @@
   word-break: break-all;
 }
 
-/* ---------- text preview, mini ruled note ---------- */
+/* ---------- text preview, mini ruled note ----------
+   罫線の行高 (1.3rem) とテキストの line-height を一致させ、
+   クランプ行数分の高さに揃える。 */
 .clip-card-note {
   position: relative;
   border: 1px solid var(--clip-line);
@@ -125,7 +151,7 @@
   background-position: 0 0.35rem;
   padding: 0.35rem 0.6rem 0.35rem 1.4rem;
   overflow: hidden;
-  max-height: 6.9rem;
+  max-height: calc(0.35rem + 1.3rem * 5 + 0.2rem);
 }
 
 .clip-card-note::before {

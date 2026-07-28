@@ -125,6 +125,20 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
     ? `${pb.baseURL}/api/files/${clip.collectionId}/${clip.id}/${clip.file}`
     : null;
 
+  const isDirty =
+    isEditing &&
+    (editName !== clip.name ||
+      (clipType === "text" && editText !== readonlyText) ||
+      hasUnsavedAnnotations);
+
+  const requestClose = () => {
+    if (isDirty) {
+      const ok = window.confirm("未保存の変更があります。破棄して閉じますか？");
+      if (!ok) return;
+    }
+    onClose();
+  };
+
   const handleEnterEdit = () => {
     setEditName(clip.name);
     setEditText(readonlyText);
@@ -220,6 +234,25 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
     setHasUnsavedAnnotations(true);
   };
 
+  // キーボードショートカット: Cmd/Ctrl+S で保存、編集中の Esc でキャンセル
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === "s") {
+      e.preventDefault();
+      if (isEditing && !isSaving) {
+        void handleSave();
+      }
+      return;
+    }
+    if (e.key === "Escape") {
+      if (isEditing) {
+        e.stopPropagation();
+        handleCancelEdit();
+      } else {
+        requestClose();
+      }
+    }
+  };
+
   return (
     <>
       {statusMessage ? (
@@ -240,9 +273,10 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
         key={clip.id}
         show={show}
         size="xl"
-        onHide={onClose}
+        onHide={requestClose}
         centered
         className="clip-modal"
+        onKeyDown={handleKeyDown}
       >
         <Modal.Header closeButton className="clip-modal-header">
           <div className="clip-header-row w-100">
@@ -414,18 +448,16 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
 
         <Modal.Footer className="d-flex justify-content-between">
           <div>
-            {isEditing ? (
-              <Button
-                variant="outline-danger"
-                size="sm"
-                onClick={() => setShowDeleteConfirm(true)}
-                className="clip-btn-delete"
-                disabled={isSaving}
-              >
-                <Trash2Icon size={14} />
-                Delete
-              </Button>
-            ) : null}
+            <Button
+              variant="outline-danger"
+              size="sm"
+              onClick={() => setShowDeleteConfirm(true)}
+              className="clip-btn-delete"
+              disabled={isSaving}
+            >
+              <Trash2Icon size={14} />
+              Delete
+            </Button>
           </div>
 
           <div className="d-flex gap-2">
@@ -444,7 +476,7 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
               </>
             ) : (
               <>
-                <Button className="clip-btn-cancel" onClick={onClose}>
+                <Button className="clip-btn-cancel" onClick={requestClose}>
                   Close
                 </Button>
                 <Button className="clip-btn-save" onClick={handleEnterEdit}>

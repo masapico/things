@@ -1,5 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getActiveProjects, getArchivedProjects, getProject, getProjectTaskCounts } from "../api";
+import {
+  getActiveProjects,
+  getArchivedProjects,
+  getProject,
+  getProjectTaskCounts,
+  duplicateProject,
+  type DuplicateProjectInput,
+} from "../api";
 import { pb } from "../../../lib/pocketbase";
 import type { ProjectsResponse } from "../../../lib/pb_types";
 
@@ -32,6 +39,32 @@ export function useProject(id: string) {
     queryKey: ["project", id],
     queryFn: () => getProject(id),
     enabled: !!id,
+  });
+}
+
+/** プロジェクトとタスクを複製する */
+export function useDuplicateProject() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      sourceProjectId,
+      input,
+    }: {
+      sourceProjectId: string;
+      input: DuplicateProjectInput;
+    }) => {
+      return await duplicateProject(sourceProjectId, input);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [queryKeyActiveProjects] });
+      queryClient.invalidateQueries({ queryKey: [queryKeyArchivedProjects] });
+      queryClient.invalidateQueries({ queryKey: ["projectTasks"] });
+      queryClient.invalidateQueries({ queryKey: ["projectTaskCounts"] });
+    },
+    onError: (error) => {
+      console.error("プロジェクトの複製に失敗しました:", error);
+    },
   });
 }
 

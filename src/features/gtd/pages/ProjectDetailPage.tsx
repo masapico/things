@@ -3,6 +3,7 @@ import { Container, Spinner, ListGroup, Badge, Stack } from "react-bootstrap";
 import { useProject, useToggleReview } from "../hooks/useProjects";
 import { useProjectTasks } from "../hooks/useProjectTasks";
 import { ProjectEditModal } from "../components/ProjectEditModal";
+import { ProjectDuplicateModal } from "../components/ProjectDuplicateModal";
 import { UnifiedTaskListRow } from "../components/UnifiedTaskListRow";
 import { TaskAddForm } from "../components/TaskAddForm";
 import type { TasksResponse } from "../../../lib/pb_types";
@@ -11,11 +12,12 @@ import {
   Play,
   Flag,
   Pencil,
+  Copy,
   FolderKanban,
   Eye,
   EyeOff,
 } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { ClipsPopover } from "../../clips/components/ClipsPopover";
 import { DragDropProvider } from "@dnd-kit/react";
 import { useSortable, isSortable } from "@dnd-kit/react/sortable";
@@ -130,7 +132,9 @@ export function ProjectDetailPage({ projectId }: ProjectDetailPageProps) {
     isError: tasksError,
   } = useProjectTasks(projectId);
 
+  const navigate = useNavigate();
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showDuplicateModal, setShowDuplicateModal] = useState(false);
   const [localTasks, setLocalTasks] = useState<TasksResponse[] | null>(null);
 
   const toggleReview = useToggleReview();
@@ -234,6 +238,14 @@ export function ProjectDetailPage({ projectId }: ProjectDetailPageProps) {
               {project.isActive ? "Active" : "Archived"}
             </Badge>
           </div>
+          <button
+            className="project-detail-edit-btn"
+            onClick={() => setShowDuplicateModal(true)}
+            aria-label="プロジェクトを複製"
+            title="プロジェクトを複製"
+          >
+            <Copy size={16} />
+          </button>
           <button
             className="project-detail-edit-btn"
             onClick={() => setShowEditModal(true)}
@@ -387,6 +399,21 @@ export function ProjectDetailPage({ projectId }: ProjectDetailPageProps) {
         project={project}
         show={showEditModal}
         onClose={() => setShowEditModal(false)}
+      />
+
+      {/* ── 複製モーダル ── */}
+      <ProjectDuplicateModal
+        project={project}
+        taskCount={tasks?.length ?? 0}
+        show={showDuplicateModal}
+        onClose={() => setShowDuplicateModal(false)}
+        onDuplicated={(newProjectId) => {
+          setShowDuplicateModal(false);
+          navigate({
+            to: "/gtd/$projectid",
+            params: { projectid: newProjectId },
+          });
+        }}
       />
     </div>
   );

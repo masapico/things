@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button, Form, Modal, Stack } from "react-bootstrap";
 import type { ClipsResponse } from "../../../lib/pb_types";
 import { PlusIcon } from "lucide-react";
@@ -28,7 +28,11 @@ export function ProjectCreateModal({ show, onClose }: ProjectCreateModalProps) {
   const [viewingClip, setViewingClip] = useState<ClipsResponse | null>(null);
   const [showClipDetail, setShowClipDetail] = useState(false);
 
-  useEffect(() => {
+  // モーダルが開かれたタイミングでフォームをリセットする
+  // (レンダー中の状態調整パターン: https://react.dev/learn/you-might-not-need-an-effect)
+  const [prevShow, setPrevShow] = useState(show);
+  if (show !== prevShow) {
+    setPrevShow(show);
     if (show) {
       setName("");
       setMemo("");
@@ -37,7 +41,7 @@ export function ProjectCreateModal({ show, onClose }: ProjectCreateModalProps) {
       setIsActive(true);
       setSelectedClips([]);
     }
-  }, [show]);
+  }
 
   async function handleSave() {
     if (!name.trim()) return;

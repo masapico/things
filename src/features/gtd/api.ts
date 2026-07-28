@@ -53,6 +53,48 @@ export async function getProjectTasks(projectId: string): Promise<TasksResponse[
   });
 }
 
+export type DuplicateProjectInput = {
+  name: string;
+  memo?: string;
+  startDate?: string;
+  endDate?: string;
+};
+
+/** プロジェクトとそのタスクを複製する。タスクは status=inbox にリセットし、sort 順は維持する */
+export async function duplicateProject(
+  sourceProjectId: string,
+  input: DuplicateProjectInput,
+): Promise<ProjectsResponse> {
+  const sourceProject = await getProject(sourceProjectId);
+  const sourceTasks = await getProjectTasks(sourceProjectId);
+
+  const newProject = await pb
+    .collection("projects")
+    .create<ProjectsResponse>({
+      name: input.name,
+      memo: input.memo || undefined,
+      startDate: input.startDate || undefined,
+      endDate: input.endDate || undefined,
+      isActive: true,
+      clips: sourceProject.clips ?? [],
+    });
+
+  // 同時作成の制約回避のため直列で作成する
+  for (const task of sourceTasks) {
+    await pb.collection("tasks").create<TasksResponse>({
+      title: task.title,
+      status: "inbox",
+      project: newProject.id,
+      sort: task.sort,
+      memo: task.memo || undefined,
+      priority: task.priority || undefined,
+      clips: task.clips ?? [],
+    });
+  }
+
+  return newProject;
+}
+
 export async function searchTasks(query: string): Promise<TasksResponse[]> {
   const escaped = query.replace(/"/g, '""');
   return await pb.collection("tasks").getFullList<TasksResponse>({

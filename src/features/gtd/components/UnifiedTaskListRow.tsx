@@ -102,12 +102,10 @@ export function UnifiedTaskListRow({
         setErrorMessage(taskMutationErrorMessage(error, "ステータスを更新できませんでした。"));
       },
     };
-    // 完了時はフェードアウトしてからステータスを更新する
+    // 通信はすぐ開始し、行のアニメーションは待ち時間に重ねる。
     if (newStatus === "completed") {
       setIsLeaving(true);
-      setTimeout(() => {
-        mutateStatus({ targetTask: task, newStatus }, mutationOptions);
-      }, 200);
+      mutateStatus({ targetTask: task, newStatus }, mutationOptions);
       return;
     }
     mutateStatus({ targetTask: task, newStatus }, mutationOptions);
@@ -147,7 +145,7 @@ export function UnifiedTaskListRow({
           {!isCompleted && (
             <ActionBtn
               icon={<SquarePen size={iconSize} />}
-              label="Edit task"
+              label="タスクを編集"
               className="task-action-btn--edit"
               disabled={false}
               onClick={() => setShowEditModal(true)}
@@ -270,19 +268,15 @@ export function UnifiedTaskListRow({
                   }}
                 />
               ) : (
-                <span
+                <button
+                  type="button"
                   className="task-completed-date task-completed-date--editable"
-                  role="button"
-                  tabIndex={0}
                   title="クリックで完了日を変更"
                   onClick={() => setIsEditingCompletedDate(true)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") setIsEditingCompletedDate(true);
-                  }}
                 >
                   <CheckCircle2 size={12} />
                   {formatCompletedDate(task.completed)}
-                </span>
+                </button>
               ))}
             <ActionBtn
               icon={<Undo2 size={iconSize} />}
@@ -326,17 +320,15 @@ function ActionBtn({
   onClick: () => void;
 }) {
   return (
-    <div
+    <button
+      type="button"
       className={`task-action-btn ${className} ${disabled ? "task-action-btn--loading" : ""}`}
-      role="button"
       title={label}
-      tabIndex={0}
-      onClick={disabled ? undefined : onClick}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" && !disabled) onClick();
-      }}
+      aria-label={label}
+      disabled={disabled}
+      onClick={onClick}
     >
       {icon}
-    </div>
+    </button>
   );
 }

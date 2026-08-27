@@ -1,9 +1,10 @@
-import { Container, Row, Col, Spinner, Badge } from "react-bootstrap";
+import { Row, Col, Spinner, Badge } from "react-bootstrap";
 import { useActiveProjects, useArchivedProjects, useProjectTaskCounts } from "../hooks/useProjects";
 import "./ProjectList.css";
 import { ChevronRight, Play, Flag, FolderKanban, Archive, Plus, RefreshCw } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import type { ProjectListView } from "../navigation";
+import { AsyncState } from "../../../components/AsyncState";
 
 function formatDate(value?: string) {
   if (!value) return "";
@@ -34,40 +35,30 @@ export function ProjectList({
     data: activeProjects,
     isLoading: activeLoading,
     isError: activeError,
-    error: activeErr,
+    refetch: refetchActive,
+    isFetching: activeFetching,
   } = useActiveProjects();
   const {
     data: archivedProjects,
     isLoading: archivedLoading,
     isError: archivedError,
-    error: archivedErr,
+    refetch: refetchArchived,
+    isFetching: archivedFetching,
   } = useArchivedProjects();
   const { data: taskCounts } = useProjectTaskCounts();
 
   const isLoading = showArchived ? archivedLoading : activeLoading;
   const isError = showArchived ? archivedError : activeError;
-  const error = showArchived ? archivedErr : activeErr;
+  const isFetching = showArchived ? archivedFetching : activeFetching;
   const projects = showArchived ? archivedProjects : activeProjects;
   const label = showArchived ? "アーカイブ" : "アクティブ";
 
   if (isLoading) {
-    return (
-      <Container className="mt-4">
-        <Spinner animation="border" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </Spinner>
-      </Container>
-    );
+    return <div className="project-list"><AsyncState kind="loading" message="プロジェクトを読み込んでいます…" /></div>;
   }
 
   if (isError) {
-    return (
-      <Container className="mt-4">
-        <p className="text-danger">
-          Failed to load projects: {error?.message ?? "Unknown error"}
-        </p>
-      </Container>
-    );
+    return <div className="project-list"><AsyncState kind="error" message="プロジェクトを読み込めませんでした。" onRetry={() => void (showArchived ? refetchArchived() : refetchActive())} /></div>;
   }
 
   return (
@@ -99,6 +90,8 @@ export function ProjectList({
           </button>
         </div>
       </div>
+
+      {isFetching ? <div className="app-background-status mb-2" role="status"><Spinner animation="border" size="sm" />更新中</div> : null}
 
       {/* トグル */}
       <div className="project-list-toggle">
@@ -208,7 +201,7 @@ export function ProjectList({
                     })()}
                     {project.clips && project.clips.length > 0 ? (
                       <Badge className="project-list-card-badge" pill>
-                        {project.clips.length} clips
+                        CLIP {project.clips.length}
                       </Badge>
                     ) : null}
                   </div>

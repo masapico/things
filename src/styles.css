@@ -1,6 +1,84 @@
+:root {
+  --app-bg: #f8faf7;
+  --app-surface: #fff;
+  --app-surface-soft: #f4f7f1;
+  --app-border: #d8e2ce;
+  --app-border-soft: #e7ede3;
+  --app-text: #263b33;
+  --app-muted: #71827b;
+  --app-primary: #146b62;
+  --app-primary-soft: #e4f0ee;
+  --app-danger: #b4514c;
+  --app-radius: 0.65rem;
+  --app-shadow: 0 3px 14px rgba(40, 60, 50, 0.09);
+  --app-motion-fast: 120ms;
+  --app-motion: 150ms;
+}
+
+html {
+  background: var(--app-bg);
+}
+
+body {
+  min-width: 320px;
+  color: var(--app-text);
+  background: var(--app-bg);
+}
+
 a {
   color: inherit;
   text-decoration: none;
+}
+
+button,
+a,
+input,
+textarea,
+select,
+[tabindex]:not([tabindex="-1"]) {
+  scroll-margin-block: 5rem;
+}
+
+:focus-visible {
+  outline: 3px solid rgba(20, 107, 98, 0.28) !important;
+  outline-offset: 2px;
+}
+
+.app-main {
+  width: 100%;
+}
+
+.app-async-state {
+  display: grid;
+  min-height: 10rem;
+  place-items: center;
+  align-content: center;
+  gap: 0.65rem;
+  padding: 1.5rem;
+  color: var(--app-muted);
+  text-align: center;
+  border: 1px dashed var(--app-border);
+  border-radius: var(--app-radius);
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.app-background-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--app-muted);
+  font-size: 0.72rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 .active_menu {

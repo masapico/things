@@ -70,9 +70,9 @@ function getClipType(clip: ClipsResponse): "text" | "image" | "file" {
 }
 
 const TYPE_META = {
-  text: { label: "Text", icon: FileTextIcon },
-  image: { label: "Image", icon: ImageIcon },
-  file: { label: "File", icon: FileIcon },
+  text: { label: "テキスト", icon: FileTextIcon },
+  image: { label: "画像", icon: ImageIcon },
+  file: { label: "ファイル", icon: FileIcon },
 } as const;
 
 export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
@@ -176,7 +176,7 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
     } catch (error) {
       console.error("Failed to update clip:", error);
       setStatusKind("error");
-      setStatusMessage("Failed to update clip.");
+      setStatusMessage("クリップを更新できませんでした。もう一度お試しください。");
     } finally {
       setIsSaving(false);
     }
@@ -192,7 +192,7 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
     } catch (error) {
       console.error("Failed to delete clip:", error);
       setStatusKind("error");
-      setStatusMessage("Failed to delete clip.");
+      setStatusMessage("クリップを削除できませんでした。もう一度お試しください。");
     }
   };
 
@@ -260,7 +260,7 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
       {statusMessage ? (
         <div
           className={`clip-status ${statusKind === "success" ? "clip-status--success" : "clip-status--error"}`}
-          role="status"
+          role={statusKind === "success" ? "status" : "alert"}
         >
           {statusKind === "success" ? (
             <CheckCircle2Icon size={16} />
@@ -287,12 +287,12 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
             </div>
             <div>
               <Modal.Title className="clip-title">
-                {isEditing ? "Edit clip" : readonlyName}
+                {isEditing ? "クリップを編集" : readonlyName}
               </Modal.Title>
               <p className="clip-subtitle">
                 {isEditing
-                  ? "Make your changes, then save."
-                  : `Created ${formatDate(clip.created)}`}
+                  ? "変更内容を確認して保存してください。"
+                  : `作成 ${formatDate(clip.created)}`}
               </p>
             </div>
             <span className="clip-type-badge">
@@ -306,19 +306,19 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
           {isEditing ? (
             <>
               <Form.Group className="mb-3">
-                <Form.Label className="clip-field-label">Title</Form.Label>
+                <Form.Label className="clip-field-label">タイトル</Form.Label>
                 <Form.Control
                   className="clip-title-input"
                   type="text"
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
-                  placeholder="Clip name"
+                  placeholder="クリップ名"
                 />
               </Form.Group>
 
               {clipType === "text" ? (
                 <Form.Group className="mb-3">
-                  <MarkdownClipEditor value={editText} onChange={setEditText} placeholder="Nothing yet" />
+                  <MarkdownClipEditor value={editText} onChange={setEditText} placeholder="内容を入力" />
                 </Form.Group>
               ) : null}
 
@@ -326,7 +326,7 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
               {clipType === "image" && fullFileUrl ? (
                 <Form.Group className="mb-3">
                   <Form.Label className="clip-field-label">
-                    Annotations
+                    注釈
                   </Form.Label>
                   <div className="clip-image-card clip-image-card--readonly">
                     <ImageAnnotator
@@ -343,7 +343,7 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
               {/* Text content */}
               {readonlyText ? (
                 <div className="mb-3">
-                  <Form.Label className="clip-field-label">Note</Form.Label>
+                  <Form.Label className="clip-field-label">メモ</Form.Label>
                   <div className="clip-pad-wrap clip-pad-preview">
                     <div className="clip-markdown-body">
                       <Markdown remarkPlugins={[remarkGfm]}>
@@ -357,7 +357,7 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
               {/* Image with annotations (readonly) */}
               {clipType === "image" && fullFileUrl ? (
                 <div className="mb-3">
-                  <Form.Label className="clip-field-label">Image</Form.Label>
+                  <Form.Label className="clip-field-label">画像</Form.Label>
                   <div className="clip-image-card">
                     <ImageAnnotator
                       src={fullFileUrl}
@@ -383,7 +383,7 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
               {clipType === "file" && clip.file ? (
                 <div className="mb-3">
                   <Form.Label className="clip-field-label">
-                    {isPdf ? "PDF preview" : "File"}
+                    {isPdf ? "PDFプレビュー" : "ファイル"}
                   </Form.Label>
                   {isPdf && fullFileUrl ? (
                     <div className="mb-3">
@@ -431,9 +431,9 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
 
               {/* Info row */}
               <div className="clip-detail-info small">
-                <span>Created: {formatDate(clip.created)}</span>
+                <span>作成: {formatDate(clip.created)}</span>
                 {clip.created !== clip.updated ? (
-                  <span> · Updated: {formatDate(clip.updated)}</span>
+                  <span> · 更新: {formatDate(clip.updated)}</span>
                 ) : null}
               </div>
             </>
@@ -450,7 +450,7 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
               disabled={isSaving}
             >
               <Trash2Icon size={14} />
-              Delete
+              削除
             </Button>
           </div>
 
@@ -458,24 +458,24 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
             {isEditing ? (
               <>
                 <Button className="clip-btn-cancel" onClick={handleCancelEdit}>
-                  Cancel
+                  キャンセル
                 </Button>
                 <Button
                   className="clip-btn-save"
                   onClick={handleSave}
                   disabled={isSaving}
                 >
-                  {isSaving ? "Saving…" : "Save changes"}
+                  {isSaving ? "保存中…" : "変更を保存"}
                 </Button>
               </>
             ) : (
               <>
                 <Button className="clip-btn-cancel" onClick={requestClose}>
-                  Close
+                  閉じる
                 </Button>
                 <Button className="clip-btn-save" onClick={handleEnterEdit}>
                   <PenLineIcon size={14} />
-                  Edit
+                  編集
                 </Button>
               </>
             )}
@@ -492,12 +492,11 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
           size="sm"
         >
           <Modal.Header closeButton className="clip-modal-header">
-            <Modal.Title className="clip-title">Delete clip</Modal.Title>
+            <Modal.Title className="clip-title">クリップを削除</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <p>
-              Are you sure you want to delete "{clip.name}"? This cannot be
-              undone.
+              「{clip.name}」を削除しますか？この操作は取り消せません。
             </p>
           </Modal.Body>
           <Modal.Footer>
@@ -505,14 +504,14 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
               className="clip-btn-cancel"
               onClick={() => setShowDeleteConfirm(false)}
             >
-              Cancel
+              キャンセル
             </Button>
             <Button
               variant="danger"
               onClick={handleDelete}
               className="clip-btn-danger"
             >
-              Delete
+              削除
             </Button>
           </Modal.Footer>
         </Modal>

@@ -9,6 +9,7 @@ import {
   Image,
   File,
   Rocket,
+  X,
 } from "lucide-react";
 import { searchClips } from "../features/clips/api";
 import { searchTasks, searchProjects } from "../features/gtd/api";
@@ -159,6 +160,23 @@ export function OmniSearch({ onSelect }: OmniSearchProps) {
     };
   }, []);
 
+  // キーボード中心の操作時に、どの画面からでもすぐ検索へ移動する。
+  useEffect(() => {
+    function focusSearch(event: KeyboardEvent) {
+      const target = event.target as HTMLElement | null;
+      const isTyping =
+        target?.matches("input, textarea, select") || target?.isContentEditable;
+      const isShortcut =
+        (event.key.toLowerCase() === "k" && (event.metaKey || event.ctrlKey)) ||
+        (event.key === "/" && !isTyping);
+      if (!isShortcut) return;
+      event.preventDefault();
+      inputRef.current?.focus();
+    }
+    window.addEventListener("keydown", focusSearch);
+    return () => window.removeEventListener("keydown", focusSearch);
+  }, []);
+
   // クリックアウトサイドで閉じる
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -221,10 +239,14 @@ export function OmniSearch({ onSelect }: OmniSearchProps) {
         </InputGroup.Text>
         <Form.Control
           ref={inputRef}
-          aria-label="omniSearch"
+          role="combobox"
+          aria-label="横断検索"
           aria-describedby="omniSearch"
-          tabIndex={1}
-          placeholder="検索..."
+          aria-expanded={isOpen}
+          aria-controls="omni-search-results"
+          aria-activedescendant={selectedIndex >= 0 ? `omni-result-${selectedIndex}` : undefined}
+          aria-autocomplete="list"
+          placeholder="検索…  ⌘K"
           value={query}
           onChange={(e) => handleQueryChange(e.target.value)}
           onFocus={() => {
@@ -232,10 +254,23 @@ export function OmniSearch({ onSelect }: OmniSearchProps) {
           }}
           onKeyDown={handleKeyDown}
         />
+        {query ? (
+          <button
+            type="button"
+            className="omni-search-clear"
+            aria-label="検索語を消去"
+            onClick={() => {
+              handleQueryChange("");
+              inputRef.current?.focus();
+            }}
+          >
+            <X size={14} />
+          </button>
+        ) : null}
       </InputGroup>
 
       {isOpen && (
-        <div className="omni-search-dropdown">
+        <div className="omni-search-dropdown" id="omni-search-results" role="listbox" aria-label="検索結果">
           {isLoading ? (
             <div className="omni-search-loading">
               <Spinner animation="border" size="sm" />
@@ -261,7 +296,10 @@ export function OmniSearch({ onSelect }: OmniSearchProps) {
                     return (
                       <button
                         key={clip.id}
+                        id={`omni-result-${globalIndex}`}
                         type="button"
+                        role="option"
+                        aria-selected={selectedIndex === globalIndex}
                         className={`omni-search-item ${selectedIndex === globalIndex ? "omni-search-item--active" : ""}`}
                         onClick={() =>
                             void handleSelect({ type: "clip", data: clip })
@@ -291,7 +329,10 @@ export function OmniSearch({ onSelect }: OmniSearchProps) {
                     return (
                       <button
                         key={task.id}
+                        id={`omni-result-${globalIndex}`}
                         type="button"
+                        role="option"
+                        aria-selected={selectedIndex === globalIndex}
                         className={`omni-search-item ${selectedIndex === globalIndex ? "omni-search-item--active" : ""}`}
                         onClick={() =>
                             void handleSelect({ type: "task", data: task })
@@ -324,7 +365,10 @@ export function OmniSearch({ onSelect }: OmniSearchProps) {
                     return (
                       <button
                         key={project.id}
+                        id={`omni-result-${globalIndex}`}
                         type="button"
+                        role="option"
+                        aria-selected={selectedIndex === globalIndex}
                         className={`omni-search-item ${selectedIndex === globalIndex ? "omni-search-item--active" : ""}`}
                         onClick={() =>
                             void handleSelect({ type: "project", data: project })
@@ -350,7 +394,7 @@ export function OmniSearch({ onSelect }: OmniSearchProps) {
                   <div className="omni-search-group-header"><Rocket size={12} />Launcher</div>
                   {launchers.map((launcher, i) => {
                     const globalIndex = clips.length + tasks.length + projects.length + i;
-                    return <button key={launcher.id} type="button" className={`omni-search-item ${selectedIndex === globalIndex ? "omni-search-item--active" : ""}`} onClick={() => void handleSelect({ type: "launcher", data: launcher })}>
+                    return <button key={launcher.id} id={`omni-result-${globalIndex}`} type="button" role="option" aria-selected={selectedIndex === globalIndex} className={`omni-search-item ${selectedIndex === globalIndex ? "omni-search-item--active" : ""}`} onClick={() => void handleSelect({ type: "launcher", data: launcher })}>
                       <Rocket size={14} className="omni-search-item-icon" /><span className="omni-search-item-name">{launcher.name}</span><span className="omni-search-item-meta">起動</span>
                     </button>;
                   })}

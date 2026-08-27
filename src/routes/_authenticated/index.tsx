@@ -1,13 +1,14 @@
 // src/routes/index.tsx
 import { createFileRoute } from "@tanstack/react-router";
 import { Calendar, Inbox, PhoneIncoming, Smile, Target } from "lucide-react";
-import { Container, ListGroup } from "react-bootstrap";
+import { Container, ListGroup, Spinner } from "react-bootstrap";
 import { Fragment } from "react";
 import { useIndexPageTasks } from "../../features/gtd/hooks/useTasks";
 import { UnifiedTaskListRow } from "../../features/gtd/components/UnifiedTaskListRow";
 import { DeadlineTaskListRow } from "../../features/gtd/components/DeadlineTaskListRow";
 import { TaskAddForm } from "../../features/gtd/components/TaskAddForm";
 import type { TasksResponse, ProjectsResponse } from "../../lib/pb_types";
+import { AsyncState } from "../../components/AsyncState";
 
 export const Route = createFileRoute("/_authenticated/")({
   component: Index,
@@ -21,7 +22,8 @@ type Section = {
 };
 
 function Index() {
-  const { data: indexPageTasks } = useIndexPageTasks();
+  const tasksQuery = useIndexPageTasks();
+  const indexPageTasks = tasksQuery.data;
 
   const sections: Section[] = [
     {
@@ -57,6 +59,23 @@ function Index() {
         <div className="mb-4">
           <TaskAddForm />
         </div>
+
+        {tasksQuery.isLoading ? (
+          <AsyncState kind="loading" message="タスクを読み込んでいます…" />
+        ) : tasksQuery.isError ? (
+          <AsyncState
+            kind="error"
+            message="タスクを読み込めませんでした。"
+            onRetry={() => void tasksQuery.refetch()}
+          />
+        ) : (
+          <>
+            {tasksQuery.isFetching ? (
+              <div className="app-background-status mb-2" role="status">
+                <Spinner animation="border" size="sm" />
+                <span>更新中</span>
+              </div>
+            ) : null}
 
         {sections.map((section) => {
           const tasks = indexPageTasks?.filter(section.filter) ?? [];
@@ -96,6 +115,8 @@ function Index() {
             </Fragment>
           );
         })}
+          </>
+        )}
       </div>
     </Container>
   );

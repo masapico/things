@@ -1,7 +1,8 @@
 import { useRef, useEffect } from "react";
-import { Alert, Col, Row, Spinner } from "react-bootstrap";
+import { Button, Col, Row, Spinner } from "react-bootstrap";
 import { ClipCard } from "./ClipCard";
 import type { ClipsResponse } from "../../../lib/pb_types";
+import { AsyncState } from "../../../components/AsyncState";
 
 type ClipListProps = {
   clips: ClipsResponse[];
@@ -9,7 +10,9 @@ type ClipListProps = {
   isError: boolean;
   hasNextPage?: boolean;
   isFetchingNextPage?: boolean;
+  isFetchNextPageError?: boolean;
   onLoadMore?: () => void;
+  onRetry?: () => void;
   onClipClick?: (clip: ClipsResponse) => void;
 };
 
@@ -19,7 +22,9 @@ export function ClipList({
   isError,
   hasNextPage,
   isFetchingNextPage,
+  isFetchNextPageError,
   onLoadMore,
+  onRetry,
   onClipClick,
 }: ClipListProps) {
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -42,20 +47,15 @@ export function ClipList({
   }, [hasNextPage, isFetchingNextPage, onLoadMore]);
 
   if (isLoading) {
-    return (
-      <div className="d-flex align-items-center gap-2 text-muted">
-        <Spinner animation="border" size="sm" />
-        <span>Loading clips…</span>
-      </div>
-    );
+    return <AsyncState kind="loading" message="クリップを読み込んでいます…" />;
   }
 
   if (isError) {
-    return <Alert variant="danger">Failed to load clips.</Alert>;
+    return <AsyncState kind="error" message="クリップを読み込めませんでした。" onRetry={onRetry} />;
   }
 
   if (!clips.length) {
-    return <Alert variant="light">No clips yet.</Alert>;
+    return <AsyncState kind="empty" message="クリップはまだありません。画面上でテキスト・画像・ファイルを貼り付けると登録できます。" />;
   }
 
   return (
@@ -72,8 +72,10 @@ export function ClipList({
       <div ref={sentinelRef} className="d-flex justify-content-center py-3">
         {isFetchingNextPage ? (
           <Spinner animation="border" size="sm" />
+        ) : isFetchNextPageError ? (
+          <Button variant="outline-primary" size="sm" onClick={onLoadMore}>続きを再読み込み</Button>
         ) : hasNextPage ? (
-          <span className="text-muted small">Scroll for more</span>
+          <span className="text-muted small">スクロールして続きを表示</span>
         ) : null}
       </div>
     </>

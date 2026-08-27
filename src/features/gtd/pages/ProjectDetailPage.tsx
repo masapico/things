@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
-import { Container, Spinner, ListGroup, Badge, Stack } from "react-bootstrap";
+import { Alert, Container, ListGroup, Badge, Stack } from "react-bootstrap";
 import { useProject, useToggleReview } from "../hooks/useProjects";
 import { useProjectTasks } from "../hooks/useProjectTasks";
 import { ProjectEditModal } from "../components/ProjectEditModal";
@@ -25,6 +25,7 @@ import type { DragEndEvent } from "@dnd-kit/dom";
 import { useUpdateTaskSorts } from "../hooks/useTasks";
 import "./ProjectDetailPage.css";
 import type { ProjectReturnTo } from "../navigation";
+import { AsyncState } from "../../../components/AsyncState";
 
 type ProjectDetailPageProps = {
   projectId: string;
@@ -157,17 +158,20 @@ export function ProjectDetailPage({
     data: project,
     isLoading: projectLoading,
     isError: projectError,
+    refetch: refetchProject,
   } = useProject(projectId);
   const {
     data: tasks,
     isLoading: tasksLoading,
     isError: tasksError,
+    refetch: refetchTasks,
   } = useProjectTasks(projectId);
 
   const navigate = useNavigate();
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDuplicateModal, setShowDuplicateModal] = useState(false);
   const [localTasks, setLocalTasks] = useState<TasksResponse[] | null>(null);
+  const [reorderError, setReorderError] = useState("");
 
   const toggleReview = useToggleReview();
   const updateSorts = useUpdateTaskSorts();
@@ -193,6 +197,7 @@ export function ProjectDetailPage({
 
       // 楽観的UI更新: 即座にローカルステートを更新
       setLocalTasks(reordered);
+      setReorderError("");
 
       // 全タスクの sort 値を振り直してサーバーに永続化
       const sortUpdates = reordered.map((t, i) => ({
@@ -200,6 +205,7 @@ export function ProjectDetailPage({
         sort: i * 100,
       }));
       updateSorts.mutate(sortUpdates, {
+        onError: () => setReorderError("並べ替えを保存できなかったため、元の順序に戻しました。"),
         onSettled: () => setLocalTasks(null),
       });
     },
@@ -208,17 +214,15 @@ export function ProjectDetailPage({
 
   // ---- Loading ----
   if (projectLoading || tasksLoading) {
-    return (
-      <Container className="mt-4">
-        <Spinner animation="border" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </Spinner>
-      </Container>
-    );
+    return <Container className="py-4"><AsyncState kind="loading" message="プロジェクトを読み込んでいます…" /></Container>;
   }
 
   // ---- Error ----
-  if (projectError || !project) {
+  if (projectError) {
+    return <Container className="py-4"><AsyncState kind="error" message="プロジェクトを読み込めませんでした。" onRetry={() => void refetchProject()} /></Container>;
+  }
+
+  if (!project) {
     return (
       <Container className="mt-4">
         <p className="text-danger">プロジェクトが見つかりませんでした。</p>
@@ -235,11 +239,7 @@ export function ProjectDetailPage({
   }
 
   if (tasksError) {
-    return (
-      <Container className="mt-4">
-        <p className="text-danger">タスクの読み込みに失敗しました。</p>
-      </Container>
-    );
+    return <Container className="py-4"><AsyncState kind="error" message="タスクを読み込めませんでした。" onRetry={() => void refetchTasks()} /></Container>;
   }
 
   const partitioned = partitionTasks(tasks ?? []);
@@ -253,6 +253,7 @@ export function ProjectDetailPage({
 
   return (
     <div className="project-detail">
+      {reorderError ? <Alert variant="danger" dismissible onClose={() => setReorderError("")} role="alert">{reorderError}</Alert> : null}
       {/* ── ヘッダー ── */}
       <div className="project-detail-header">
         <div className="project-detail-header-top">
@@ -309,7 +310,7 @@ export function ProjectDetailPage({
                     role="button"
                     title="クリップを表示"
                   >
-                    {clipCount} clips
+                    CLIP {clipCount}
                   </Badge>
                 </ClipsPopover>
               </span>

@@ -14,7 +14,9 @@ export function ClipsPage() {
     isError,
     hasNextPage,
     isFetchingNextPage,
+    isFetchNextPageError,
     fetchNextPage,
+    refetch,
   } = useClips();
 
   const clips = useMemo(
@@ -46,7 +48,9 @@ export function ClipsPage() {
           isError={isError}
           hasNextPage={hasNextPage}
           isFetchingNextPage={isFetchingNextPage}
+          isFetchNextPageError={isFetchNextPageError}
           onLoadMore={() => fetchNextPage()}
+          onRetry={() => void refetch()}
           onClipClick={setSelectedClip}
         />
 

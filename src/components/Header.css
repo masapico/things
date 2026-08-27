@@ -1,7 +1,7 @@
 /* Header — "steno pad" design language */
 
 .app-header {
-  border-bottom: 1px solid #d8e2ce;
+  border-bottom: 1px solid var(--app-border);
   background: #fcfdfa;
   position: sticky;
   top: 0;
@@ -42,7 +42,7 @@
   color: #5b6b64;
   text-decoration: none;
   position: relative;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: background var(--app-motion) ease, color var(--app-motion) ease;
 }
 
 .app-header-nav-item:hover {
@@ -161,7 +161,9 @@
 @media (max-width: 575px) {
   .app-header-inner { flex-wrap: wrap; }
   .app-header-nav { flex: 1; justify-content: space-around; }
+  .app-header-nav-item { min-width: 2.5rem; min-height: 2.5rem; justify-content: center; }
   .app-header-right { margin-left: auto; }
   .app-header-search { order: 3; flex-basis: 100%; max-width: none; }
   .app-header-clock { gap: .3rem; }
+  .app-header-logout { width: 2.75rem; height: 2.75rem; }
 }

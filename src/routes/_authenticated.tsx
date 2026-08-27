@@ -1,7 +1,5 @@
 import { createFileRoute, redirect, Outlet } from "@tanstack/react-router";
 import { pb } from "../lib/pocketbase";
-import { Container, Row } from "react-bootstrap";
-
 import Header from "../components/Header";
 
 export const Route = createFileRoute("/_authenticated")({
@@ -25,13 +23,11 @@ export const Route = createFileRoute("/_authenticated")({
 
 function AuthLayout() {
   return (
-    <Container>
-      <Row>
-        <Header />
-      </Row>
-      <Row>
+    <div className="app-shell">
+      <Header />
+      <main className="app-main">
         <Outlet />
-      </Row>
-    </Container>
+      </main>
+    </div>
   );
 }

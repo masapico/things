@@ -22,9 +22,9 @@ const TYPE_META: Record<
   ClipType,
   { label: string; icon: typeof FileTextIcon }
 > = {
-  text: { label: "Text", icon: FileTextIcon },
-  image: { label: "Image", icon: ImageIcon },
-  file: { label: "File", icon: FileIcon },
+  text: { label: "テキスト", icon: FileTextIcon },
+  image: { label: "画像", icon: ImageIcon },
+  file: { label: "ファイル", icon: FileIcon },
 };
 
 export function ClipRegister() {
@@ -164,7 +164,7 @@ export function ClipRegister() {
     } catch (error) {
       console.error("Failed to save clip:", error);
       setStatusKind("error");
-      setStatusMessage("Failed to save the clip. Try again.");
+      setStatusMessage("クリップを保存できませんでした。もう一度お試しください。");
     } finally {
       setIsSaving(false);
     }
@@ -177,7 +177,7 @@ export function ClipRegister() {
       {statusMessage ? (
         <div
           className={`clip-status ${statusKind === "success" ? "clip-status--success" : "clip-status--error"}`}
-          role="status"
+          role={statusKind === "success" ? "status" : "alert"}
         >
           {statusKind === "success" ? (
             <CheckCircle2Icon size={16} />
@@ -201,8 +201,8 @@ export function ClipRegister() {
               <ClipboardPlusIcon size={20} />
             </div>
             <div>
-              <Modal.Title className="clip-title">Register clip</Modal.Title>
-              <p className="clip-subtitle">Give it a name, then save it.</p>
+              <Modal.Title className="clip-title">クリップを登録</Modal.Title>
+              <p className="clip-subtitle">名前と内容を確認して保存してください。</p>
             </div>
             <span className="clip-type-badge">
               <TypeIcon size={12} />
@@ -212,21 +212,21 @@ export function ClipRegister() {
         </Modal.Header>
         <Modal.Body>
           <Form.Group className="mb-3">
-            <Form.Label className="clip-field-label">Title</Form.Label>
+            <Form.Label className="clip-field-label">タイトル</Form.Label>
             <Form.Control
               className="clip-title-input"
               type="text"
               value={title}
               onChange={(event) => setTitle(event.target.value)}
-              placeholder="Name this clip"
+              placeholder="クリップ名"
             />
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label className="clip-field-label">Content</Form.Label>
+            <Form.Label className="clip-field-label">内容</Form.Label>
 
             {clipType === "text" ? (
-              <MarkdownClipEditor value={textContent} onChange={setTextContent} placeholder="Nothing pasted yet" />
+              <MarkdownClipEditor value={textContent} onChange={setTextContent} placeholder="貼り付けた内容" />
             ) : null}
 
             {clipType === "image" ? (
@@ -246,7 +246,7 @@ export function ClipRegister() {
                 </div>
                 <div>
                   <div className="clip-file-name">
-                    {fileContent?.name ?? "File"}
+                    {fileContent?.name ?? "ファイル"}
                   </div>
                   {fileContent?.size ? (
                     <div className="clip-file-meta">
@@ -260,14 +260,14 @@ export function ClipRegister() {
         </Modal.Body>
         <Modal.Footer>
           <Button className="clip-btn-cancel" onClick={resetState}>
-            Cancel
+            キャンセル
           </Button>
           <Button
             className="clip-btn-save"
             onClick={handleSave}
             disabled={isSaving}
           >
-            {isSaving ? "Saving…" : "Save clip"}
+            {isSaving ? "保存中…" : "クリップを保存"}
           </Button>
         </Modal.Footer>
       </Modal>

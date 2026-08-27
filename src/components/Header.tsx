@@ -15,8 +15,16 @@ function useCurrentTime() {
   const [now, setNow] = useState(new Date());
 
   useEffect(() => {
-    const timer = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(timer);
+    let interval: number | undefined;
+    const delay = 60_000 - (Date.now() % 60_000) + 50;
+    const timeout = window.setTimeout(() => {
+      setNow(new Date());
+      interval = window.setInterval(() => setNow(new Date()), 60_000);
+    }, delay);
+    return () => {
+      window.clearTimeout(timeout);
+      if (interval !== undefined) window.clearInterval(interval);
+    };
   }, []);
 
   const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
@@ -111,6 +119,7 @@ export function Header() {
                 search={{ redirect: pathname }}
                 className="app-header-logout"
                 title="ログアウト"
+                aria-label="ログアウト"
               >
                 <LogOut size={17} />
               </Link>

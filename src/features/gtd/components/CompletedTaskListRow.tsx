@@ -42,30 +42,25 @@ export function CompletedTaskListRow({ task }: CompletedTaskListRowProps) {
           {task.title}
         </div>
         <RecurrenceBadge task={task} />
-        <div
+        <button
+          type="button"
           className={`task-action-btn task-action-btn--undo ${isStatusPending ? "task-action-btn--loading" : ""}`}
-          role="button"
           title="Inboxに戻す"
-          tabIndex={0}
-          onClick={!isStatusPending ? handleUndo : undefined}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !isStatusPending) handleUndo();
-          }}
+          aria-label="Inboxに戻す"
+          disabled={isStatusPending}
+          onClick={handleUndo}
         >
           <Undo2 size={iconSize} />
-        </div>
-        <div
+        </button>
+        <button
+          type="button"
           className="task-action-btn task-action-btn--edit"
-          role="button"
-          title="Edit task"
-          tabIndex={0}
+          title="タスクを編集"
+          aria-label="タスクを編集"
           onClick={() => setShowEditModal(true)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") setShowEditModal(true);
-          }}
         >
           <Pencil size={iconSize} />
-        </div>
+        </button>
       </Stack>
       {errorMessage ? <div className="task-row-error" role="alert">{errorMessage}</div> : null}
       <TaskEditModal

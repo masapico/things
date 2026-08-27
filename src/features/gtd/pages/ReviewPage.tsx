@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Alert, Badge, Button, ListGroup, Spinner } from "react-bootstrap";
+import { Alert, Badge, Button, ListGroup } from "react-bootstrap";
 import { Link } from "@tanstack/react-router";
 import {
   AlertTriangle,
@@ -17,6 +17,7 @@ import { UnifiedTaskListRow } from "../components/UnifiedTaskListRow";
 import { useActiveProjects, useToggleReview } from "../hooks/useProjects";
 import { useReviewTasks } from "../hooks/useReviewTasks";
 import "./ReviewPage.css";
+import { AsyncState } from "../../../components/AsyncState";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -114,18 +115,13 @@ export function ReviewPage() {
 
   if (tasksQuery.isLoading || projectsQuery.isLoading) {
     return (
-      <div className="review-page review-page-state">
-        <Spinner animation="border" size="sm" />
-        <span>レビュー項目を読み込んでいます…</span>
-      </div>
+      <div className="review-page"><AsyncState kind="loading" message="レビュー項目を読み込んでいます…" /></div>
     );
   }
 
   if (tasksQuery.isError || projectsQuery.isError) {
     return (
-      <div className="review-page">
-        <Alert variant="danger">レビュー項目を読み込めませんでした。</Alert>
-      </div>
+      <div className="review-page"><AsyncState kind="error" message="レビュー項目を読み込めませんでした。" onRetry={() => { void tasksQuery.refetch(); void projectsQuery.refetch(); }} /></div>
     );
   }
 

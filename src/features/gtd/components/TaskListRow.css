@@ -162,6 +162,9 @@
   transition: background-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
   color: #6c757d;
   opacity: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
 }
 
 /* 行 hover / キーボードフォーカス時に表示 */
@@ -372,7 +375,19 @@
   border-radius: 4px;
   padding: 1px 5px;
   border-bottom: 1px dashed #ced4da;
+  border-top: 0;
+  border-right: 0;
+  border-left: 0;
+  background: transparent;
   transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+@media (max-width: 575px), (pointer: coarse) {
+  .task-action-btn {
+    width: 44px;
+    height: 44px;
+    opacity: 0.72;
+  }
 }
 
 .task-completed-date--editable:hover {

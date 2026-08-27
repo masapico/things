@@ -7,6 +7,7 @@ import type { LaunchersKindOptions, LaunchersResponse } from "../../../lib/pb_ty
 import { useLauncherMutations, useLaunchers } from "../hooks/useLaunchers";
 import { LauncherEditModal, type LauncherFormValue } from "../components/LauncherEditModal";
 import "./LauncherPage.css";
+import { AsyncState } from "../../../components/AsyncState";
 
 const ICONS = { url: ExternalLinkIcon, application: AppWindowIcon, file: FileIcon, folder: FolderIcon } as const;
 const LABELS: Record<LaunchersKindOptions, string> = { url: "URL", application: "アプリ", file: "ファイル", folder: "フォルダ" };
@@ -53,16 +54,20 @@ export function LauncherPage() {
     const from = event.operation.source.initialIndex, to = event.operation.source.index;
     if (from === to) return;
     const next = reorder(items, from, to); setLocalItems(next);
-    mutations.reorder.mutate(next.map((item, index) => ({ id: item.id, sort: index * 100 })), { onSettled: () => setLocalItems(null) });
+    mutations.reorder.mutate(next.map((item, index) => ({ id: item.id, sort: index * 100 })), {
+      onError: () => setMessage({ kind: "danger", text: "並べ替えを保存できなかったため、元の順序に戻しました。" }),
+      onSettled: () => setLocalItems(null),
+    });
   }, [items, mutations.reorder]);
 
-  if (query.isLoading) return <div className="launcher-state"><Spinner /></div>;
-  if (query.isError) return <Alert variant="danger" className="mt-4">ランチャーを読み込めませんでした。</Alert>;
+  if (query.isLoading) return <div className="launcher-page"><AsyncState kind="loading" message="ランチャーを読み込んでいます…" /></div>;
+  if (query.isError) return <div className="launcher-page"><AsyncState kind="error" message="ランチャーを読み込めませんでした。" onRetry={() => void query.refetch()} /></div>;
   return <div className="launcher-page">
     <div className="launcher-header"><div><h1><RocketIcon size={23} /> Launcher</h1><p>よく使うアプリ、URL、ファイル、フォルダをすぐに開きます。</p></div><Button onClick={() => { setEditing(null); setShowEditor(true); }}><PlusIcon size={16} /> 登録</Button></div>
-    {message && <Alert variant={message.kind}>{message.text}</Alert>}
+    {query.isFetching ? <div className="app-background-status mb-2" role="status"><Spinner animation="border" size="sm" />更新中</div> : null}
+    {message && <Alert variant={message.kind} dismissible onClose={() => setMessage(undefined)} role={message.kind === "danger" ? "alert" : "status"}>{message.text}</Alert>}
     {items.length ? <DragDropProvider onDragEnd={dragEnd}><div className="launcher-list">{items.map((item, index) => <SortableLauncher key={item.id} item={item} index={index} launching={launchingId === item.id} onLaunch={() => launch(item)} onEdit={() => { setEditing(item); setShowEditor(true); }} onDelete={() => setDeleting(item)} />)}</div></DragDropProvider> : <div className="launcher-empty"><RocketIcon size={32} /><p>ランチャー項目はまだありません。</p><Button variant="outline-primary" onClick={() => setShowEditor(true)}>最初の項目を登録</Button></div>}
     <LauncherEditModal key={`${editing?.id ?? "new"}-${showEditor}`} show={showEditor} launcher={editing} isSaving={mutations.create.isPending || mutations.update.isPending} onClose={() => { setShowEditor(false); setEditing(null); }} onSave={save} />
-    <Modal show={!!deleting} onHide={() => setDeleting(null)} centered size="sm"><Modal.Header closeButton><Modal.Title>項目を削除</Modal.Title></Modal.Header><Modal.Body>「{deleting?.name}」を削除しますか？</Modal.Body><Modal.Footer><Button variant="outline-secondary" onClick={() => setDeleting(null)}>キャンセル</Button><Button variant="danger" onClick={() => deleting && mutations.remove.mutate(deleting.id, { onSuccess: () => setDeleting(null) })}>削除</Button></Modal.Footer></Modal>
+    <Modal show={!!deleting} onHide={() => !mutations.remove.isPending && setDeleting(null)} centered size="sm"><Modal.Header closeButton={!mutations.remove.isPending}><Modal.Title>項目を削除</Modal.Title></Modal.Header><Modal.Body>「{deleting?.name}」を削除しますか？</Modal.Body><Modal.Footer><Button variant="outline-secondary" disabled={mutations.remove.isPending} onClick={() => setDeleting(null)}>キャンセル</Button><Button variant="danger" disabled={mutations.remove.isPending} onClick={() => deleting && mutations.remove.mutate(deleting.id, { onSuccess: () => { setDeleting(null); setMessage({ kind: "success", text: "削除しました。" }); }, onError: () => setMessage({ kind: "danger", text: "削除できませんでした。もう一度お試しください。" }) })}>{mutations.remove.isPending ? <><Spinner animation="border" size="sm" /> 削除中</> : "削除"}</Button></Modal.Footer></Modal>
   </div>;
 }

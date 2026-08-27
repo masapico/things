@@ -1,9 +1,9 @@
-import { useState } from "react";
 import { Container, Row, Col, Spinner, Badge } from "react-bootstrap";
 import { useActiveProjects, useArchivedProjects, useProjectTaskCounts } from "../hooks/useProjects";
 import "./ProjectList.css";
-import { ChevronRight, Play, Flag, FolderKanban, Archive, Plus } from "lucide-react";
+import { ChevronRight, Play, Flag, FolderKanban, Archive, Plus, RefreshCw } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import type { ProjectListView } from "../navigation";
 
 function formatDate(value?: string) {
   if (!value) return "";
@@ -18,8 +18,18 @@ function formatDate(value?: string) {
   });
 }
 
-export function ProjectList({ onCreateClick }: { onCreateClick: () => void }) {
-  const [showArchived, setShowArchived] = useState(false);
+type ProjectListProps = {
+  view: ProjectListView;
+  onViewChange: (view: ProjectListView) => void;
+  onCreateClick: () => void;
+};
+
+export function ProjectList({
+  view,
+  onViewChange,
+  onCreateClick,
+}: ProjectListProps) {
+  const showArchived = view === "archived";
   const {
     data: activeProjects,
     isLoading: activeLoading,
@@ -74,14 +84,20 @@ export function ProjectList({ onCreateClick }: { onCreateClick: () => void }) {
             </p>
           </div>
         </div>
-        <button
-          type="button"
-          className="project-list-create-btn"
-          onClick={onCreateClick}
-        >
-          <Plus size={16} />
-          新規作成
-        </button>
+        <div className="project-list-header-actions">
+          <Link to="/gtd/review" className="project-list-review-btn">
+            <RefreshCw size={15} />
+            週次レビュー
+          </Link>
+          <button
+            type="button"
+            className="project-list-create-btn"
+            onClick={onCreateClick}
+          >
+            <Plus size={16} />
+            新規作成
+          </button>
+        </div>
       </div>
 
       {/* トグル */}
@@ -89,14 +105,14 @@ export function ProjectList({ onCreateClick }: { onCreateClick: () => void }) {
         <button
           type="button"
           className={`project-list-toggle-btn${!showArchived ? " project-list-toggle-btn--active" : ""}`}
-          onClick={() => setShowArchived(false)}
+          onClick={() => onViewChange("active")}
         >
           アクティブ
         </button>
         <button
           type="button"
           className={`project-list-toggle-btn${showArchived ? " project-list-toggle-btn--active" : ""}`}
-          onClick={() => setShowArchived(true)}
+          onClick={() => onViewChange("archived")}
         >
           <Archive size={14} />
           アーカイブ
@@ -129,6 +145,7 @@ export function ProjectList({ onCreateClick }: { onCreateClick: () => void }) {
               <Link
                 to="/gtd/$projectid"
                 params={{ projectid: project.id }}
+                search={{ returnTo: view }}
                 className="project-list-card-link"
               >
                 <div className={`project-list-card${showArchived ? " project-list-card--archived" : ""}`}>

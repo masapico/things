@@ -9,6 +9,7 @@ function invalidateTaskQueries(queryClient: ReturnType<typeof useQueryClient>) {
   queryClient.invalidateQueries({ queryKey: [queryKeyIndexPage] });
   queryClient.invalidateQueries({ queryKey: ["projectTasks"] });
   queryClient.invalidateQueries({ queryKey: ["projectTaskCounts"] });
+  queryClient.invalidateQueries({ queryKey: ["reviewTasks"] });
 }
 
 // Index Page Tasks

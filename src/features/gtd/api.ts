@@ -53,6 +53,14 @@ export async function getProjectTasks(projectId: string): Promise<TasksResponse[
   });
 }
 
+export async function getReviewTasks(): Promise<TasksResponse[]> {
+  return await pb.collection("tasks").getFullList<TasksResponse>({
+    filter: 'status != "completed"',
+    sort: "duedate,updated",
+    expand: "project",
+  });
+}
+
 export type DuplicateProjectInput = {
   name: string;
   memo?: string;

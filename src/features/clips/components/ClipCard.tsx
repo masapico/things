@@ -1,8 +1,9 @@
 import { Badge, Button, Card, Image } from "react-bootstrap";
-import { DownloadIcon, ExternalLinkIcon } from "lucide-react";
+import { DownloadIcon, ExternalLinkIcon, FileIcon } from "lucide-react";
 import type { ClipsResponse } from "../../../lib/pb_types";
 import { pb } from "../../../lib/pocketbase";
 import "./ClipCard.css";
+import { PdfThumbnail } from "./PdfThumbnail";
 
 type ClipCardProps = {
   clip: ClipsResponse;
@@ -88,8 +89,8 @@ function getClipType(clip: ClipsResponse): "text" | "image" | "file" {
 export function ClipCard({ clip, onClick }: ClipCardProps) {
   const clipType = getClipType(clip);
   // 画像タイプは大きめのサムネイル、それ以外は小さめ
-  const thumbnailSize = clipType === "image" ? "400x300" : "100x100";
-  const thumbnailUrl = getThumbnailUrl(clip, thumbnailSize);
+  const thumbnailUrl =
+    clipType === "image" ? getThumbnailUrl(clip, "400x300") : null;
   const fullFileUrl = clip.file
     ? `${pb.baseURL}/api/files/${clip.collectionId}/${clip.id}/${clip.file}`
     : null;
@@ -137,6 +138,19 @@ export function ClipCard({ clip, onClick }: ClipCardProps) {
                 objectFit: "contain",
               }}
             />
+          </div>
+        ) : null}
+
+        {clipType === "file" && extension === "PDF" && fullFileUrl ? (
+          <PdfThumbnail url={fullFileUrl} title={clip.name} />
+        ) : null}
+
+        {clipType === "file" && extension !== "PDF" ? (
+          <div className="clip-card-file-info d-flex align-items-center gap-2">
+            <FileIcon size={22} />
+            <span className="clip-card-file-name">
+              {getDisplayFileName(clip)}
+            </span>
           </div>
         ) : null}
 

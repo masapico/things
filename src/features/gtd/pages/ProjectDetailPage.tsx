@@ -24,10 +24,39 @@ import { useSortable, isSortable } from "@dnd-kit/react/sortable";
 import type { DragEndEvent } from "@dnd-kit/dom";
 import { useUpdateTaskSorts } from "../hooks/useTasks";
 import "./ProjectDetailPage.css";
+import type { ProjectReturnTo } from "../navigation";
 
 type ProjectDetailPageProps = {
   projectId: string;
+  returnTo: ProjectReturnTo;
 };
+
+function ProjectBackLink({ returnTo }: { returnTo: ProjectReturnTo }) {
+  const content = (
+    <>
+      <ArrowLeft size={18} />
+      <span className="visually-hidden">前の画面に戻る</span>
+    </>
+  );
+
+  if (returnTo === "review") {
+    return (
+      <Link to="/gtd/review" className="project-detail-back">
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <Link
+      to="/gtd"
+      search={{ view: returnTo }}
+      className="project-detail-back"
+    >
+      {content}
+    </Link>
+  );
+}
 
 function formatDate(value?: string) {
   if (!value) return "";
@@ -120,7 +149,10 @@ function SortableTaskRow({
   );
 }
 
-export function ProjectDetailPage({ projectId }: ProjectDetailPageProps) {
+export function ProjectDetailPage({
+  projectId,
+  returnTo,
+}: ProjectDetailPageProps) {
   const {
     data: project,
     isLoading: projectLoading,
@@ -190,7 +222,11 @@ export function ProjectDetailPage({ projectId }: ProjectDetailPageProps) {
     return (
       <Container className="mt-4">
         <p className="text-danger">プロジェクトが見つかりませんでした。</p>
-        <Link to="/gtd" className="btn btn-outline-secondary btn-sm mt-2">
+        <Link
+          to={returnTo === "review" ? "/gtd/review" : "/gtd"}
+          search={returnTo === "review" ? {} : { view: returnTo }}
+          className="btn btn-outline-secondary btn-sm mt-2"
+        >
           <ArrowLeft size={14} className="me-1" />
           プロジェクト一覧に戻る
         </Link>
@@ -220,13 +256,7 @@ export function ProjectDetailPage({ projectId }: ProjectDetailPageProps) {
       {/* ── ヘッダー ── */}
       <div className="project-detail-header">
         <div className="project-detail-header-top">
-          <Link
-            to="/gtd"
-            className="project-detail-back"
-            aria-label="プロジェクト一覧に戻る"
-          >
-            <ArrowLeft size={18} />
-          </Link>
+          <ProjectBackLink returnTo={returnTo} />
           <div className="project-detail-title-row">
             <div className="project-detail-icon">
               <FolderKanban size={20} />
@@ -412,6 +442,7 @@ export function ProjectDetailPage({ projectId }: ProjectDetailPageProps) {
           navigate({
             to: "/gtd/$projectid",
             params: { projectid: newProjectId },
+            search: { returnTo: "active" },
           });
         }}
       />

@@ -46,7 +46,11 @@ export function Header() {
         setShowTaskModal(true);
         break;
       case "project":
-        navigate({ to: "/gtd/$projectid", params: { projectid: result.data.id } });
+        navigate({
+          to: "/gtd/$projectid",
+          params: { projectid: result.data.id },
+          search: { returnTo: "active" },
+        });
         break;
     }
   }

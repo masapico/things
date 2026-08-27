@@ -72,6 +72,31 @@
 }
 
 /* ── 新規作成ボタン ── */
+.project-list-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.project-list-review-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--clip-line-strong);
+  border-radius: 0.5rem;
+  color: var(--clip-ink-soft);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.project-list-review-btn:hover {
+  border-color: var(--clip-teal);
+  background: var(--clip-teal-soft);
+  color: var(--clip-teal);
+}
+
 .project-list-create-btn {
   display: inline-flex;
   align-items: center;

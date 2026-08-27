@@ -16,6 +16,7 @@
     "@tanstack/react-router": "^1.170.18",
     "bootstrap": "^5.3.8",
     "lucide-react": "^0.545.0",
+    "pdfjs-dist": "^6.2.108",
     "pocketbase": "^0.27.0",
     "react": "^19.2.7",
     "react-bootstrap": "^2.10.10",

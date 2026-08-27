@@ -1,7 +1,10 @@
-.clock-tools-trigger { border: 0; cursor: pointer; transition: color .18s, background .18s, transform .18s; }
+.clock-tools-trigger { min-height: 2.15rem; border: 1px solid transparent; cursor: pointer; transition: color .18s, background .18s, border-color .18s, transform .18s; }
 .clock-tools-trigger:hover { background: #e4f0ee; }
-.clock-tools-trigger.is-warning { color: #775916; background: #fff0c7; }
-.clock-tools-trigger.is-due { color: #842029; background: #f8d7da; box-shadow: 0 0 0 2px rgba(220,53,69,.28); animation: clock-alert 1s ease-in-out infinite; }
+.clock-tools-trigger.is-warning { border-color: #ead08d; color: #775916; background: #fff8e5; }
+.clock-tools-trigger.is-due { border-color: #e3a5aa; color: #842029; background: #fff0f1; box-shadow: 0 0 0 2px rgba(220,53,69,.16); animation: clock-alert 1s ease-in-out infinite; }
+.clock-tools-indicator { display: inline-flex; align-items: center; max-width: 7.2rem; padding: .12rem .38rem; overflow: hidden; border-radius: 999px; color: #146b62; background: #dfeee9; font-size: .66rem; font-weight: 700; font-variant-numeric: tabular-nums; text-overflow: ellipsis; white-space: nowrap; }
+.is-warning .clock-tools-indicator { color: #775916; background: #f7df9d; }
+.is-due .clock-tools-indicator { color: #fff; background: #c64f59; }
 .clock-tools-popover { width: min(22rem, calc(100vw - 1rem)); max-width: none; }
 .clock-tools-popover .popover-header { color: #40544b; background: #f7faf5; }
 .clock-tools-popover .popover-body { display: grid; gap: .75rem; }
@@ -15,3 +18,4 @@
 .clock-tool-section .btn { display: inline-flex; align-items: center; justify-content: center; gap: .3rem; }
 @keyframes clock-alert { 0%,100% { transform: translateX(0); } 35% { transform: translateX(-2px); } 65% { transform: translateX(2px); } }
 @media (prefers-reduced-motion: reduce) { .clock-tools-trigger.is-due { animation: none; } }
+@media (max-width: 575px) { .clock-tools-indicator { max-width: 5.4rem; } }

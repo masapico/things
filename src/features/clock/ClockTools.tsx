@@ -26,7 +26,8 @@ export function ClockTools({ dateStr, hours, minutes }: Props) {
     <button ref={target} type="button" className={`app-header-clock clock-tools-trigger${due ? " is-due" : warning ? " is-warning" : ""}`} title={dateStr} onClick={() => setShow((value) => !value)} aria-expanded={show}>
       <ClockIcon size={14} className="app-header-clock-icon" />
       <span className="app-header-clock-date">{dateStr}</span>
-      <span className="app-header-clock-time">{due ? "確認" : next?.text ?? <>{hours}<span className="app-header-clock-colon">:</span>{minutes}</>}</span>
+      <span className="app-header-clock-time">{hours}<span className="app-header-clock-colon">:</span>{minutes}</span>
+      {(due || next) && <span className="clock-tools-indicator" aria-label={due ? "タイマーまたはアラームが終了しました" : `次の通知 ${next?.text}`}>{due ? "確認" : next?.text}</span>}
     </button>
     <Overlay target={target} show={show} placement="bottom-end" rootClose onHide={() => setShow(false)}>
       <Popover className="clock-tools-popover"><Popover.Header>タイマーとアラーム</Popover.Header><Popover.Body>

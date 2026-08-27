@@ -5,6 +5,12 @@ import { pb } from "../../../lib/pocketbase";
 
 const queryKeyIndexPage = "indexPageTasks";
 
+function invalidateTaskQueries(queryClient: ReturnType<typeof useQueryClient>) {
+  queryClient.invalidateQueries({ queryKey: [queryKeyIndexPage] });
+  queryClient.invalidateQueries({ queryKey: ["projectTasks"] });
+  queryClient.invalidateQueries({ queryKey: ["projectTaskCounts"] });
+}
+
 // Index Page Tasks
 export function useIndexPageTasks() {
   return useQuery({
@@ -30,8 +36,7 @@ export const useCreateTask = () => {
       return record;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKeyIndexPage] });
-      queryClient.invalidateQueries({ queryKey: ["projectTasks"] });
+      invalidateTaskQueries(queryClient);
     },
     onError: (error) => {
       console.error("タスクの作成に失敗しました:", error);
@@ -62,8 +67,7 @@ export const useCreateInboxTask = () => {
       return record;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKeyIndexPage] });
-      queryClient.invalidateQueries({ queryKey: ["projectTasks"] });
+      invalidateTaskQueries(queryClient);
     },
     onError: (error) => {
       console.error("タスクの作成に失敗しました:", error);
@@ -93,8 +97,7 @@ export const useChangeStatusInboxTask = () => {
         .update<TasksResponse>(targetTask.id, updateData);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKeyIndexPage] });
-      queryClient.invalidateQueries({ queryKey: ["projectTasks"] });
+      invalidateTaskQueries(queryClient);
     },
     onError: (error) => {
       console.error("タスクのステータス変更に失敗しました:", error);
@@ -111,8 +114,7 @@ export const useDeleteInboxTask = () => {
       return await pb.collection("tasks").delete(targetTask.id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKeyIndexPage] });
-      queryClient.invalidateQueries({ queryKey: ["projectTasks"] });
+      invalidateTaskQueries(queryClient);
     },
     onError: (error) => {
       console.error("タスクの削除に失敗しました:", error);
@@ -141,8 +143,7 @@ export const useUpdateTask = () => {
       return await pb.collection("tasks").update<TasksResponse>(id, data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKeyIndexPage] });
-      queryClient.invalidateQueries({ queryKey: ["projectTasks"] });
+      invalidateTaskQueries(queryClient);
     },
     onError: (error) => {
       console.error("タスクの更新に失敗しました:", error);

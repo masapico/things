@@ -1,5 +1,5 @@
 import { pb } from "../../lib/pocketbase";
-import type { ClipsResponse } from "../../lib/pb_types";
+import type { ClipsResponse, Update } from "../../lib/pb_types";
 
 export async function getClips(): Promise<ClipsResponse[]> {
   const result = await pb.collection("clips").getFullList<ClipsResponse>({
@@ -54,9 +54,9 @@ export async function searchClips(query: string): Promise<ClipsResponse[]> {
 
 export async function updateClip(
   id: string,
-  data: { name?: string; text?: string },
-): Promise<void> {
-  await pb.collection("clips").update(id, data);
+  data: Update<"clips">,
+): Promise<ClipsResponse> {
+  return await pb.collection("clips").update<ClipsResponse>(id, data);
 }
 
 export async function deleteClip(id: string): Promise<void> {

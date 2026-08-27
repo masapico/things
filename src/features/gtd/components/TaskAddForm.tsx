@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import { Button, Form, InputGroup } from "react-bootstrap";
+import { Alert, Button, Form, InputGroup } from "react-bootstrap";
 import { ListPlus } from "lucide-react";
 import { useCreateTask, type CreateTaskInput } from "../hooks/useTasks";
 
@@ -14,6 +14,7 @@ export function TaskAddForm({ projectId, onCreated }: TaskAddFormProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const { mutate, isPending } = useCreateTask();
   const [showSuccess, setShowSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   // 成功フィードバックを短時間だけ表示
   useEffect(() => {
@@ -27,6 +28,7 @@ export function TaskAddForm({ projectId, onCreated }: TaskAddFormProps) {
 
     const title = inputRef.current?.value ?? "";
     if (title.trim() === "") return;
+    setErrorMessage("");
 
     const input: CreateTaskInput = {
       title,
@@ -42,6 +44,9 @@ export function TaskAddForm({ projectId, onCreated }: TaskAddFormProps) {
         if (inputRef.current) inputRef.current.value = "";
         setShowSuccess(true);
         onCreated?.();
+      },
+      onError: () => {
+        setErrorMessage("タスクを追加できませんでした。もう一度お試しください。");
       },
     });
   }
@@ -69,6 +74,11 @@ export function TaskAddForm({ projectId, onCreated }: TaskAddFormProps) {
           {isPending ? "..." : <ListPlus />}
         </Button>
       </InputGroup>
+      {errorMessage ? (
+        <Alert variant="danger" className="task-add-error" role="alert">
+          {errorMessage}
+        </Alert>
+      ) : null}
     </Form>
   );
 }

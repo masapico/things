@@ -19,7 +19,8 @@
 }
 
 .omni-search-loading,
-.omni-search-empty {
+.omni-search-empty,
+.omni-search-error {
   padding: 16px;
   text-align: center;
   color: #6b7280;
@@ -81,4 +82,8 @@
   flex-shrink: 0;
   font-size: 0.65rem;
   color: #9ca3af;
+}
+
+.omni-search-error {
+  color: #b02a37;
 }

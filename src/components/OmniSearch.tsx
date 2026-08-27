@@ -68,11 +68,13 @@ export function OmniSearch({ onSelect }: OmniSearchProps) {
   const [tasks, setTasks] = useState<TasksResponse[]>([]);
   const [projects, setProjects] = useState<ProjectsResponse[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasError, setHasError] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const searchRequestRef = useRef(0);
 
   const flatResults = useCallback((): OmniSearchResult[] => {
     return [
@@ -83,14 +85,16 @@ export function OmniSearch({ onSelect }: OmniSearchProps) {
   }, [clips, tasks, projects]);
 
   // 検索実行（デバウンス 300ms）
-  const runSearch = useCallback((trimmed: string) => {
+  const runSearch = useCallback((trimmed: string, requestId: number) => {
     setIsLoading(true);
+    setHasError(false);
     Promise.all([
       searchClips(trimmed),
       searchTasks(trimmed),
       searchProjects(trimmed),
     ])
       .then(([c, t, p]) => {
+        if (requestId !== searchRequestRef.current) return;
         setClips(c);
         setTasks(t);
         setProjects(p);
@@ -98,15 +102,24 @@ export function OmniSearch({ onSelect }: OmniSearchProps) {
         setIsOpen(true);
       })
       .catch((err) => {
+        if (requestId !== searchRequestRef.current) return;
         console.error("OmniSearch error:", err);
+        setClips([]);
+        setTasks([]);
+        setProjects([]);
+        setHasError(true);
+        setIsOpen(true);
       })
       .finally(() => {
-        setIsLoading(false);
+        if (requestId === searchRequestRef.current) {
+          setIsLoading(false);
+        }
       });
   }, []);
 
   function handleQueryChange(value: string) {
     setQuery(value);
+    const requestId = ++searchRequestRef.current;
 
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
@@ -115,16 +128,19 @@ export function OmniSearch({ onSelect }: OmniSearchProps) {
       setClips([]);
       setTasks([]);
       setProjects([]);
+      setHasError(false);
+      setIsLoading(false);
       setIsOpen(false);
       return;
     }
 
-    debounceRef.current = setTimeout(() => runSearch(trimmed), 300);
+    debounceRef.current = setTimeout(() => runSearch(trimmed, requestId), 300);
   }
 
   // クリーンアップ
   useEffect(() => {
     return () => {
+      searchRequestRef.current += 1;
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
   }, []);
@@ -202,6 +218,10 @@ export function OmniSearch({ onSelect }: OmniSearchProps) {
           {isLoading ? (
             <div className="omni-search-loading">
               <Spinner animation="border" size="sm" />
+            </div>
+          ) : hasError ? (
+            <div className="omni-search-error" role="alert">
+              検索できませんでした。入力し直してお試しください。
             </div>
           ) : !hasResults ? (
             <div className="omni-search-empty">該当する結果がありません</div>

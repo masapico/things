@@ -15,6 +15,7 @@ import {
   ExternalLinkIcon,
 } from "lucide-react";
 import type { ClipsResponse } from "../../../lib/pb_types";
+import type { Update } from "../../../lib/pb_types";
 import { pb } from "../../../lib/pocketbase";
 import { updateClip, deleteClip } from "../api";
 import { ImageAnnotator, type Annotation } from "./ImageAnnotator";
@@ -87,6 +88,7 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
   // across edit cycles so the readonly view doesn't rely on the stale `clip` prop.
   const [savedAnnotations, setSavedAnnotations] = useState<Annotation[]>([]);
   const [savedText, setSavedText] = useState("");
+  const [savedName, setSavedName] = useState("");
 
   // Reset local state when the clip changes (before render, not in an effect)
   if (clip?.id !== prevClipIdRef.current) {
@@ -101,6 +103,7 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
         : [],
     );
     setSavedText(clip?.text ?? "");
+    setSavedName(clip?.name ?? "");
   }
 
   useEffect(() => {
@@ -115,19 +118,16 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
   const { label: typeLabel, icon: TypeIcon } = TYPE_META[clipType];
   // Use saved state for the readonly view to stay up to date after saving
   // while the `clip` prop is still stale.
-  const readonlyText = savedText || clip.text || "";
-  const readonlyAnnotations: Annotation[] = savedAnnotations.length > 0
-    ? savedAnnotations
-    : clip.annotations && Array.isArray(clip.annotations)
-      ? clip.annotations
-      : [];
+  const readonlyText = savedText;
+  const readonlyName = savedName;
+  const readonlyAnnotations: Annotation[] = savedAnnotations;
   const fullFileUrl = clip.file
     ? `${pb.baseURL}/api/files/${clip.collectionId}/${clip.id}/${clip.file}`
     : null;
 
   const isDirty =
     isEditing &&
-    (editName !== clip.name ||
+    (editName !== readonlyName ||
       (clipType === "text" && editText !== readonlyText) ||
       hasUnsavedAnnotations);
 
@@ -140,7 +140,7 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
   };
 
   const handleEnterEdit = () => {
-    setEditName(clip.name);
+    setEditName(readonlyName);
     setEditText(readonlyText);
     setEditAnnotations(readonlyAnnotations);
     setHasUnsavedAnnotations(false);
@@ -150,15 +150,15 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const data: Record<string, unknown> = {};
-      data.name = editName.trim() || clip.name;
+      const data: Update<"clips"> = {};
+      data.name = editName.trim() || readonlyName;
       if (clipType === "text") {
         data.text = editText;
       }
       if (hasUnsavedAnnotations) {
-        data.annotations = JSON.stringify(editAnnotations);
+        data.annotations = editAnnotations;
       }
-      await updateClip(clip.id, data as { name?: string; text?: string });
+      const updatedClip = await updateClip(clip.id, data);
       queryClient.invalidateQueries({ queryKey: ["clips"] });
       // Persist the saved data so the readonly view stays up to date
       // even though the `clip` prop is still stale.
@@ -168,6 +168,7 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
       if (clipType === "text") {
         setSavedText(editText);
       }
+      setSavedName(updatedClip.name);
       setIsEditing(false);
       setStatusKind("success");
       setStatusMessage("Clip updated.");
@@ -195,7 +196,7 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
   };
 
   const handleCancelEdit = () => {
-    setEditName(clip.name);
+    setEditName(readonlyName);
     setEditText(readonlyText);
     setEditAnnotations(readonlyAnnotations);
     setHasUnsavedAnnotations(false);
@@ -285,7 +286,7 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
             </div>
             <div>
               <Modal.Title className="clip-title">
-                {isEditing ? "Edit clip" : clip.name}
+                {isEditing ? "Edit clip" : readonlyName}
               </Modal.Title>
               <p className="clip-subtitle">
                 {isEditing

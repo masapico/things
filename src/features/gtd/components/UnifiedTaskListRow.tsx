@@ -66,6 +66,7 @@ export function UnifiedTaskListRow({
   const [showEditModal, setShowEditModal] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
   const [isEditingCompletedDate, setIsEditingCompletedDate] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const { mutate: mutateStatus, isPending: isStatusPending } =
     useChangeStatusInboxTask();
@@ -75,22 +76,33 @@ export function UnifiedTaskListRow({
     setIsEditingCompletedDate(false);
     if (!dateStr) return;
     // 日付のみ指定された場合はその日の 12:00 を保存（タイムゾーンずれ防止）
-    mutateUpdate({ id: task.id, completed: `${dateStr}T12:00:00` });
+    setErrorMessage("");
+    mutateUpdate(
+      { id: task.id, completed: `${dateStr}T12:00:00` },
+      {
+        onError: () =>
+          setErrorMessage("完了日を更新できませんでした。"),
+      },
+    );
   }
 
   function changeStatus(newStatus: TasksResponse["status"]) {
+    setErrorMessage("");
+    const mutationOptions = {
+      onError: () => {
+        setIsLeaving(false);
+        setErrorMessage("ステータスを更新できませんでした。");
+      },
+    };
     // 完了時はフェードアウトしてからステータスを更新する
     if (newStatus === "completed") {
       setIsLeaving(true);
       setTimeout(() => {
-        mutateStatus({ targetTask: task, newStatus });
+        mutateStatus({ targetTask: task, newStatus }, mutationOptions);
       }, 200);
       return;
     }
-    mutateStatus(
-      { targetTask: task, newStatus },
-      { onSuccess: () => console.log(`task ${newStatus}`, task.id) },
-    );
+    mutateStatus({ targetTask: task, newStatus }, mutationOptions);
   }
 
   const isCompleted = task.status === "completed";
@@ -274,6 +286,12 @@ export function UnifiedTaskListRow({
         )}
 
       </Stack>
+
+      {errorMessage ? (
+        <div className="task-row-error" role="alert">
+          {errorMessage}
+        </div>
+      ) : null}
 
       <TaskEditModal
         task={task}

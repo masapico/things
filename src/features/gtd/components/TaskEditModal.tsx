@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Button, Form, Modal, Stack } from "react-bootstrap";
+import { Alert, Button, Form, Modal, Stack } from "react-bootstrap";
 import type { TasksResponse, ClipsResponse } from "../../../lib/pb_types";
 import { useUpdateTask, useDeleteInboxTask } from "../hooks/useTasks";
 import { useActiveProjects } from "../hooks/useProjects";
@@ -51,6 +51,7 @@ export function TaskEditModal({ task, show, onClose }: TaskEditModalProps) {
   // ClipDetailModal 用
   const [viewingClip, setViewingClip] = useState<ClipsResponse | null>(null);
   const [showClipDetail, setShowClipDetail] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   // モーダルが開かれるたびにフォームをリセット
   useEffect(() => {
@@ -62,11 +63,13 @@ export function TaskEditModal({ task, show, onClose }: TaskEditModalProps) {
         setDuedate(toDateInputValue(task.duedate));
         setProject(task.project ?? "");
         setSelectedClips(task.clips ?? []);
+        setErrorMessage("");
       });
     }
   }, [show, task]);
 
   function handleSave() {
+    setErrorMessage("");
     updateMutation.mutate(
       {
         id: task.id,
@@ -81,6 +84,9 @@ export function TaskEditModal({ task, show, onClose }: TaskEditModalProps) {
         onSuccess: () => {
           onClose();
         },
+        onError: () => {
+          setErrorMessage("タスクを保存できませんでした。もう一度お試しください。");
+        },
       },
     );
   }
@@ -90,6 +96,9 @@ export function TaskEditModal({ task, show, onClose }: TaskEditModalProps) {
     deleteMutation.mutate(task, {
       onSuccess: () => {
         onClose();
+      },
+      onError: () => {
+        setErrorMessage("タスクを削除できませんでした。もう一度お試しください。");
       },
     });
   }
@@ -131,6 +140,11 @@ export function TaskEditModal({ task, show, onClose }: TaskEditModalProps) {
           </div>
         </Modal.Header>
         <Modal.Body>
+          {errorMessage ? (
+            <Alert variant="danger" role="alert">
+              {errorMessage}
+            </Alert>
+          ) : null}
           <Form>
             {/* タイトル */}
             <Form.Group className="mb-3">

@@ -424,3 +424,15 @@
   border-color: #198754;
   color: #198754;
 }
+
+.task-add-error {
+  margin: 0.4rem 0 0;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.75rem;
+}
+
+.task-row-error {
+  margin-top: 0.25rem;
+  color: #b02a37;
+  font-size: 0.72rem;
+}

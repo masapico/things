@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { FileTextIcon } from "lucide-react";
-import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
+import pdfWorkerUrl from "pdfjs-dist/legacy/build/pdf.worker.min.mjs?url";
 
 type PdfThumbnailProps = {
   url: string;
@@ -43,7 +43,7 @@ export function PdfThumbnail({ url, title }: PdfThumbnailProps) {
     async function renderFirstPage() {
       setState("loading");
       try {
-        const pdfjs = await import("pdfjs-dist");
+        const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
         pdfjs.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 
         const task = pdfjs.getDocument({ url });

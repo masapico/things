@@ -19,7 +19,7 @@
 - React Bootstrap / Bootstrap / Lucide React
 - dnd-kit（タスクのドラッグ並べ替え）
 - react-markdown / remark-gfm（クリップ本文の Markdown 表示）
-- PDF.js（PDFクリップの1ページ目プレビュー）
+- PDF.js legacy build（旧ブラウザ互換を含むPDFクリップの1ページ目プレビュー）
 
 ## 現在の機能
 

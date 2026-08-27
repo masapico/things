@@ -5,6 +5,8 @@ import "./TaskListRow.css";
 import { useChangeStatusInboxTask } from "../hooks/useTasks";
 import { TaskEditModal } from "./TaskEditModal";
 import { useState } from "react";
+import { RecurrenceBadge } from "./RecurrenceBadge";
+import { taskMutationErrorMessage } from "../recurrence";
 
 type CompletedTaskListRowProps = {
   task: TasksResponse;
@@ -13,14 +15,23 @@ type CompletedTaskListRowProps = {
 export function CompletedTaskListRow({ task }: CompletedTaskListRowProps) {
   const iconSize = 16;
   const [showEditModal, setShowEditModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const { mutate: mutateStatus, isPending: isStatusPending } =
     useChangeStatusInboxTask();
 
   function handleUndo() {
+    if (
+      task.recurrenceUnit &&
+      !window.confirm("完了を取り消し、自動生成された次回タスクも削除しますか？")
+    ) return;
+    setErrorMessage("");
     mutateStatus(
       { targetTask: task, newStatus: "inbox" },
-      { onSuccess: () => console.log("task undo", task.id) },
+      {
+        onError: (error) =>
+          setErrorMessage(taskMutationErrorMessage(error, "完了を取り消せませんでした。")),
+      },
     );
   }
 
@@ -30,6 +41,7 @@ export function CompletedTaskListRow({ task }: CompletedTaskListRowProps) {
         <div className="task-title task-title--completed">
           {task.title}
         </div>
+        <RecurrenceBadge task={task} />
         <div
           className={`task-action-btn task-action-btn--undo ${isStatusPending ? "task-action-btn--loading" : ""}`}
           role="button"
@@ -55,6 +67,7 @@ export function CompletedTaskListRow({ task }: CompletedTaskListRowProps) {
           <Pencil size={iconSize} />
         </div>
       </Stack>
+      {errorMessage ? <div className="task-row-error" role="alert">{errorMessage}</div> : null}
       <TaskEditModal
         task={task}
         show={showEditModal}

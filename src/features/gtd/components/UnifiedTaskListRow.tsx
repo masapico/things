@@ -15,6 +15,8 @@ import { useChangeStatusInboxTask, useUpdateTask } from "../hooks/useTasks";
 import { TaskInfo } from "./TaskInfo";
 import { TaskEditModal } from "./TaskEditModal";
 import { useState } from "react";
+import { RecurrenceBadge } from "./RecurrenceBadge";
+import { taskMutationErrorMessage } from "../recurrence";
 
 type UnifiedTaskListRowProps = {
   task: TasksResponse;
@@ -87,11 +89,17 @@ export function UnifiedTaskListRow({
   }
 
   function changeStatus(newStatus: TasksResponse["status"]) {
+    if (
+      task.status === "completed" &&
+      newStatus === "inbox" &&
+      task.recurrenceUnit &&
+      !window.confirm("完了を取り消し、自動生成された次回タスクも削除しますか？")
+    ) return;
     setErrorMessage("");
     const mutationOptions = {
-      onError: () => {
+      onError: (error: unknown) => {
         setIsLeaving(false);
-        setErrorMessage("ステータスを更新できませんでした。");
+        setErrorMessage(taskMutationErrorMessage(error, "ステータスを更新できませんでした。"));
       },
     };
     // 完了時はフェードアウトしてからステータスを更新する
@@ -149,6 +157,7 @@ export function UnifiedTaskListRow({
 
         {/* タスク付随情報（完了タスクでは非表示） */}
         {!isCompleted && <TaskInfo task={task} />}
+        {isCompleted && <RecurrenceBadge task={task} />}
 
         {/* ── アクションボタン（ステータスに応じて出し分け）── */}
 

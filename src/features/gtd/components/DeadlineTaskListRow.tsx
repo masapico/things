@@ -2,6 +2,7 @@ import { ListGroup, Stack } from "react-bootstrap";
 import type { TasksResponse } from "../../../lib/pb_types";
 import { Calendar, FolderKanban } from "lucide-react";
 import "./TaskListRow.css";
+import { RecurrenceBadge } from "./RecurrenceBadge";
 
 type DeadlineTaskListRowProps = {
   task: TasksResponse;
@@ -71,6 +72,8 @@ export function DeadlineTaskListRow({ task, projectName }: DeadlineTaskListRowPr
         <div className="task-title" title={task.memo ? task.memo : ""}>
           {task.title}
         </div>
+
+        <RecurrenceBadge task={task} />
 
         {/* プロジェクト名 */}
         {projectName && (

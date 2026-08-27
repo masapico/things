@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import { Alert, Button, Form, Modal, Stack } from "react-bootstrap";
-import type { TasksResponse, ClipsResponse } from "../../../lib/pb_types";
+import type {
+  TasksResponse,
+  ClipsResponse,
+  TasksRecurrenceUnitOptions,
+} from "../../../lib/pb_types";
 import { useUpdateTask, useDeleteInboxTask } from "../hooks/useTasks";
 import { useActiveProjects } from "../hooks/useProjects";
 import type { TasksPriorityOptions } from "../../../lib/pb_types";
@@ -43,6 +47,12 @@ export function TaskEditModal({ task, show, onClose }: TaskEditModalProps) {
     task.priority ?? "",
   );
   const [duedate, setDuedate] = useState(toDateInputValue(task.duedate));
+  const [recurrenceUnit, setRecurrenceUnit] = useState<TasksRecurrenceUnitOptions | "">(
+    task.recurrenceUnit ?? "",
+  );
+  const [recurrenceInterval, setRecurrenceInterval] = useState(
+    task.recurrenceInterval ?? 1,
+  );
   const [project, setProject] = useState(task.project ?? "");
   const [selectedClips, setSelectedClips] = useState<string[]>(
     task.clips ?? [],
@@ -61,6 +71,8 @@ export function TaskEditModal({ task, show, onClose }: TaskEditModalProps) {
         setMemo(task.memo ?? "");
         setPriority(task.priority ?? "");
         setDuedate(toDateInputValue(task.duedate));
+        setRecurrenceUnit(task.recurrenceUnit ?? "");
+        setRecurrenceInterval(task.recurrenceInterval ?? 1);
         setProject(task.project ?? "");
         setSelectedClips(task.clips ?? []);
         setErrorMessage("");
@@ -70,6 +82,10 @@ export function TaskEditModal({ task, show, onClose }: TaskEditModalProps) {
 
   function handleSave() {
     setErrorMessage("");
+    const scheduleChanged =
+      recurrenceUnit !== (task.recurrenceUnit ?? "") ||
+      recurrenceInterval !== (task.recurrenceInterval ?? 1) ||
+      duedate !== toDateInputValue(task.duedate);
     updateMutation.mutate(
       {
         id: task.id,
@@ -77,6 +93,13 @@ export function TaskEditModal({ task, show, onClose }: TaskEditModalProps) {
         memo: memo.trim() || null,
         priority: priority || null,
         duedate: duedate || null,
+        recurrenceUnit: recurrenceUnit || null,
+        recurrenceInterval: recurrenceUnit ? recurrenceInterval : null,
+        recurrenceAnchor: recurrenceUnit
+          ? scheduleChanged
+            ? duedate
+            : toDateInputValue(task.recurrenceAnchor) || duedate
+          : null,
         project: project || null,
         clips: selectedClips,
       },
@@ -108,9 +131,19 @@ export function TaskEditModal({ task, show, onClose }: TaskEditModalProps) {
     memo !== (task.memo ?? "") ||
     priority !== (task.priority ?? "") ||
     duedate !== toDateInputValue(task.duedate) ||
+    recurrenceUnit !== (task.recurrenceUnit ?? "") ||
+    recurrenceInterval !== (task.recurrenceInterval ?? 1) ||
     project !== (task.project ?? "") ||
-    JSON.stringify(selectedClips.sort()) !==
-      JSON.stringify((task.clips ?? []).sort());
+    JSON.stringify([...selectedClips].sort()) !==
+      JSON.stringify([...(task.clips ?? [])].sort());
+
+  const recurrenceInvalid = Boolean(
+    recurrenceUnit &&
+      (!duedate ||
+        !Number.isInteger(recurrenceInterval) ||
+        recurrenceInterval < 1 ||
+        recurrenceInterval > 99),
+  );
 
   return (
     <>
@@ -202,6 +235,48 @@ export function TaskEditModal({ task, show, onClose }: TaskEditModalProps) {
               </Form.Group>
             </Stack>
 
+            <Stack direction="horizontal" gap={3} className="mb-3 align-items-start">
+              <Form.Group style={{ flex: 1 }}>
+                <Form.Label className="task-edit-field-label">繰り返し</Form.Label>
+                <Form.Select
+                  className="task-edit-select"
+                  value={recurrenceUnit}
+                  disabled={task.status === "completed"}
+                  onChange={(e) =>
+                    setRecurrenceUnit(e.target.value as TasksRecurrenceUnitOptions | "")
+                  }
+                >
+                  <option value="">なし</option>
+                  <option value="day">日ごと</option>
+                  <option value="week">週ごと</option>
+                  <option value="month">月ごと</option>
+                </Form.Select>
+              </Form.Group>
+              {recurrenceUnit ? (
+                <Form.Group style={{ flex: 1 }}>
+                  <Form.Label className="task-edit-field-label">間隔</Form.Label>
+                  <Form.Control
+                    className="task-edit-input"
+                    type="number"
+                    min={1}
+                    max={99}
+                    step={1}
+                    value={recurrenceInterval}
+                    disabled={task.status === "completed"}
+                    onChange={(e) => setRecurrenceInterval(Number(e.target.value))}
+                    isInvalid={recurrenceInvalid}
+                  />
+                  <Form.Text muted>
+                    {task.status === "completed"
+                      ? "次回タスクで設定を変更できます。"
+                      : duedate
+                        ? "完了時に次回タスクを自動作成します。"
+                        : "繰り返しには期限が必要です。"}
+                  </Form.Text>
+                </Form.Group>
+              ) : null}
+            </Stack>
+
             {/* プロジェクト */}
             <Form.Group className="mb-3">
               <Form.Label className="task-edit-field-label">
@@ -253,7 +328,12 @@ export function TaskEditModal({ task, show, onClose }: TaskEditModalProps) {
             <Button
               className="task-edit-btn-save"
               onClick={handleSave}
-              disabled={!title.trim() || !hasChanges || updateMutation.isPending}
+              disabled={
+                !title.trim() ||
+                !hasChanges ||
+                recurrenceInvalid ||
+                updateMutation.isPending
+              }
             >
               {updateMutation.isPending ? "保存中…" : "保存"}
             </Button>

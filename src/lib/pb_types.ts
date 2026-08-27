@@ -153,6 +153,13 @@ export const TasksPriorityOptions = {
 	"low": "low",
 } as const
 export type TasksPriorityOptions = typeof TasksPriorityOptions[keyof typeof TasksPriorityOptions]
+
+export const TasksRecurrenceUnitOptions = {
+	"day": "day",
+	"week": "week",
+	"month": "month",
+} as const
+export type TasksRecurrenceUnitOptions = typeof TasksRecurrenceUnitOptions[keyof typeof TasksRecurrenceUnitOptions]
 export type TasksRecord = {
 	clips?: RecordIdString[]
 	completed?: IsoDateString
@@ -162,6 +169,10 @@ export type TasksRecord = {
 	memo?: string
 	priority?: TasksPriorityOptions
 	project?: RecordIdString
+	recurrenceAnchor?: IsoDateString
+	recurrenceInterval?: number
+	recurrencePrevious?: RecordIdString
+	recurrenceUnit?: TasksRecurrenceUnitOptions
 	sort?: number
 	status: TasksStatusOptions
 	title: string

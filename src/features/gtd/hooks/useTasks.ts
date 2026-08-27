@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import { getIndexPageTasks } from "../api";
-import type { TasksRecord, TasksResponse } from "../../../lib/pb_types";
+import { completeTask, getIndexPageTasks, undoTaskCompletion } from "../api";
+import type { TasksRecord, TasksResponse, TasksStatusOptions } from "../../../lib/pb_types";
 import { pb } from "../../../lib/pocketbase";
 
 const queryKeyIndexPage = "indexPageTasks";
@@ -86,13 +86,13 @@ export const useChangeStatusInboxTask = () => {
       newStatus,
     }: {
       targetTask: TasksResponse;
-      newStatus: string;
+      newStatus: TasksStatusOptions;
     }) => {
-      const updateData: Record<string, unknown> = { status: newStatus };
-      // completed ステータスに変更する場合、completed フィールドに現在日時をセット
-      if (newStatus === "completed") {
-        updateData.completed = new Date().toISOString();
+      if (newStatus === "completed") return completeTask(targetTask.id);
+      if (targetTask.status === "completed" && newStatus === "inbox") {
+        return undoTaskCompletion(targetTask.id);
       }
+      const updateData: Record<string, unknown> = { status: newStatus };
       return await pb
         .collection("tasks")
         .update<TasksResponse>(targetTask.id, updateData);
@@ -133,6 +133,9 @@ export type UpdateTaskInput = {
   project?: string | null;
   clips?: string[];
   completed?: string | null;
+  recurrenceUnit?: TasksRecord["recurrenceUnit"] | null;
+  recurrenceInterval?: number | null;
+  recurrenceAnchor?: string | null;
 };
 
 export const useUpdateTask = () => {

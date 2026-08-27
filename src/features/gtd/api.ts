@@ -1,5 +1,29 @@
 import { pb } from "../../lib/pocketbase";
 import type { TasksResponse, ProjectsResponse } from "../../lib/pb_types";
+import { localCalendarDate } from "./recurrence";
+
+export type CompleteTaskResult = {
+  completedTaskId: string;
+  nextTaskId: string | null;
+};
+
+export type UndoTaskCompletionResult = {
+  restoredTaskId: string;
+  deletedNextTaskId: string | null;
+};
+
+export async function completeTask(id: string): Promise<CompleteTaskResult> {
+  return pb.send(`/api/things/tasks/${encodeURIComponent(id)}/complete`, {
+    method: "POST",
+    body: { today: localCalendarDate() },
+  });
+}
+
+export async function undoTaskCompletion(id: string): Promise<UndoTaskCompletionResult> {
+  return pb.send(`/api/things/tasks/${encodeURIComponent(id)}/undo-completion`, {
+    method: "POST",
+  });
+}
 
 export async function getIndexPageTasks(): Promise<TasksResponse[]> {
   return await pb.collection("tasks").getFullList<TasksResponse>({

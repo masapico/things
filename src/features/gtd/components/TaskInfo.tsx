@@ -1,6 +1,7 @@
 import type { TasksResponse } from "../../../lib/pb_types";
 import { Calendar, Flag, FolderKanban, Paperclip } from "lucide-react";
 import { ClipsPopover } from "../../clips/components/ClipsPopover";
+import { RecurrenceBadge } from "./RecurrenceBadge";
 import "./TaskListRow.css";
 
 type TaskInfoProps = {
@@ -79,6 +80,10 @@ export function TaskInfo({ task }: TaskInfoProps) {
         {label}
       </span>,
     );
+  }
+
+  if (task.recurrenceUnit) {
+    parts.push(<RecurrenceBadge key="recurrence" task={task} />);
   }
 
   if (priority) {

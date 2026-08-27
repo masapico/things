@@ -18,7 +18,10 @@ import type { ClipsResponse } from "../../../lib/pb_types";
 import type { Update } from "../../../lib/pb_types";
 import { pb } from "../../../lib/pocketbase";
 import { updateClip, deleteClip } from "../api";
-import { ImageAnnotator, type Annotation } from "./ImageAnnotator";
+import { ImageAnnotator } from "./ImageAnnotator";
+import { MarkdownClipEditor } from "./MarkdownClipEditor";
+import { EMPTY_ANNOTATION_DOCUMENT, parseAnnotationDocument } from "../annotations/annotationModel";
+import type { AnnotationDocument } from "../annotations/annotationModel";
 import "./ClipRegister.css";
 import "./ClipDetailModal.css";
 
@@ -76,7 +79,7 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState("");
   const [editText, setEditText] = useState("");
-  const [editAnnotations, setEditAnnotations] = useState<Annotation[]>([]);
+  const [editAnnotations, setEditAnnotations] = useState<AnnotationDocument>(EMPTY_ANNOTATION_DOCUMENT);
   const [isSaving, setIsSaving] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
   const [statusKind, setStatusKind] = useState<"success" | "error">("success");
@@ -86,7 +89,7 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
 
   // Track the latest saved data for the readonly view — this persists
   // across edit cycles so the readonly view doesn't rely on the stale `clip` prop.
-  const [savedAnnotations, setSavedAnnotations] = useState<Annotation[]>([]);
+  const [savedAnnotations, setSavedAnnotations] = useState<AnnotationDocument>(EMPTY_ANNOTATION_DOCUMENT);
   const [savedText, setSavedText] = useState("");
   const [savedName, setSavedName] = useState("");
 
@@ -97,11 +100,7 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
     setShowDeleteConfirm(false);
     setStatusMessage("");
     setHasUnsavedAnnotations(false);
-    setSavedAnnotations(
-      clip?.annotations && Array.isArray(clip.annotations)
-        ? clip.annotations
-        : [],
-    );
+    setSavedAnnotations(parseAnnotationDocument(clip?.annotations));
     setSavedText(clip?.text ?? "");
     setSavedName(clip?.name ?? "");
   }
@@ -120,7 +119,7 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
   // while the `clip` prop is still stale.
   const readonlyText = savedText;
   const readonlyName = savedName;
-  const readonlyAnnotations: Annotation[] = savedAnnotations;
+  const readonlyAnnotations = savedAnnotations;
   const fullFileUrl = clip.file
     ? `${pb.baseURL}/api/files/${clip.collectionId}/${clip.id}/${clip.file}`
     : null;
@@ -230,7 +229,7 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
     }
   };
 
-  const handleAnnotationsChange = (updated: Annotation[]) => {
+  const handleAnnotationsChange = (updated: AnnotationDocument) => {
     setEditAnnotations(updated);
     setHasUnsavedAnnotations(true);
   };
@@ -317,30 +316,7 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
 
               {clipType === "text" ? (
                 <Form.Group className="mb-3">
-                  <div className="clip-split-pane">
-                    <div className="clip-split-pane-half">
-                      <div className="clip-field-label">Edit</div>
-                      <div className="clip-pad-wrap">
-                        <Form.Control
-                          as="textarea"
-                          rows={14}
-                          className="clip-pad-textarea"
-                          value={editText}
-                          onChange={(e) => setEditText(e.target.value)}
-                        />
-                      </div>
-                    </div>
-                    <div className="clip-split-pane-half">
-                      <div className="clip-field-label">Preview</div>
-                      <div className="clip-pad-wrap clip-pad-preview">
-                        <div className="clip-markdown-body">
-                          <Markdown remarkPlugins={[remarkGfm]}>
-                            {editText || "*Nothing yet*"}
-                          </Markdown>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <MarkdownClipEditor value={editText} onChange={setEditText} placeholder="Nothing yet" />
                 </Form.Group>
               ) : null}
 
@@ -353,7 +329,7 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
                   <div className="clip-image-card">
                     <ImageAnnotator
                       src={fullFileUrl}
-                      annotations={editAnnotations}
+                      value={editAnnotations}
                       onChange={handleAnnotationsChange}
                     />
                   </div>
@@ -383,7 +359,7 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
                   <div className="clip-image-card">
                     <ImageAnnotator
                       src={fullFileUrl}
-                      annotations={readonlyAnnotations}
+                      value={readonlyAnnotations}
                       onChange={() => {}}
                       readonly
                     />

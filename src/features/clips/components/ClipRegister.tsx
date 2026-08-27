@@ -10,9 +10,10 @@ import {
   CheckCircle2Icon,
   AlertCircleIcon,
 } from "lucide-react";
-import Markdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import { ImageAnnotator, type Annotation } from "./ImageAnnotator";
+import { ImageAnnotator } from "./ImageAnnotator";
+import { MarkdownClipEditor } from "./MarkdownClipEditor";
+import { EMPTY_ANNOTATION_DOCUMENT } from "../annotations/annotationModel";
+import type { AnnotationDocument } from "../annotations/annotationModel";
 import "./ClipRegister.css";
 
 type ClipType = "text" | "image" | "file";
@@ -37,7 +38,7 @@ export function ClipRegister() {
   const [statusKind, setStatusKind] = useState<"success" | "error">("success");
   const queryClient = useQueryClient();
   const [isSaving, setIsSaving] = useState(false);
-  const [annotations, setAnnotations] = useState<Annotation[]>([]);
+  const [annotations, setAnnotations] = useState<AnnotationDocument>(EMPTY_ANNOTATION_DOCUMENT);
 
   useEffect(() => {
     const handlePaste = (event: ClipboardEvent) => {
@@ -121,7 +122,7 @@ export function ClipRegister() {
     setFileContent(null);
     setClipType("text");
     setTitle("");
-    setAnnotations([]);
+    setAnnotations(EMPTY_ANNOTATION_DOCUMENT);
     setPreviewUrl((current) => {
       if (current) {
         URL.revokeObjectURL(current);
@@ -150,8 +151,8 @@ export function ClipRegister() {
         data.file = fileContent;
         data.filename = fileContent.name;
 
-        if (clipType === "image" && annotations.length > 0) {
-          data.annotations = JSON.stringify(annotations);
+        if (clipType === "image" && annotations.items.length > 0) {
+          data.annotations = annotations;
         }
       }
 
@@ -225,38 +226,14 @@ export function ClipRegister() {
             <Form.Label className="clip-field-label">Content</Form.Label>
 
             {clipType === "text" ? (
-              <div className="clip-split-pane">
-                <div className="clip-split-pane-half">
-                  <div className="clip-field-label">Edit</div>
-                  <div className="clip-pad-wrap">
-                    <Form.Control
-                      as="textarea"
-                      rows={14}
-                      className="clip-pad-textarea"
-                      value={textContent}
-                      onChange={(event) => setTextContent(event.target.value)}
-                      placeholder="Nothing pasted yet"
-                    />
-                  </div>
-                </div>
-                <div className="clip-split-pane-half">
-                  <div className="clip-field-label">Preview</div>
-                  <div className="clip-pad-wrap clip-pad-preview">
-                    <div className="clip-markdown-body">
-                      <Markdown remarkPlugins={[remarkGfm]}>
-                        {textContent || "*Nothing pasted yet*"}
-                      </Markdown>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <MarkdownClipEditor value={textContent} onChange={setTextContent} placeholder="Nothing pasted yet" />
             ) : null}
 
             {clipType === "image" ? (
               <div className="clip-image-card">
                 <ImageAnnotator
                   src={previewUrl}
-                  annotations={annotations}
+                  value={annotations}
                   onChange={setAnnotations}
                 />
               </div>

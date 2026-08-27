@@ -1,70 +1,22 @@
-.image-annotator {
-  display: inline-grid;
-  position: relative;
-  border-radius: 0.35rem;
-  overflow: hidden;
-  cursor: crosshair;
-  user-select: none;
-  max-width: 100%;
-}
-
-.image-annotator > img,
-.image-annotator-svg {
-  grid-area: 1 / 1;
-  max-width: 100%;
-  max-height: 280px;
-}
-
-.image-annotator-svg {
-  pointer-events: none;
-}
-
-.image-annotator-rect {
-  fill: rgba(20, 107, 98, 0.15);
-  stroke: #146b62;
-  stroke-width: 2;
-  cursor: pointer;
-  pointer-events: auto;
-  transition: fill 0.12s ease;
-}
-
-.image-annotator-rect:hover {
-  fill: rgba(196, 86, 79, 0.2);
-  stroke: #c4564f;
-  stroke-width: 2.5;
-}
-
-.image-annotator-drawing {
-  fill: rgba(20, 107, 98, 0.1);
-  stroke: #146b62;
-  stroke-width: 2;
-  stroke-dasharray: 4 3;
-  pointer-events: none;
-}
-
-.image-annotator-hint {
-  position: absolute;
-  bottom: 0.35rem;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 0.68rem;
-  color: #5b6b64;
-  background: rgba(252, 253, 250, 0.85);
-  padding: 0.15rem 0.6rem;
-  border-radius: 4px;
-  white-space: nowrap;
-  pointer-events: none;
-  backdrop-filter: blur(2px);
-}
-
-.image-annotator--readonly {
-  cursor: default;
-}
-
-.image-annotator--readonly .image-annotator-rect {
-  cursor: default;
-}
-
-.image-annotator--readonly .image-annotator-hint {
-  display: none;
-}
+.annotation-editor { width: 100%; }
+.annotation-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; padding: .5rem; border: 1px solid #d8ded9; border-radius: .45rem .45rem 0 0; background: #f8faf8; }
+.annotation-toolbar .form-select { width: auto; }
+.annotation-colors { display: flex; gap: .3rem; }
+.annotation-colors button { width: 1.25rem; height: 1.25rem; padding: 0; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 0 1px #adb5bd; }
+.annotation-colors button.is-active { box-shadow: 0 0 0 2px #495057; }
+.annotation-viewport { overflow: auto; max-height: 62vh; background: #e9ecef; border-radius: 0 0 .45rem .45rem; }
+.annotation-stage { display: grid; position: relative; min-width: 50%; max-width: 300%; margin: 0 auto; touch-action: none; user-select: none; }
+.annotation-stage > img, .annotation-stage > svg { grid-area: 1 / 1; width: 100%; height: auto; }
+.annotation-stage > svg { z-index: 1; }
+.annotation-stage.tool-select { cursor: default; }
+.annotation-stage:not(.tool-select) { cursor: crosshair; }
+.image-annotation { fill: rgba(220,53,69,.08); stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; pointer-events: stroke; }
+.image-annotation.is-selected { filter: drop-shadow(0 0 3px #fff); stroke-dasharray: 7 3; }
+.image-annotation.is-preview { opacity: .75; pointer-events: none; }
+.annotation-resize-handle { fill: #fff; stroke: #0d6efd; stroke-width: 2; vector-effect: non-scaling-stroke; cursor: nwse-resize; }
+text.image-annotation { fill: currentColor; stroke: none; pointer-events: all; paint-order: stroke; }
+.annotation-text-input { position: absolute; z-index: 2; width: min(15rem,45%); transform: translateY(-50%); }
+.annotation-hint { padding-top: .35rem; color: #6c757d; font-size: .75rem; }
+.annotation-editor--readonly .annotation-viewport { max-height: 70vh; background: transparent; }
+.annotation-editor--readonly .annotation-stage { width: 100% !important; }
+@media (max-width:575px) { .annotation-toolbar { gap: .35rem; } .annotation-viewport { max-height: 55vh; } }

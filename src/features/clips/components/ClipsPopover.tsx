@@ -90,7 +90,7 @@ export function ClipsPopover({ clipIds, children }: ClipsPopoverProps) {
                   />
                 ) : (
                   <span className="clips-popover-icon">
-                    <TypeIcon size={14} />
+                    <TypeIcon size={16} />
                   </span>
                 )}
                 <span className="clips-popover-name">{clip.name}</span>

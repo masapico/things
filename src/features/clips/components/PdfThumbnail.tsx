@@ -1,15 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { FileTextIcon } from "lucide-react";
 import pdfWorkerUrl from "pdfjs-dist/legacy/build/pdf.worker.min.mjs?url";
+import "./PdfThumbnail.css";
 
 type PdfThumbnailProps = {
   url: string;
   title: string;
+  variant?: "card" | "modal";
 };
 
 type PreviewState = "idle" | "loading" | "ready" | "error";
 
-export function PdfThumbnail({ url, title }: PdfThumbnailProps) {
+export function PdfThumbnail({ url, title, variant = "card" }: PdfThumbnailProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [shouldRender, setShouldRender] = useState(false);
@@ -102,12 +104,12 @@ export function PdfThumbnail({ url, title }: PdfThumbnailProps) {
   return (
     <div
       ref={containerRef}
-      className="clip-card-pdf-preview"
+      className={`pdf-preview pdf-preview--${variant}`}
       aria-label={`${title} のPDF表紙`}
     >
       {state !== "ready" ? (
         <div
-          className={`clip-card-pdf-placeholder${state === "loading" ? " clip-card-pdf-placeholder--loading" : ""}`}
+          className={`pdf-preview-placeholder${state === "loading" ? " pdf-preview-placeholder--loading" : ""}`}
         >
           <FileTextIcon size={30} />
           <span>

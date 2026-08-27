@@ -264,15 +264,29 @@
 }
 
 .task-info-item--clips {
+  min-height: 24px;
   cursor: pointer;
-  border-radius: 4px;
-  padding: 0 2px;
-  transition: background-color 0.12s ease, color 0.12s ease;
+  border: 1px solid #cfe0dc;
+  border-radius: 999px;
+  padding: 2px 7px;
+  background-color: #edf6f3;
+  color: #397168;
+  font: inherit;
+  font-size: .78rem;
+  font-weight: 600;
+  line-height: 1;
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
 }
 
 .task-info-item--clips:hover {
-  background-color: rgba(0, 0, 0, 0.06);
-  color: #6c757d;
+  border-color: #91bdb4;
+  background-color: #dfeee9;
+  color: #205f55;
+}
+
+.task-info-item--clips:focus-visible {
+  outline: 2px solid #4f8f83;
+  outline-offset: 2px;
 }
 
 .task-info-separator {

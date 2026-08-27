@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   DEFAULT_ANNOTATION_STYLE,
+  moveAnnotation,
   parseAnnotationDocument,
   simplifyPath,
 } from "./annotationModel";
@@ -37,5 +38,35 @@ describe("simplifyPath", () => {
   it("近すぎる中間点を省いて端点を残す", () => {
     const points = [{ x: 0, y: 0 }, { x: 0.0001, y: 0.0001 }, { x: 1, y: 1 }];
     expect(simplifyPath(points)).toEqual([points[0], points[2]]);
+  });
+});
+
+describe("moveAnnotation", () => {
+  it("四角を画像範囲内で移動する", () => {
+    const result = moveAnnotation({
+      id: "rect",
+      type: "rect",
+      x: 0.7,
+      y: 0.2,
+      width: 0.2,
+      height: 0.3,
+      style: DEFAULT_ANNOTATION_STYLE,
+    }, 0.5, -0.5);
+    expect(result).toMatchObject({ x: 0.8, y: 0 });
+  });
+
+  it("矢印の形を保ったまま端で移動量を制限する", () => {
+    const result = moveAnnotation({
+      id: "arrow",
+      type: "arrow",
+      start: { x: 0.2, y: 0.3 },
+      end: { x: 0.8, y: 0.7 },
+      style: DEFAULT_ANNOTATION_STYLE,
+    }, 0.5, 0.5);
+    if (result.type !== "arrow") throw new Error("arrow expected");
+    expect(result.start.x).toBeCloseTo(0.4);
+    expect(result.start.y).toBeCloseTo(0.6);
+    expect(result.end.x).toBeCloseTo(1);
+    expect(result.end.y).toBeCloseTo(1);
   });
 });

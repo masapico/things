@@ -20,6 +20,7 @@ import { pb } from "../../../lib/pocketbase";
 import { updateClip, deleteClip } from "../api";
 import { ImageAnnotator } from "./ImageAnnotator";
 import { MarkdownClipEditor } from "./MarkdownClipEditor";
+import { PdfThumbnail } from "./PdfThumbnail";
 import { EMPTY_ANNOTATION_DOCUMENT, parseAnnotationDocument } from "../annotations/annotationModel";
 import type { AnnotationDocument } from "../annotations/annotationModel";
 import "./ClipRegister.css";
@@ -123,6 +124,7 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
   const fullFileUrl = clip.file
     ? `${pb.baseURL}/api/files/${clip.collectionId}/${clip.id}/${clip.file}`
     : null;
+  const isPdf = clipType === "file" && getFileExtension(getDisplayFileName(clip)) === "PDF";
 
   const isDirty =
     isEditing &&
@@ -326,7 +328,7 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
                   <Form.Label className="clip-field-label">
                     Annotations
                   </Form.Label>
-                  <div className="clip-image-card">
+                  <div className="clip-image-card clip-image-card--readonly">
                     <ImageAnnotator
                       src={fullFileUrl}
                       value={editAnnotations}
@@ -363,16 +365,16 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
                       onChange={() => {}}
                       readonly
                     />
-                    <div className="mt-2">
-                      <Button
-                        variant="outline-secondary"
-                        size="sm"
-                        onClick={handleOpen}
-                      >
-                        <ExternalLinkIcon size={14} className="me-1" />
-                        元画像を開く
-                      </Button>
-                    </div>
+                    <Button
+                      variant="light"
+                      size="sm"
+                      className="clip-asset-action clip-asset-action--overlay"
+                      onClick={handleOpen}
+                      aria-label="元画像を開く"
+                      title="元画像を開く"
+                    >
+                      <ExternalLinkIcon size={16} />
+                    </Button>
                   </div>
                 </div>
               ) : null}
@@ -380,33 +382,48 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
               {/* File info */}
               {clipType === "file" && clip.file ? (
                 <div className="mb-3">
-                  <Form.Label className="clip-field-label">File</Form.Label>
+                  <Form.Label className="clip-field-label">
+                    {isPdf ? "PDF preview" : "File"}
+                  </Form.Label>
+                  {isPdf && fullFileUrl ? (
+                    <div className="mb-3">
+                      <PdfThumbnail
+                        url={fullFileUrl}
+                        title={readonlyName}
+                        variant="modal"
+                      />
+                    </div>
+                  ) : null}
                   <div className="clip-file-card">
                     <div className="clip-file-icon">
                       <FileIcon size={20} />
                     </div>
-                    <div className="flex-grow-1">
+                    <div className="clip-file-copy">
                       <div className="clip-file-name">
                         {getDisplayFileName(clip)}
                       </div>
-                      <div className="d-flex gap-2 mt-2">
-                        <Button
-                          variant="outline-secondary"
-                          size="sm"
-                          onClick={handleOpen}
-                        >
-                          <ExternalLinkIcon size={14} className="me-1" />
-                          open
-                        </Button>
-                        <Button
-                          variant="outline-secondary"
-                          size="sm"
-                          onClick={handleDownload}
-                        >
-                          <DownloadIcon size={14} className="me-1" />
-                          download
-                        </Button>
-                      </div>
+                    </div>
+                    <div className="clip-file-actions" aria-label="ファイル操作">
+                      <Button
+                        variant="light"
+                        size="sm"
+                        className="clip-asset-action"
+                        onClick={handleOpen}
+                        aria-label="ファイルを開く"
+                        title="開く"
+                      >
+                        <ExternalLinkIcon size={16} />
+                      </Button>
+                      <Button
+                        variant="light"
+                        size="sm"
+                        className="clip-asset-action"
+                        onClick={handleDownload}
+                        aria-label="ファイルをダウンロード"
+                        title="ダウンロード"
+                      >
+                        <DownloadIcon size={16} />
+                      </Button>
                     </div>
                   </div>
                 </div>

@@ -8,15 +8,16 @@
 .clip-selector-selected {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 6px;
 }
 
 .clip-selector-badge {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
-  font-size: 0.75rem;
-  padding: 2px 6px;
+  gap: 4px;
+  max-width: 100%;
+  font-size: 0.82rem;
+  padding: 4px 6px 4px 9px;
   border: 1px solid #d1d5db;
 }
 
@@ -28,13 +29,17 @@
 }
 
 .clip-selector-badge-label {
-  display: inline;
+  display: block;
+  max-width: min(22rem, 70vw);
+  overflow: hidden;
   padding: 0;
   border: none;
   background: none;
   color: inherit;
   font-size: inherit;
   line-height: inherit;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .clip-selector-badge-label:hover {
@@ -45,7 +50,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 22px;
+  height: 22px;
   padding: 0;
+  border-radius: 50%;
   border: none;
   background: none;
   color: #6b7280;
@@ -54,7 +62,14 @@
 }
 
 .clip-selector-badge-remove:hover {
+  background-color: rgba(220, 53, 69, .1);
   color: #dc3545;
+}
+
+.clip-selector-badge-label:focus-visible,
+.clip-selector-badge-remove:focus-visible {
+  outline: 2px solid #4f8f83;
+  outline-offset: 1px;
 }
 
 /* 検索入力 */

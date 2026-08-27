@@ -1,5 +1,5 @@
-import { Badge, Button, Card, Image } from "react-bootstrap";
-import { DownloadIcon, ExternalLinkIcon, FileIcon } from "lucide-react";
+import { Badge, Card, Image } from "react-bootstrap";
+import { FileIcon } from "lucide-react";
 import type { ClipsResponse } from "../../../lib/pb_types";
 import { pb } from "../../../lib/pocketbase";
 import "./ClipCard.css";
@@ -94,7 +94,6 @@ export function ClipCard({ clip, onClick }: ClipCardProps) {
   const fullFileUrl = clip.file
     ? `${pb.baseURL}/api/files/${clip.collectionId}/${clip.id}/${clip.file}`
     : null;
-  const fullImageUrl = clipType === "image" ? fullFileUrl : null;
   const extension = getFileExtension(getDisplayFileName(clip));
 
   return (
@@ -153,71 +152,6 @@ export function ClipCard({ clip, onClick }: ClipCardProps) {
             </span>
           </div>
         ) : null}
-
-        <div className="clip-card-actions">
-          {/* 画像タイプ: 「元画像を開く」ボタン */}
-          {fullImageUrl ? (
-          <Button
-            variant="outline-secondary"
-            size="sm"
-            className="clip-card-action-btn"
-            onClick={(e) => {
-              e.stopPropagation();
-              window.open(fullImageUrl, "_blank", "noopener,noreferrer");
-            }}
-            title="元画像を開く"
-          >
-            <ExternalLinkIcon size={13} className="me-1" />
-            元画像を開く
-          </Button>
-        ) : null}
-
-        {/* ファイルタイプ: PDFは開く + ダウンロード、それ以外はダウンロードのみ */}
-          {clipType === "file" && fullFileUrl ? (
-          <div className="d-flex gap-2">
-            {extension === "PDF" ? (
-              <Button
-                variant="outline-secondary"
-                size="sm"
-                className="clip-card-action-btn"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  window.open(fullFileUrl, "_blank", "noopener,noreferrer");
-                }}
-              >
-                <ExternalLinkIcon size={13} className="me-1" />
-                開く
-              </Button>
-            ) : null}
-            <Button
-              variant="outline-secondary"
-              size="sm"
-              className="clip-card-action-btn"
-              onClick={async (e) => {
-                e.stopPropagation();
-                try {
-                  const response = await fetch(fullFileUrl);
-                  if (!response.ok) throw new Error("Download failed");
-                  const blob = await response.blob();
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement("a");
-                  a.href = url;
-                  a.download = getDisplayFileName(clip) || "download";
-                  document.body.appendChild(a);
-                  a.click();
-                  document.body.removeChild(a);
-                  URL.revokeObjectURL(url);
-                } catch {
-                  window.open(fullFileUrl, "_blank", "noopener,noreferrer");
-                }
-              }}
-            >
-              <DownloadIcon size={13} className="me-1" />
-              ダウンロード
-            </Button>
-          </div>
-        ) : null}
-        </div>
 
         {clip.text ? (
           <div className="clip-card-note">

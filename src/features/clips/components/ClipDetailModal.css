@@ -15,6 +15,55 @@
   font-size: 0.78rem;
 }
 
+.clip-image-card--readonly {
+  position: relative;
+}
+
+.clip-asset-action.btn {
+  display: inline-flex;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--clip-line);
+  border-radius: 0.45rem;
+  background: var(--clip-paper-white);
+  color: #49625a;
+}
+
+.clip-asset-action.btn:hover {
+  border-color: #9ab9b1;
+  background: var(--clip-teal-soft);
+  color: var(--clip-teal);
+}
+
+.clip-asset-action.btn:focus-visible {
+  outline: 2px solid var(--clip-teal);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+.clip-asset-action--overlay.btn {
+  position: absolute;
+  z-index: 3;
+  top: 1.15rem;
+  right: 1.15rem;
+  box-shadow: 0 2px 8px rgba(27, 42, 40, 0.16);
+}
+
+.clip-file-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.clip-file-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0.4rem;
+}
+
 /* モーダル内ボタンの操作フィードバック */
 .clip-btn-save:active,
 .clip-btn-cancel:active,

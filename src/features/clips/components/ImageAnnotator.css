@@ -9,12 +9,21 @@
 .annotation-stage > img, .annotation-stage > svg { grid-area: 1 / 1; width: 100%; height: auto; }
 .annotation-stage > svg { z-index: 1; }
 .annotation-stage.tool-select { cursor: default; }
+.annotation-stage.tool-select .image-annotation,
+.annotation-stage.tool-select .annotation-hit-target { cursor: grab; }
+.annotation-stage.tool-select.is-dragging,
+.annotation-stage.tool-select.is-dragging .image-annotation,
+.annotation-stage.tool-select.is-dragging .annotation-hit-target { cursor: grabbing; }
 .annotation-stage:not(.tool-select) { cursor: crosshair; }
 .image-annotation { fill: rgba(220,53,69,.08); stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; pointer-events: stroke; }
+.image-annotation--rect { pointer-events: all; }
+.image-annotation--line { pointer-events: none; }
+.annotation-hit-target { fill: none; stroke: transparent; stroke-width: 16; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; pointer-events: stroke; }
+.annotation-hit-target.is-preview { pointer-events: none; }
 .image-annotation.is-selected { filter: drop-shadow(0 0 3px #fff); stroke-dasharray: 7 3; }
 .image-annotation.is-preview { opacity: .75; pointer-events: none; }
 .annotation-resize-handle { fill: #fff; stroke: #0d6efd; stroke-width: 2; vector-effect: non-scaling-stroke; cursor: nwse-resize; }
-text.image-annotation { fill: currentColor; stroke: none; pointer-events: all; paint-order: stroke; }
+text.image-annotation { stroke: none; pointer-events: all; paint-order: stroke; }
 .annotation-text-input { position: absolute; z-index: 2; width: min(15rem,45%); transform: translateY(-50%); }
 .annotation-hint { padding-top: .35rem; color: #6c757d; font-size: .75rem; }
 .annotation-editor--readonly .annotation-viewport { max-height: 70vh; background: transparent; }

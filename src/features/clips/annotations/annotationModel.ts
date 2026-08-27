@@ -58,6 +58,31 @@ export const DEFAULT_ANNOTATION_STYLE: AnnotationStyle = {
 
 const clamp = (value: number) => Math.max(0, Math.min(1, value));
 
+export function moveAnnotation(item: Annotation, dx: number, dy: number): Annotation {
+  const points = item.type === "rect"
+    ? [{ x: item.x, y: item.y }, { x: item.x + item.width, y: item.y + item.height }]
+    : item.type === "arrow"
+      ? [item.start, item.end]
+      : item.type === "path"
+        ? item.points
+        : [item.point];
+  const minX = Math.min(...points.map((point) => point.x));
+  const maxX = Math.max(...points.map((point) => point.x));
+  const minY = Math.min(...points.map((point) => point.y));
+  const maxY = Math.max(...points.map((point) => point.y));
+  const safeDx = Math.max(-minX, Math.min(1 - maxX, dx));
+  const safeDy = Math.max(-minY, Math.min(1 - maxY, dy));
+  const move = (point: AnnotationPoint) => ({
+    x: point.x + safeDx,
+    y: point.y + safeDy,
+  });
+
+  if (item.type === "rect") return { ...item, x: item.x + safeDx, y: item.y + safeDy };
+  if (item.type === "arrow") return { ...item, start: move(item.start), end: move(item.end) };
+  if (item.type === "path") return { ...item, points: item.points.map(move) };
+  return { ...item, point: move(item.point) };
+}
+
 export function createAnnotationId() {
   return globalThis.crypto?.randomUUID?.() ??
     `annotation-${Date.now()}-${Math.random().toString(36).slice(2)}`;

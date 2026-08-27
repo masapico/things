@@ -57,14 +57,15 @@ export function TaskInfo({ task }: TaskInfoProps) {
   if (clipCount > 0) {
     parts.push(
       <ClipsPopover key="clips" clipIds={task.clips ?? []}>
-        <span
+        <button
+          type="button"
           className="task-info-item task-info-item--clips"
-          role="button"
+          aria-label={`${clipCount}件のクリップを表示`}
           title={`${clipCount}件のクリップを表示`}
         >
-          <Paperclip size={iconSize} />
-          {clipCount}
-        </span>
+          <Paperclip size={14} />
+          CLIP {clipCount}
+        </button>
       </ClipsPopover>,
     );
   }

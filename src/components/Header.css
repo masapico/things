@@ -128,3 +128,28 @@
   background: #fef0ef;
   color: #c4564f;
 }
+
+.launcher-header-status {
+  position: fixed;
+  top: .75rem;
+  left: 50%;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .45rem .75rem;
+  border: 1px solid #b8d5ca;
+  border-radius: .45rem;
+  color: #146b62;
+  background: #edf8f4;
+  box-shadow: 0 3px 12px rgba(40,60,50,.14);
+  font-size: .78rem;
+  transform: translateX(-50%);
+}
+
+@media (max-width: 767px) {
+  .app-header-inner { gap: .35rem; }
+  .app-header-nav-item { padding-inline: .45rem; }
+  .app-header-nav-item span, .app-header-clock-date { display: none; }
+  .app-header-search { min-width: 6rem; }
+}

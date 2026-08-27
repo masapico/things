@@ -16,6 +16,7 @@ import { Route as AuthenticatedClipsIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedGtdIndexRouteImport } from './routes/_authenticated/gtd/index'
 import { Route as AuthenticatedGtdProjectidRouteImport } from './routes/_authenticated/gtd/$projectid'
 import { Route as AuthenticatedGtdReviewRouteImport } from './routes/_authenticated/gtd/review'
+import { Route as AuthenticatedLauncherIndexRouteImport } from './routes/_authenticated/launcher/index'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
@@ -52,6 +53,12 @@ const AuthenticatedGtdReviewRoute = AuthenticatedGtdReviewRouteImport.update({
   path: '/gtd/review',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedLauncherIndexRoute =
+  AuthenticatedLauncherIndexRouteImport.update({
+    id: '/launcher/',
+    path: '/launcher/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
@@ -60,6 +67,7 @@ export interface FileRoutesByFullPath {
   '/gtd/review': typeof AuthenticatedGtdReviewRoute
   '/clips/': typeof AuthenticatedClipsIndexRoute
   '/gtd/': typeof AuthenticatedGtdIndexRoute
+  '/launcher/': typeof AuthenticatedLauncherIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -68,6 +76,7 @@ export interface FileRoutesByTo {
   '/gtd/review': typeof AuthenticatedGtdReviewRoute
   '/clips': typeof AuthenticatedClipsIndexRoute
   '/gtd': typeof AuthenticatedGtdIndexRoute
+  '/launcher': typeof AuthenticatedLauncherIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -78,13 +87,27 @@ export interface FileRoutesById {
   '/_authenticated/gtd/review': typeof AuthenticatedGtdReviewRoute
   '/_authenticated/clips/': typeof AuthenticatedClipsIndexRoute
   '/_authenticated/gtd/': typeof AuthenticatedGtdIndexRoute
+  '/_authenticated/launcher/': typeof AuthenticatedLauncherIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/login' | '/gtd/$projectid' | '/gtd/review' | '/clips/' | '/gtd/'
+    | '/'
+    | '/login'
+    | '/gtd/$projectid'
+    | '/gtd/review'
+    | '/clips/'
+    | '/gtd/'
+    | '/launcher/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/' | '/gtd/$projectid' | '/gtd/review' | '/clips' | '/gtd'
+  to:
+    | '/login'
+    | '/'
+    | '/gtd/$projectid'
+    | '/gtd/review'
+    | '/clips'
+    | '/gtd'
+    | '/launcher'
   id:
     | '__root__'
     | '/_authenticated'
@@ -94,6 +117,7 @@ export interface FileRouteTypes {
     | '/_authenticated/gtd/review'
     | '/_authenticated/clips/'
     | '/_authenticated/gtd/'
+    | '/_authenticated/launcher/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -152,6 +176,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedGtdReviewRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/launcher/': {
+      id: '/_authenticated/launcher/'
+      path: '/launcher'
+      fullPath: '/launcher/'
+      preLoaderRoute: typeof AuthenticatedLauncherIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
@@ -161,6 +192,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedGtdReviewRoute: typeof AuthenticatedGtdReviewRoute
   AuthenticatedClipsIndexRoute: typeof AuthenticatedClipsIndexRoute
   AuthenticatedGtdIndexRoute: typeof AuthenticatedGtdIndexRoute
+  AuthenticatedLauncherIndexRoute: typeof AuthenticatedLauncherIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -169,6 +201,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedGtdReviewRoute: AuthenticatedGtdReviewRoute,
   AuthenticatedClipsIndexRoute: AuthenticatedClipsIndexRoute,
   AuthenticatedGtdIndexRoute: AuthenticatedGtdIndexRoute,
+  AuthenticatedLauncherIndexRoute: AuthenticatedLauncherIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

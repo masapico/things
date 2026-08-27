@@ -1,0 +1,22 @@
+.launcher-page { width: 100%; padding: 1.5rem 0 3rem; }
+.launcher-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.25rem; }
+.launcher-header h1 { display: flex; align-items: center; gap: .55rem; margin: 0; color: #263b33; font-size: 1.35rem; }
+.launcher-header p { margin: .3rem 0 0; color: #71827b; font-size: .82rem; }
+.launcher-header .btn { display: inline-flex; align-items: center; gap: .35rem; }
+.launcher-list { overflow: hidden; border: 1px solid #d8e2ce; border-radius: .65rem; background: #fff; }
+.launcher-row { display: flex; align-items: center; border-bottom: 1px solid #edf1ea; transition: background .15s, opacity .15s; }
+.launcher-row:last-child { border-bottom: 0; }
+.launcher-row:hover { background: #f8faf7; }
+.launcher-row--dragging { opacity: .55; }
+.launcher-drag, .launcher-main { border: 0; background: transparent; }
+.launcher-drag { padding: .8rem .35rem .8rem .65rem; color: #9aa8a1; cursor: grab; }
+.launcher-main { display: flex; flex: 1; min-width: 0; align-items: center; gap: .75rem; padding: .7rem .5rem; text-align: left; color: #33473f; }
+.launcher-kind { display: grid; place-items: center; width: 2.25rem; height: 2.25rem; flex: 0 0 auto; border-radius: .5rem; background: #e4f0ee; color: #146b62; }
+.launcher-kind--url { background: #e8f0fe; color: #315f9e; } .launcher-kind--file { background: #fff3d9; color: #8a6416; } .launcher-kind--folder { background: #f2eaf8; color: #75538d; }
+.launcher-copy { display: flex; flex: 1; min-width: 0; flex-direction: column; }
+.launcher-copy strong, .launcher-copy small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.launcher-copy small { color: #87968f; font-size: .72rem; }
+.launcher-type { color: #82928b; font-size: .7rem; }
+.launcher-action { padding: .65rem; color: #7d8f87; } .launcher-action--danger { margin-right: .25rem; color: #b45d57; }
+.launcher-empty, .launcher-state { display: grid; min-height: 15rem; place-items: center; align-content: center; gap: .5rem; color: #819088; border: 1px dashed #cdd8c8; border-radius: .65rem; }
+@media (max-width: 575px) { .launcher-type { display: none; } .launcher-header p { display: none; } .launcher-copy small { max-width: 48vw; } }

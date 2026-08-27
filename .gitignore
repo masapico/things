@@ -24,4 +24,7 @@ dist-ssr
 *.sw?
 
 pocketbase/*
-!pocketbase/pb_migrations
+!pocketbase/pb_migrations/
+!pocketbase/pb_migrations/**
+!pocketbase/pb_hooks/
+!pocketbase/pb_hooks/**

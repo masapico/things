@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { Container } from "react-bootstrap";
-import { LogOut, Paperclip, ListTodo, Home, Clock } from "lucide-react";
+import { LogOut, Paperclip, ListTodo, Home, Rocket } from "lucide-react";
 import { ClipRegister } from "../features/clips/components/ClipRegister";
 import { ClipDetailModal } from "../features/clips/components/ClipDetailModal";
 import { TaskEditModal } from "../features/gtd/components/TaskEditModal";
 import { OmniSearch, type OmniSearchResult } from "./OmniSearch";
 import type { ClipsResponse, TasksResponse } from "../lib/pb_types";
+import { launchItem } from "../features/launcher/api";
+import { ClockTools } from "../features/clock/ClockTools";
 import "./Header.css";
 
 function useCurrentTime() {
@@ -34,8 +36,15 @@ export function Header() {
   const [showClipModal, setShowClipModal] = useState(false);
   const [selectedTask, setSelectedTask] = useState<TasksResponse | null>(null);
   const [showTaskModal, setShowTaskModal] = useState(false);
+  const [launcherMessage, setLauncherMessage] = useState("");
 
-  function handleOmniSelect(result: OmniSearchResult) {
+  useEffect(() => {
+    if (!launcherMessage) return;
+    const timer = window.setTimeout(() => setLauncherMessage(""), 2500);
+    return () => window.clearTimeout(timer);
+  }, [launcherMessage]);
+
+  async function handleOmniSelect(result: OmniSearchResult) {
     switch (result.type) {
       case "clip":
         setSelectedClip(result.data);
@@ -52,6 +61,10 @@ export function Header() {
           search: { returnTo: "active" },
         });
         break;
+      case "launcher":
+        await launchItem(result.data.id);
+        setLauncherMessage(`${result.data.name} を起動しました。`);
+        break;
     }
   }
 
@@ -59,10 +72,12 @@ export function Header() {
     { to: "/", icon: Home, label: "HOME" },
     { to: "/gtd", icon: ListTodo, label: "GTD" },
     { to: "/clips", icon: Paperclip, label: "CLIPS" },
+    { to: "/launcher", icon: Rocket, label: "LAUNCHER" },
   ];
 
   return (
     <>
+      {launcherMessage && <div className="launcher-header-status" role="status"><Rocket size={14} />{launcherMessage}</div>}
       <header className="app-header">
         <Container>
           <div className="app-header-inner">
@@ -90,15 +105,7 @@ export function Header() {
 
             {/* 右: 日時 + ログアウト */}
             <div className="app-header-right">
-              <div className="app-header-clock" title={dateStr}>
-                <Clock size={14} className="app-header-clock-icon" />
-                <span className="app-header-clock-date">{dateStr}</span>
-                <span className="app-header-clock-time">
-                  {hours}
-                  <span className="app-header-clock-colon">:</span>
-                  {minutes}
-                </span>
-              </div>
+              <ClockTools dateStr={dateStr} hours={hours} minutes={minutes} />
               <Link
                 to="/login"
                 search={{ redirect: pathname }}

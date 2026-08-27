@@ -16,6 +16,7 @@
 - TanStack Router（ファイルベースルーティング）
 - TanStack Query（取得データと更新後キャッシュの管理）
 - PocketBase（認証、データベース、ファイル保存、静的ファイル配信）
+- PocketBase JS hooks（認証付きのローカルWindowsランチャーAPI）
 - React Bootstrap / Bootstrap / Lucide React
 - dnd-kit（タスクのドラッグ並べ替え）
 - react-markdown / remark-gfm（クリップ本文の Markdown 表示）
@@ -60,12 +61,20 @@
 - クリップの名前・テキスト・画像注釈を編集でき、削除、元ファイル表示、ダウンロードができます。
 - プロジェクトとタスクの編集画面から既存クリップを選択し、関連付けられます。
 
+### Launcher / Clock
+
+- `/launcher` でURL、アプリ、ファイル、フォルダの起動項目を登録・編集・並べ替えできます。横断検索からも起動できます。
+- 実行要求は登録済みIDだけを認証付きAPIへ送り、PocketBaseと同じWindows端末のループバック接続だけを許可します。
+- ヘッダー時計からタイマー1件と一回限りのアラーム1件を設定できます。設定は `things.clock.v1` としてlocalStorageへ保存し、音を使わず色と動きで通知します。
+- `OooPEN.ps1` と `_menu.txt` はThingsのランチャーとは同期しません。
+
 ## PocketBase コレクション
 
 - `users`: ログインユーザー。現在のデータ用コレクションは、認証済みユーザーだけが操作できます。
 - `projects`: `name`、`memo`、`startDate`、`endDate`、`isActive`、`reviewToggle`、複数の `clips` を保持します。
 - `tasks`: `title`、`memo`、`status`、`priority`、`duedate`、`completed`、`sort`、単一の `project`、複数の `clips` を保持します。
 - `clips`: `name`、`text`、`file`、元ファイル名、画像注釈を保持します。
+- `launchers`: `name`、`kind`、`target`、`arguments`、`sort` を保持します。
 - `projects` と `tasks` は、タスク側の単一 `project` フィールドによる 1:N です。
 - プロジェクトとタスクの `clips` は複数IDを保持する関連フィールドです。同じクリップを複数箇所から参照できます。
 - `contexts` コレクションとタスクの contexts フィールドは削除済みです。

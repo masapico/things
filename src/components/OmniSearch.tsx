@@ -8,6 +8,7 @@ import {
   FileText,
   Image,
   File,
+  Rocket,
 } from "lucide-react";
 import { searchClips } from "../features/clips/api";
 import { searchTasks, searchProjects } from "../features/gtd/api";
@@ -16,15 +17,18 @@ import type {
   TasksResponse,
   ProjectsResponse,
 } from "../lib/pb_types";
+import type { LaunchersResponse } from "../lib/pb_types";
+import { searchLaunchers } from "../features/launcher/api";
 import "./OmniSearch.css";
 
 export type OmniSearchResult =
   | { type: "clip"; data: ClipsResponse }
   | { type: "task"; data: TasksResponse }
-  | { type: "project"; data: ProjectsResponse };
+  | { type: "project"; data: ProjectsResponse }
+  | { type: "launcher"; data: LaunchersResponse };
 
 type OmniSearchProps = {
-  onSelect: (result: OmniSearchResult) => void;
+  onSelect: (result: OmniSearchResult) => void | Promise<void>;
 };
 
 function getFileExtension(fileName?: string) {
@@ -67,8 +71,10 @@ export function OmniSearch({ onSelect }: OmniSearchProps) {
   const [clips, setClips] = useState<ClipsResponse[]>([]);
   const [tasks, setTasks] = useState<TasksResponse[]>([]);
   const [projects, setProjects] = useState<ProjectsResponse[]>([]);
+  const [launchers, setLaunchers] = useState<LaunchersResponse[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -81,23 +87,27 @@ export function OmniSearch({ onSelect }: OmniSearchProps) {
       ...clips.map((c) => ({ type: "clip" as const, data: c })),
       ...tasks.map((t) => ({ type: "task" as const, data: t })),
       ...projects.map((p) => ({ type: "project" as const, data: p })),
+      ...launchers.map((launcher) => ({ type: "launcher" as const, data: launcher })),
     ];
-  }, [clips, tasks, projects]);
+  }, [clips, tasks, projects, launchers]);
 
   // 検索実行（デバウンス 300ms）
   const runSearch = useCallback((trimmed: string, requestId: number) => {
     setIsLoading(true);
     setHasError(false);
+    setErrorMessage("");
     Promise.all([
       searchClips(trimmed),
       searchTasks(trimmed),
       searchProjects(trimmed),
+      searchLaunchers(trimmed),
     ])
-      .then(([c, t, p]) => {
+      .then(([c, t, p, launcherItems]) => {
         if (requestId !== searchRequestRef.current) return;
         setClips(c);
         setTasks(t);
         setProjects(p);
+        setLaunchers(launcherItems);
         setSelectedIndex(-1);
         setIsOpen(true);
       })
@@ -107,7 +117,9 @@ export function OmniSearch({ onSelect }: OmniSearchProps) {
         setClips([]);
         setTasks([]);
         setProjects([]);
+        setLaunchers([]);
         setHasError(true);
+        setErrorMessage("検索できませんでした。入力し直してお試しください。");
         setIsOpen(true);
       })
       .finally(() => {
@@ -128,7 +140,9 @@ export function OmniSearch({ onSelect }: OmniSearchProps) {
       setClips([]);
       setTasks([]);
       setProjects([]);
+      setLaunchers([]);
       setHasError(false);
+      setErrorMessage("");
       setIsLoading(false);
       setIsOpen(false);
       return;
@@ -159,10 +173,17 @@ export function OmniSearch({ onSelect }: OmniSearchProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  function handleSelect(result: OmniSearchResult) {
-    onSelect(result);
-    setQuery("");
-    setIsOpen(false);
+  async function handleSelect(result: OmniSearchResult) {
+    try {
+      await onSelect(result);
+      setQuery("");
+      setIsOpen(false);
+    } catch (error) {
+      console.error("Launcher error:", error);
+      setHasError(true);
+      setErrorMessage("ランチャーを起動できませんでした。対象と引数を確認してください。");
+      setIsOpen(true);
+    }
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
@@ -182,7 +203,7 @@ export function OmniSearch({ onSelect }: OmniSearchProps) {
     } else if (e.key === "Enter") {
       e.preventDefault();
       if (selectedIndex >= 0 && selectedIndex < results.length) {
-        handleSelect(results[selectedIndex]);
+        void handleSelect(results[selectedIndex]);
       }
     } else if (e.key === "Escape") {
       setIsOpen(false);
@@ -190,7 +211,7 @@ export function OmniSearch({ onSelect }: OmniSearchProps) {
     }
   }
 
-  const hasResults = clips.length > 0 || tasks.length > 0 || projects.length > 0;
+  const hasResults = clips.length > 0 || tasks.length > 0 || projects.length > 0 || launchers.length > 0;
 
   return (
     <div className="omni-search" ref={containerRef}>
@@ -221,7 +242,7 @@ export function OmniSearch({ onSelect }: OmniSearchProps) {
             </div>
           ) : hasError ? (
             <div className="omni-search-error" role="alert">
-              検索できませんでした。入力し直してお試しください。
+              {errorMessage || "処理できませんでした。"}
             </div>
           ) : !hasResults ? (
             <div className="omni-search-empty">該当する結果がありません</div>
@@ -243,7 +264,7 @@ export function OmniSearch({ onSelect }: OmniSearchProps) {
                         type="button"
                         className={`omni-search-item ${selectedIndex === globalIndex ? "omni-search-item--active" : ""}`}
                         onClick={() =>
-                          handleSelect({ type: "clip", data: clip })
+                            void handleSelect({ type: "clip", data: clip })
                         }
                       >
                         <TypeIcon size={14} className="omni-search-item-icon" />
@@ -273,7 +294,7 @@ export function OmniSearch({ onSelect }: OmniSearchProps) {
                         type="button"
                         className={`omni-search-item ${selectedIndex === globalIndex ? "omni-search-item--active" : ""}`}
                         onClick={() =>
-                          handleSelect({ type: "task", data: task })
+                            void handleSelect({ type: "task", data: task })
                         }
                       >
                         <ListTodo
@@ -306,7 +327,7 @@ export function OmniSearch({ onSelect }: OmniSearchProps) {
                         type="button"
                         className={`omni-search-item ${selectedIndex === globalIndex ? "omni-search-item--active" : ""}`}
                         onClick={() =>
-                          handleSelect({ type: "project", data: project })
+                            void handleSelect({ type: "project", data: project })
                         }
                       >
                         <FolderKanban
@@ -321,6 +342,17 @@ export function OmniSearch({ onSelect }: OmniSearchProps) {
                         </span>
                       </button>
                     );
+                  })}
+                </div>
+              )}
+              {launchers.length > 0 && (
+                <div className="omni-search-group">
+                  <div className="omni-search-group-header"><Rocket size={12} />Launcher</div>
+                  {launchers.map((launcher, i) => {
+                    const globalIndex = clips.length + tasks.length + projects.length + i;
+                    return <button key={launcher.id} type="button" className={`omni-search-item ${selectedIndex === globalIndex ? "omni-search-item--active" : ""}`} onClick={() => void handleSelect({ type: "launcher", data: launcher })}>
+                      <Rocket size={14} className="omni-search-item-icon" /><span className="omni-search-item-name">{launcher.name}</span><span className="omni-search-item-meta">起動</span>
+                    </button>;
                   })}
                 </div>
               )}

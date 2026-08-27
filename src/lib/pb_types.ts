@@ -12,6 +12,7 @@ export const Collections = {
 	Otps: "_otps",
 	Superusers: "_superusers",
 	Clips: "clips",
+	Launchers: "launchers",
 	Projects: "projects",
 	Tasks: "tasks",
 	Users: "users",
@@ -107,6 +108,24 @@ export type ClipsRecord<Tannotations = unknown> = {
 	updated: IsoAutoDateString
 }
 
+export const LaunchersKindOptions = {
+	"url": "url",
+	"application": "application",
+	"file": "file",
+	"folder": "folder",
+} as const
+export type LaunchersKindOptions = typeof LaunchersKindOptions[keyof typeof LaunchersKindOptions]
+export type LaunchersRecord = {
+	arguments?: string
+	created: IsoAutoDateString
+	id: string
+	kind: LaunchersKindOptions
+	name: string
+	sort?: number
+	target: string
+	updated: IsoAutoDateString
+}
+
 export type ProjectsRecord = {
 	clips?: RecordIdString[]
 	created: IsoAutoDateString
@@ -169,6 +188,7 @@ export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemF
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
 export type ClipsResponse<Tannotations = unknown, Texpand = unknown> = Required<ClipsRecord<Tannotations>> & BaseSystemFields<Texpand>
+export type LaunchersResponse<Texpand = unknown> = Required<LaunchersRecord> & BaseSystemFields<Texpand>
 export type ProjectsResponse<Texpand = unknown> = Required<ProjectsRecord> & BaseSystemFields<Texpand>
 export type TasksResponse<Texpand = unknown> = Required<TasksRecord> & BaseSystemFields<Texpand>
 export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
@@ -182,6 +202,7 @@ export type CollectionRecords = {
 	_otps: OtpsRecord
 	_superusers: SuperusersRecord
 	clips: ClipsRecord
+	launchers: LaunchersRecord
 	projects: ProjectsRecord
 	tasks: TasksRecord
 	users: UsersRecord
@@ -194,6 +215,7 @@ export type CollectionResponses = {
 	_otps: OtpsResponse
 	_superusers: SuperusersResponse
 	clips: ClipsResponse
+	launchers: LaunchersResponse
 	projects: ProjectsResponse
 	tasks: TasksResponse
 	users: UsersResponse

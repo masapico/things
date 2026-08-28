@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button, Form, Modal } from "react-bootstrap";
 import Markdown from "react-markdown";
@@ -13,6 +13,7 @@ import {
   AlertCircleIcon,
   DownloadIcon,
   ExternalLinkIcon,
+  BarChart3,
 } from "lucide-react";
 import type { ClipsResponse } from "../../../lib/pb_types";
 import type { Update } from "../../../lib/pb_types";
@@ -25,6 +26,9 @@ import { EMPTY_ANNOTATION_DOCUMENT, parseAnnotationDocument } from "../annotatio
 import type { AnnotationDocument } from "../annotations/annotationModel";
 import "./ClipRegister.css";
 import "./ClipDetailModal.css";
+import "../data/dataClip.css";
+
+const DataClipViewer = lazy(() => import("../data/DataClipViewer").then((module) => ({ default: module.DataClipViewer })));
 
 type ClipDetailModalProps = {
   clip: ClipsResponse | null;
@@ -55,24 +59,11 @@ function getDisplayFileName(clip: ClipsResponse) {
   return clip.filename || clip.file;
 }
 
-function getClipType(clip: ClipsResponse): "text" | "image" | "file" {
-  if (clip.file) {
-    const ext = getFileExtension(getDisplayFileName(clip));
-    if (
-      ext &&
-      ["PNG", "JPG", "JPEG", "GIF", "WEBP", "BMP", "SVG"].includes(ext)
-    ) {
-      return "image";
-    }
-    return "file";
-  }
-  return "text";
-}
-
 const TYPE_META = {
   text: { label: "テキスト", icon: FileTextIcon },
   image: { label: "画像", icon: ImageIcon },
   file: { label: "ファイル", icon: FileIcon },
+  data: { label: "データ", icon: BarChart3 },
 } as const;
 
 export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
@@ -114,7 +105,7 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
 
   if (!clip) return null;
 
-  const clipType = getClipType(clip);
+  const clipType = clip.kind;
   const { label: typeLabel, icon: TypeIcon } = TYPE_META[clipType];
   // Use saved state for the readonly view to stay up to date after saving
   // while the `clip` prop is still stale.
@@ -340,8 +331,13 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
             </>
           ) : (
             <>
+              {clipType === "data" ? (
+                <Suspense fallback={<div className="py-5 text-center">データを読み込んでいます…</div>}>
+                  <DataClipViewer clipId={clip.id} name={readonlyName} value={clip.data} />
+                </Suspense>
+              ) : null}
               {/* Text content */}
-              {readonlyText ? (
+              {clipType === "text" && readonlyText ? (
                 <div className="mb-3">
                   <Form.Label className="clip-field-label">メモ</Form.Label>
                   <div className="clip-pad-wrap clip-pad-preview">
@@ -473,7 +469,7 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
                 <Button className="clip-btn-cancel" onClick={requestClose}>
                   閉じる
                 </Button>
-                <Button className="clip-btn-save" onClick={handleEnterEdit}>
+                <Button className="clip-btn-save" onClick={handleEnterEdit} hidden={clipType === "data"}>
                   <PenLineIcon size={14} />
                   編集
                 </Button>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { OverlayTrigger, Popover, Spinner, Image } from "react-bootstrap";
-import { FileText, Image as ImageIcon, File } from "lucide-react";
+import { BarChart3, FileText, Image as ImageIcon, File } from "lucide-react";
 import type { ClipsResponse } from "../../../lib/pb_types";
 import { pb } from "../../../lib/pocketbase";
 import { useClipsByIds } from "../hooks/useClipsByIds";
@@ -14,31 +14,11 @@ type ClipsPopoverProps = {
   children: React.ReactNode;
 };
 
-function getFileExtension(fileName?: string) {
-  if (!fileName) return null;
-  const match = fileName.match(/\.([A-Za-z0-9]+)$/);
-  return match ? match[1].toUpperCase() : null;
-}
-
-function getClipType(clip: ClipsResponse): "text" | "image" | "file" {
-  const target = clip.filename || clip.file;
-  if (target) {
-    const ext = getFileExtension(target);
-    if (
-      ext &&
-      ["PNG", "JPG", "JPEG", "GIF", "WEBP", "BMP", "SVG"].includes(ext)
-    ) {
-      return "image";
-    }
-    return "file";
-  }
-  return "text";
-}
-
 const TYPE_ICONS = {
   text: FileText,
   image: ImageIcon,
   file: File,
+  data: BarChart3,
 } as const;
 
 function getThumbnailUrl(clip: ClipsResponse) {
@@ -69,7 +49,7 @@ export function ClipsPopover({ clipIds, children }: ClipsPopoverProps) {
           <p className="clips-popover-empty">クリップがありません</p>
         ) : (
           clips.map((clip) => {
-            const clipType = getClipType(clip);
+            const clipType = clip.kind;
             const TypeIcon = TYPE_ICONS[clipType];
             const thumbnailUrl =
               clipType === "image" ? getThumbnailUrl(clip) : null;

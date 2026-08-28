@@ -8,6 +8,7 @@ import {
   FileText,
   Image,
   File,
+  BarChart3,
   Rocket,
   X,
 } from "lucide-react";
@@ -32,30 +33,11 @@ type OmniSearchProps = {
   onSelect: (result: OmniSearchResult) => void | Promise<void>;
 };
 
-function getFileExtension(fileName?: string) {
-  if (!fileName) return null;
-  const match = fileName.match(/\.([A-Za-z0-9]+)$/);
-  return match ? match[1].toUpperCase() : null;
-}
-
-function getClipType(clip: ClipsResponse): "text" | "image" | "file" {
-  if (clip.file) {
-    const ext = getFileExtension(clip.file);
-    if (
-      ext &&
-      ["PNG", "JPG", "JPEG", "GIF", "WEBP", "BMP", "SVG"].includes(ext)
-    ) {
-      return "image";
-    }
-    return "file";
-  }
-  return "text";
-}
-
 const CLIP_TYPE_ICONS = {
   text: FileText,
   image: Image,
   file: File,
+  data: BarChart3,
 } as const;
 
 const STATUS_LABELS: Record<string, string> = {
@@ -290,7 +272,7 @@ export function OmniSearch({ onSelect }: OmniSearchProps) {
                     Clips
                   </div>
                   {clips.map((clip, i) => {
-                    const clipType = getClipType(clip);
+                    const clipType = clip.kind;
                     const TypeIcon = CLIP_TYPE_ICONS[clipType];
                     const globalIndex = i;
                     return (

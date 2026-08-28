@@ -1,9 +1,13 @@
+import { lazy, Suspense } from "react";
 import { Badge, Card, Image } from "react-bootstrap";
-import { FileIcon } from "lucide-react";
+import { BarChart3, FileIcon } from "lucide-react";
 import type { ClipsResponse } from "../../../lib/pb_types";
 import { pb } from "../../../lib/pocketbase";
 import "./ClipCard.css";
 import { PdfThumbnail } from "./PdfThumbnail";
+import { validateDataDocument } from "../data/dataClipModel";
+
+const DataChart = lazy(() => import("../data/DataChart").then((module) => ({ default: module.DataChart })));
 
 type ClipCardProps = {
   clip: ClipsResponse;
@@ -72,22 +76,8 @@ function getDisplayFileName(clip: ClipsResponse) {
   return clip.filename || clip.file;
 }
 
-function getClipType(clip: ClipsResponse): "text" | "image" | "file" {
-  if (clip.file) {
-    const ext = getFileExtension(getDisplayFileName(clip));
-    if (
-      ext &&
-      ["PNG", "JPG", "JPEG", "GIF", "WEBP", "BMP", "SVG"].includes(ext)
-    ) {
-      return "image";
-    }
-    return "file";
-  }
-  return "text";
-}
-
 export function ClipCard({ clip, onClick }: ClipCardProps) {
-  const clipType = getClipType(clip);
+  const clipType = clip.kind;
   // 画像タイプは大きめのサムネイル、それ以外は小さめ
   const thumbnailUrl =
     clipType === "image" ? getThumbnailUrl(clip, "400x300") : null;
@@ -153,6 +143,14 @@ export function ClipCard({ clip, onClick }: ClipCardProps) {
           </div>
         ) : null}
 
+        {clipType === "data" ? (
+          validateDataDocument(clip.data) ? (
+            <Suspense fallback={<div className="clip-card-file-info"><BarChart3 size={22} /> データを読み込み中…</div>}>
+              <DataChart document={clip.data} compact />
+            </Suspense>
+          ) : <div className="clip-card-file-info text-danger">データ形式が不正です</div>
+        ) : null}
+
         {clip.text ? (
           <div className="clip-card-note">
             <Card.Text className="clip-card-note-text mb-0">
@@ -162,6 +160,7 @@ export function ClipCard({ clip, onClick }: ClipCardProps) {
         ) : null}
 
         <div className="clip-card-meta small mt-auto">
+          {clipType === "data" && validateDataDocument(clip.data) ? <span>{clip.data.rows.length} 行 × {clip.data.columns.length} 列 · </span> : null}
           <time dateTime={clip.created} title={formatDate(clip.created)}>
             {formatRelativeDate(clip.created)}
           </time>

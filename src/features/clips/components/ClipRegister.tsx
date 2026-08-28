@@ -42,6 +42,7 @@ export function ClipRegister() {
 
   useEffect(() => {
     const handlePaste = (event: ClipboardEvent) => {
+      if (window.location.pathname.startsWith("/clips/data/")) return;
       const target = event.target as HTMLElement | null;
       const isEditable =
         target?.isContentEditable ||
@@ -143,6 +144,7 @@ export function ClipRegister() {
 
       const data: Record<string, unknown> = {
         name: safeTitle,
+        kind: clipType,
       };
 
       if (clipType === "text") {

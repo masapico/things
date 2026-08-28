@@ -97,12 +97,22 @@ export type SuperusersRecord = {
 	verified?: boolean
 }
 
-export type ClipsRecord<Tannotations = unknown> = {
+export const ClipsKindOptions = {
+	"text": "text",
+	"image": "image",
+	"file": "file",
+	"data": "data",
+} as const
+export type ClipsKindOptions = typeof ClipsKindOptions[keyof typeof ClipsKindOptions]
+export type ClipsRecord<Tannotations = unknown, Tdata = unknown> = {
 	annotations?: null | Tannotations
 	created: IsoAutoDateString
+	data?: null | Tdata
+	dataSearch?: string
 	file?: FileNameString
 	filename?: string
 	id: string
+	kind: ClipsKindOptions
 	name: string
 	text?: string
 	updated: IsoAutoDateString
@@ -198,7 +208,7 @@ export type ExternalauthsResponse<Texpand = unknown> = Required<ExternalauthsRec
 export type MfasResponse<Texpand = unknown> = Required<MfasRecord> & BaseSystemFields<Texpand>
 export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemFields<Texpand>
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
-export type ClipsResponse<Tannotations = unknown, Texpand = unknown> = Required<ClipsRecord<Tannotations>> & BaseSystemFields<Texpand>
+export type ClipsResponse<Tannotations = unknown, Tdata = unknown, Texpand = unknown> = Required<ClipsRecord<Tannotations, Tdata>> & BaseSystemFields<Texpand>
 export type LaunchersResponse<Texpand = unknown> = Required<LaunchersRecord> & BaseSystemFields<Texpand>
 export type ProjectsResponse<Texpand = unknown> = Required<ProjectsRecord> & BaseSystemFields<Texpand>
 export type TasksResponse<Texpand = unknown> = Required<TasksRecord> & BaseSystemFields<Texpand>

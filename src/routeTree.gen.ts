@@ -17,6 +17,8 @@ import { Route as AuthenticatedGtdIndexRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedGtdProjectidRouteImport } from './routes/_authenticated/gtd/$projectid'
 import { Route as AuthenticatedGtdReviewRouteImport } from './routes/_authenticated/gtd/review'
 import { Route as AuthenticatedLauncherIndexRouteImport } from './routes/_authenticated/launcher/index'
+import { Route as AuthenticatedClipsDataClipidRouteImport } from './routes/_authenticated/clips/data/$clipid'
+import { Route as AuthenticatedClipsDataNewRouteImport } from './routes/_authenticated/clips/data/new'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
@@ -59,6 +61,18 @@ const AuthenticatedLauncherIndexRoute =
     path: '/launcher/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedClipsDataClipidRoute =
+  AuthenticatedClipsDataClipidRouteImport.update({
+    id: '/clips/data/$clipid',
+    path: '/clips/data/$clipid',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedClipsDataNewRoute =
+  AuthenticatedClipsDataNewRouteImport.update({
+    id: '/clips/data/new',
+    path: '/clips/data/new',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
@@ -68,6 +82,8 @@ export interface FileRoutesByFullPath {
   '/clips/': typeof AuthenticatedClipsIndexRoute
   '/gtd/': typeof AuthenticatedGtdIndexRoute
   '/launcher/': typeof AuthenticatedLauncherIndexRoute
+  '/clips/data/$clipid': typeof AuthenticatedClipsDataClipidRoute
+  '/clips/data/new': typeof AuthenticatedClipsDataNewRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -77,6 +93,8 @@ export interface FileRoutesByTo {
   '/clips': typeof AuthenticatedClipsIndexRoute
   '/gtd': typeof AuthenticatedGtdIndexRoute
   '/launcher': typeof AuthenticatedLauncherIndexRoute
+  '/clips/data/$clipid': typeof AuthenticatedClipsDataClipidRoute
+  '/clips/data/new': typeof AuthenticatedClipsDataNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -88,6 +106,8 @@ export interface FileRoutesById {
   '/_authenticated/clips/': typeof AuthenticatedClipsIndexRoute
   '/_authenticated/gtd/': typeof AuthenticatedGtdIndexRoute
   '/_authenticated/launcher/': typeof AuthenticatedLauncherIndexRoute
+  '/_authenticated/clips/data/$clipid': typeof AuthenticatedClipsDataClipidRoute
+  '/_authenticated/clips/data/new': typeof AuthenticatedClipsDataNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -99,6 +119,8 @@ export interface FileRouteTypes {
     | '/clips/'
     | '/gtd/'
     | '/launcher/'
+    | '/clips/data/$clipid'
+    | '/clips/data/new'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -108,6 +130,8 @@ export interface FileRouteTypes {
     | '/clips'
     | '/gtd'
     | '/launcher'
+    | '/clips/data/$clipid'
+    | '/clips/data/new'
   id:
     | '__root__'
     | '/_authenticated'
@@ -118,6 +142,8 @@ export interface FileRouteTypes {
     | '/_authenticated/clips/'
     | '/_authenticated/gtd/'
     | '/_authenticated/launcher/'
+    | '/_authenticated/clips/data/$clipid'
+    | '/_authenticated/clips/data/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -183,6 +209,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLauncherIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/clips/data/$clipid': {
+      id: '/_authenticated/clips/data/$clipid'
+      path: '/clips/data/$clipid'
+      fullPath: '/clips/data/$clipid'
+      preLoaderRoute: typeof AuthenticatedClipsDataClipidRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/clips/data/new': {
+      id: '/_authenticated/clips/data/new'
+      path: '/clips/data/new'
+      fullPath: '/clips/data/new'
+      preLoaderRoute: typeof AuthenticatedClipsDataNewRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
@@ -193,6 +233,8 @@ interface AuthenticatedRouteChildren {
   AuthenticatedClipsIndexRoute: typeof AuthenticatedClipsIndexRoute
   AuthenticatedGtdIndexRoute: typeof AuthenticatedGtdIndexRoute
   AuthenticatedLauncherIndexRoute: typeof AuthenticatedLauncherIndexRoute
+  AuthenticatedClipsDataClipidRoute: typeof AuthenticatedClipsDataClipidRoute
+  AuthenticatedClipsDataNewRoute: typeof AuthenticatedClipsDataNewRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -202,6 +244,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedClipsIndexRoute: AuthenticatedClipsIndexRoute,
   AuthenticatedGtdIndexRoute: AuthenticatedGtdIndexRoute,
   AuthenticatedLauncherIndexRoute: AuthenticatedLauncherIndexRoute,
+  AuthenticatedClipsDataClipidRoute: AuthenticatedClipsDataClipidRoute,
+  AuthenticatedClipsDataNewRoute: AuthenticatedClipsDataNewRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

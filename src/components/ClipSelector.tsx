@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Badge, Form, InputGroup, Spinner } from "react-bootstrap";
-import { X, Search, FileText, Image, File } from "lucide-react";
+import { BarChart3, X, Search, FileText, Image, File } from "lucide-react";
 import { getRecentClips, getClipsByIds, searchClips } from "../features/clips/api";
 import type { ClipsResponse } from "../lib/pb_types";
 import "./ClipSelector.css";
@@ -11,30 +11,11 @@ type ClipSelectorProps = {
   onClipClick?: (clip: ClipsResponse) => void;
 };
 
-function getFileExtension(fileName?: string) {
-  if (!fileName) return null;
-  const match = fileName.match(/\.([A-Za-z0-9]+)$/);
-  return match ? match[1].toUpperCase() : null;
-}
-
-function getClipType(clip: ClipsResponse): "text" | "image" | "file" {
-  if (clip.file) {
-    const ext = getFileExtension(clip.file);
-    if (
-      ext &&
-      ["PNG", "JPG", "JPEG", "GIF", "WEBP", "BMP", "SVG"].includes(ext)
-    ) {
-      return "image";
-    }
-    return "file";
-  }
-  return "text";
-}
-
 const TYPE_ICONS = {
   text: FileText,
   image: Image,
   file: File,
+  data: BarChart3,
 } as const;
 
 export function ClipSelector({ selectedClipIds, onChange, onClipClick }: ClipSelectorProps) {
@@ -180,7 +161,7 @@ export function ClipSelector({ selectedClipIds, onChange, onClipClick }: ClipSel
           </p>
         ) : (
           displayClips.map((clip) => {
-            const clipType = getClipType(clip);
+            const clipType = clip.kind;
             const TypeIcon = TYPE_ICONS[clipType];
             const isSelected = selectedClipIds.includes(clip.id);
 

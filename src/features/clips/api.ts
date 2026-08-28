@@ -1,5 +1,6 @@
 import { pb } from "../../lib/pocketbase";
-import type { ClipsResponse, Update } from "../../lib/pb_types";
+import type { ClipsResponse, Create, Update } from "../../lib/pb_types";
+import type { DataClipDocumentV1 } from "./data/dataClipModel";
 
 export async function getClips(): Promise<ClipsResponse[]> {
   const result = await pb.collection("clips").getFullList<ClipsResponse>({
@@ -30,7 +31,7 @@ export async function getClipsPage({
 export async function getRecentClips(limit = 50): Promise<ClipsResponse[]> {
   const result = await pb.collection("clips").getList<ClipsResponse>(1, limit, {
     sort: "-created",
-    fields: "id,name,created,updated",
+    fields: "id,name,kind,file,filename,created,updated",
   });
   return result.items;
 }
@@ -47,7 +48,7 @@ export async function getClipsByIds(ids: string[]): Promise<ClipsResponse[]> {
 export async function searchClips(query: string): Promise<ClipsResponse[]> {
   const escaped = query.replace(/"/g, '""');
   return await pb.collection("clips").getFullList<ClipsResponse>({
-    filter: `name ~ "${escaped}" || text ~ "${escaped}"`,
+    filter: `name ~ "${escaped}" || text ~ "${escaped}" || dataSearch ~ "${escaped}"`,
     sort: "-created",
   });
 }
@@ -57,6 +58,29 @@ export async function updateClip(
   data: Update<"clips">,
 ): Promise<ClipsResponse> {
   return await pb.collection("clips").update<ClipsResponse>(id, data);
+}
+
+export async function getClip(id: string): Promise<ClipsResponse> {
+  return await pb.collection("clips").getOne<ClipsResponse>(id);
+}
+
+export async function createDataClip(name: string, document: DataClipDocumentV1): Promise<ClipsResponse> {
+  const data: Create<"clips"> = {
+    kind: "data",
+    name,
+    data: document,
+    dataSearch: document.columns.map((column) => column.name).join(" "),
+  };
+  return await pb.collection("clips").create<ClipsResponse>(data);
+}
+
+export async function updateDataClip(id: string, name: string, document: DataClipDocumentV1): Promise<ClipsResponse> {
+  return await updateClip(id, {
+    kind: "data",
+    name,
+    data: document,
+    dataSearch: document.columns.map((column) => column.name).join(" "),
+  });
 }
 
 export async function deleteClip(id: string): Promise<void> {

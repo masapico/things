@@ -1110,10 +1110,67 @@ migrate((app) => {
           "presentable": false,
           "system": false,
           "type": "autodate"
+        },
+        {
+          "help": "",
+          "hidden": false,
+          "id": "select92310001",
+          "maxSelect": 1,
+          "name": "recurrenceUnit",
+          "presentable": false,
+          "required": false,
+          "system": false,
+          "type": "select",
+          "values": [
+            "day",
+            "week",
+            "month"
+          ]
+        },
+        {
+          "help": "",
+          "hidden": false,
+          "id": "number92310002",
+          "max": 99,
+          "min": 1,
+          "name": "recurrenceInterval",
+          "onlyInt": true,
+          "presentable": false,
+          "required": false,
+          "system": false,
+          "type": "number"
+        },
+        {
+          "help": "",
+          "hidden": false,
+          "id": "date923100003",
+          "max": "",
+          "min": "",
+          "name": "recurrenceAnchor",
+          "presentable": false,
+          "required": false,
+          "system": false,
+          "type": "date"
+        },
+        {
+          "cascadeDelete": false,
+          "collectionId": "pbc_2602490748",
+          "help": "",
+          "hidden": false,
+          "id": "relation9231004",
+          "maxSelect": 1,
+          "minSelect": 0,
+          "name": "recurrencePrevious",
+          "presentable": false,
+          "required": false,
+          "system": false,
+          "type": "relation"
         }
       ],
       "id": "pbc_2602490748",
-      "indexes": [],
+      "indexes": [
+        "CREATE UNIQUE INDEX `idx_tasks_recurrence_previous` ON `tasks` (`recurrencePrevious`) WHERE `recurrencePrevious` != ''"
+      ],
       "listRule": "@request.auth.id != \"\"",
       "name": "tasks",
       "system": false,
@@ -1230,6 +1287,49 @@ migrate((app) => {
           "presentable": false,
           "system": false,
           "type": "autodate"
+        },
+        {
+          "help": "",
+          "hidden": false,
+          "id": "select1002749145",
+          "maxSelect": 1,
+          "name": "kind",
+          "presentable": false,
+          "required": true,
+          "system": false,
+          "type": "select",
+          "values": [
+            "text",
+            "image",
+            "file",
+            "data"
+          ]
+        },
+        {
+          "help": "",
+          "hidden": false,
+          "id": "json2918445923",
+          "maxSize": 0,
+          "name": "data",
+          "presentable": false,
+          "required": false,
+          "system": false,
+          "type": "json"
+        },
+        {
+          "autogeneratePattern": "",
+          "help": "",
+          "hidden": false,
+          "id": "text2010906258",
+          "max": 0,
+          "min": 0,
+          "name": "dataSearch",
+          "pattern": "",
+          "presentable": false,
+          "primaryKey": false,
+          "required": false,
+          "system": false,
+          "type": "text"
         }
       ],
       "id": "pbc_53716239",

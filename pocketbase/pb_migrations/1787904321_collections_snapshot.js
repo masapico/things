@@ -482,12 +482,12 @@ migrate((app) => {
           "type": "text"
         },
         {
-          "exceptDomains": null,
+          "exceptDomains": [],
           "help": "",
           "hidden": false,
           "id": "email3885137012",
           "name": "email",
-          "onlyDomains": null,
+          "onlyDomains": [],
           "presentable": false,
           "required": true,
           "system": true,
@@ -660,12 +660,12 @@ migrate((app) => {
           "type": "text"
         },
         {
-          "exceptDomains": null,
+          "exceptDomains": [],
           "help": "",
           "hidden": false,
           "id": "email3885137012",
           "name": "email",
-          "onlyDomains": null,
+          "onlyDomains": [],
           "presentable": false,
           "required": true,
           "system": true,
@@ -724,7 +724,7 @@ migrate((app) => {
           "protected": false,
           "required": false,
           "system": false,
-          "thumbs": null,
+          "thumbs": [],
           "type": "file"
         },
         {
@@ -1080,20 +1080,6 @@ migrate((app) => {
           "type": "relation"
         },
         {
-          "cascadeDelete": false,
-          "collectionId": "pbc_3961493164",
-          "help": "",
-          "hidden": false,
-          "id": "relation2891042485",
-          "maxSelect": 10,
-          "minSelect": 0,
-          "name": "contexts",
-          "presentable": false,
-          "required": false,
-          "system": false,
-          "type": "relation"
-        },
-        {
           "help": "",
           "hidden": false,
           "id": "date989355118",
@@ -1170,83 +1156,6 @@ migrate((app) => {
           "type": "text"
         },
         {
-          "help": "",
-          "hidden": false,
-          "id": "number1361375778",
-          "max": null,
-          "min": null,
-          "name": "sort",
-          "onlyInt": false,
-          "presentable": false,
-          "required": false,
-          "system": false,
-          "type": "number"
-        },
-        {
-          "hidden": false,
-          "id": "autodate2990389176",
-          "name": "created",
-          "onCreate": true,
-          "onUpdate": false,
-          "presentable": false,
-          "system": false,
-          "type": "autodate"
-        },
-        {
-          "hidden": false,
-          "id": "autodate3332085495",
-          "name": "updated",
-          "onCreate": true,
-          "onUpdate": true,
-          "presentable": false,
-          "system": false,
-          "type": "autodate"
-        }
-      ],
-      "id": "pbc_3961493164",
-      "indexes": [],
-      "listRule": "@request.auth.id != \"\"",
-      "name": "contexts",
-      "system": false,
-      "type": "base",
-      "updateRule": "@request.auth.id != \"\"",
-      "viewRule": "@request.auth.id != \"\""
-    },
-    {
-      "createRule": "@request.auth.id != \"\"",
-      "deleteRule": "@request.auth.id != \"\"",
-      "fields": [
-        {
-          "autogeneratePattern": "[a-z0-9]{15}",
-          "help": "",
-          "hidden": false,
-          "id": "text3208210256",
-          "max": 15,
-          "min": 15,
-          "name": "id",
-          "pattern": "^[a-z0-9]+$",
-          "presentable": false,
-          "primaryKey": true,
-          "required": true,
-          "system": true,
-          "type": "text"
-        },
-        {
-          "autogeneratePattern": "",
-          "help": "",
-          "hidden": false,
-          "id": "text1579384326",
-          "max": 0,
-          "min": 0,
-          "name": "name",
-          "pattern": "",
-          "presentable": false,
-          "primaryKey": false,
-          "required": true,
-          "system": false,
-          "type": "text"
-        },
-        {
           "autogeneratePattern": "",
           "help": "",
           "hidden": false,
@@ -1267,13 +1176,13 @@ migrate((app) => {
           "id": "file2359244304",
           "maxSelect": 1,
           "maxSize": 0,
-          "mimeTypes": null,
+          "mimeTypes": [],
           "name": "file",
           "presentable": false,
           "protected": false,
           "required": false,
           "system": false,
-          "thumbs": null,
+          "thumbs": [],
           "type": "file"
         },
         {
@@ -1327,6 +1236,132 @@ migrate((app) => {
       "indexes": [],
       "listRule": "@request.auth.id != \"\"",
       "name": "clips",
+      "system": false,
+      "type": "base",
+      "updateRule": "@request.auth.id != \"\"",
+      "viewRule": "@request.auth.id != \"\""
+    },
+    {
+      "createRule": "@request.auth.id != \"\"",
+      "deleteRule": "@request.auth.id != \"\"",
+      "fields": [
+        {
+          "autogeneratePattern": "[a-z0-9]{15}",
+          "help": "",
+          "hidden": false,
+          "id": "text6437801192",
+          "max": 15,
+          "min": 15,
+          "name": "id",
+          "pattern": "^[a-z0-9]+$",
+          "presentable": false,
+          "primaryKey": true,
+          "required": true,
+          "system": true,
+          "type": "text"
+        },
+        {
+          "autogeneratePattern": "",
+          "help": "",
+          "hidden": false,
+          "id": "text6437801193",
+          "max": 100,
+          "min": 1,
+          "name": "name",
+          "pattern": "",
+          "presentable": true,
+          "primaryKey": false,
+          "required": true,
+          "system": false,
+          "type": "text"
+        },
+        {
+          "help": "",
+          "hidden": false,
+          "id": "select64378011",
+          "maxSelect": 1,
+          "name": "kind",
+          "presentable": false,
+          "required": true,
+          "system": false,
+          "type": "select",
+          "values": [
+            "url",
+            "application",
+            "file",
+            "folder"
+          ]
+        },
+        {
+          "autogeneratePattern": "",
+          "help": "",
+          "hidden": false,
+          "id": "text6437801194",
+          "max": 2048,
+          "min": 1,
+          "name": "target",
+          "pattern": "",
+          "presentable": false,
+          "primaryKey": false,
+          "required": true,
+          "system": false,
+          "type": "text"
+        },
+        {
+          "autogeneratePattern": "",
+          "help": "",
+          "hidden": false,
+          "id": "text6437801195",
+          "max": 4096,
+          "min": 0,
+          "name": "arguments",
+          "pattern": "",
+          "presentable": false,
+          "primaryKey": false,
+          "required": false,
+          "system": false,
+          "type": "text"
+        },
+        {
+          "help": "",
+          "hidden": false,
+          "id": "number64378011",
+          "max": null,
+          "min": null,
+          "name": "sort",
+          "onlyInt": false,
+          "presentable": false,
+          "required": false,
+          "system": false,
+          "type": "number"
+        },
+        {
+          "hidden": false,
+          "id": "autodate643780",
+          "name": "created",
+          "onCreate": true,
+          "onUpdate": false,
+          "presentable": false,
+          "system": false,
+          "type": "autodate"
+        },
+        {
+          "hidden": false,
+          "id": "autodate643781",
+          "name": "updated",
+          "onCreate": true,
+          "onUpdate": true,
+          "presentable": false,
+          "system": false,
+          "type": "autodate"
+        }
+      ],
+      "id": "pbc_6437801192",
+      "indexes": [
+        "CREATE INDEX `idx_launchers_sort` ON `launchers` (`sort`)"
+      ],
+      "listRule": "@request.auth.id != \"\"",
+      "name": "launchers",
       "system": false,
       "type": "base",
       "updateRule": "@request.auth.id != \"\"",

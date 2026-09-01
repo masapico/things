@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Alert, Button, ButtonGroup, Container, Form, Spinner } from "react-bootstrap";
 import { ArrowLeft, BarChart3, Copy, Plus, Redo2, Repeat2, Save, Star, Trash2, Undo2 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useBlocker, useRouter } from "@tanstack/react-router";
+import { useBlocker, useNavigate, useRouter } from "@tanstack/react-router";
 import { createDataClip, getClip, updateDataClip } from "../api";
 import { parseDelimitedText } from "../data/csv";
 import {
@@ -55,6 +55,7 @@ function adjustAxisForDelete(selection: DataSelection, axis: "row" | "column", s
 
 export function DataClipEditorPage({ clipId, returnTo }: Props) {
   const router = useRouter();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [rawText, setRawText] = useState("");
   const [firstRowIsHeader, setFirstRowIsHeader] = useState(true);
@@ -67,6 +68,7 @@ export function DataClipEditorPage({ clipId, returnTo }: Props) {
   const [isLoading, setIsLoading] = useState(Boolean(clipId));
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
+  const [savedMessage, setSavedMessage] = useState("");
   const anchorRef = useRef<{ row: number; column: number } | null>(null);
   const allowNavigationRef = useRef(false);
 
@@ -189,8 +191,21 @@ export function DataClipEditorPage({ clipId, returnTo }: Props) {
     const validationError = validateAllVisualizations(document); if (validationError) { setError(validationError); return; }
     setIsSaving(true); setError("");
     try {
-      if (clipId) await updateDataClip(clipId, name.trim(), document); else await createDataClip(name.trim(), document);
-      await queryClient.invalidateQueries({ queryKey: ["clips"] }); setIsDirty(false); allowNavigationRef.current = true; router.history.push(returnTo);
+      const savedClip = clipId
+        ? await updateDataClip(clipId, name.trim(), document)
+        : await createDataClip(name.trim(), document);
+      await queryClient.invalidateQueries({ queryKey: ["clips"] });
+      setIsDirty(false);
+      setSavedMessage("保存しました。");
+      if (!clipId) {
+        allowNavigationRef.current = true;
+        await navigate({
+          to: "/clips/data/$clipid",
+          params: { clipid: savedClip.id },
+          search: { returnTo },
+          replace: true,
+        });
+      }
     } catch (reason) { setError(reason instanceof Error ? reason.message : "データCLIPを保存できませんでした。もう一度お試しください。"); }
     finally { setIsSaving(false); }
   }
@@ -201,6 +216,7 @@ export function DataClipEditorPage({ clipId, returnTo }: Props) {
   return <Container fluid className="data-editor-page">
     <header className="data-editor-header"><Button variant="light" aria-label="戻る" onClick={goBack}><ArrowLeft size={18} /></Button><div><h1>{clipId ? "データCLIPを編集" : "データCLIPを作成"}</h1><p>1つの表から複数のビューを作成できます。</p></div>{document && <Button variant="primary" onClick={() => void save()} disabled={isSaving || !name.trim()}><Save size={16} /> {isSaving ? "保存中…" : "保存"}</Button>}</header>
     {error && <Alert variant="danger">{error}</Alert>}
+    {savedMessage && !isDirty && <Alert variant="success">{savedMessage}</Alert>}
     {!document ? <section className="data-import-panel"><Form.Group><Form.Label>CSVまたはExcelのセルを貼り付け</Form.Label><Form.Control as="textarea" rows={14} value={rawText} onChange={(event) => setRawText(event.target.value)} autoFocus /></Form.Group><div className="d-flex justify-content-between align-items-center mt-3"><Form.Check label="先頭行を列名として使う" checked={firstRowIsHeader} onChange={(event) => setFirstRowIsHeader(event.target.checked)} /><Button onClick={importData} disabled={!rawText.trim()}>データを読み込む</Button></div></section> : activeView && <>
       <div className="data-editor-title-row"><Form.Control value={name} onChange={(event) => { setName(event.target.value); setIsDirty(true); }} aria-label="CLIPタイトル" /><ButtonGroup><Button variant="outline-secondary" onClick={undo} disabled={!undoStack.length}><Undo2 size={16} /></Button><Button variant="outline-secondary" onClick={redo} disabled={!redoStack.length}><Redo2 size={16} /></Button></ButtonGroup><Button variant="outline-secondary" onClick={() => commit(transposeDataDocument(document))}><Repeat2 size={15} /> 行列を転置</Button></div>
       <div className="data-structure-actions"><ButtonGroup size="sm"><Button variant="outline-secondary" onClick={() => insertRow(false)}><Plus size={14} /> 行を前に</Button><Button variant="outline-secondary" onClick={() => insertRow(true)}><Plus size={14} /> 行を後に</Button><Button variant="outline-danger" onClick={deleteRows} disabled={document.rows.length <= activeView.selection.rowEnd - activeView.selection.rowStart + 1}><Trash2 size={14} /> 選択行</Button></ButtonGroup><ButtonGroup size="sm"><Button variant="outline-secondary" onClick={() => insertColumn(false)}><Plus size={14} /> 列を左に</Button><Button variant="outline-secondary" onClick={() => insertColumn(true)}><Plus size={14} /> 列を右に</Button><Button variant="outline-danger" onClick={deleteColumns} disabled={document.columns.length <= activeView.selection.columnEnd - activeView.selection.columnStart + 1}><Trash2 size={14} /> 選択列</Button></ButtonGroup><small>セルを選択してCSV/TSVを貼り付けできます</small></div>

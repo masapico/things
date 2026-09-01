@@ -18,9 +18,14 @@
 .data-grid th, .data-grid td { min-width: 100px; max-width: 240px; height: 30px; padding: .25rem .4rem; border-right: 1px solid #d8e2ce; border-bottom: 1px solid #d8e2ce; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .data-grid thead th { position: sticky; top: 0; z-index: 2; background: #eef3e9; padding: .3rem; }
 .data-grid thead th .form-control, .data-grid thead th .form-select { min-width: 110px; font-size: .72rem; margin-bottom: .2rem; }
+.data-grid-column-selector, .data-grid-row-selector { width: 100%; padding: .1rem .25rem; border: 0; border-radius: .25rem; background: transparent; color: #3d514a; font: inherit; font-weight: 600; }
+.data-grid-column-selector { margin-bottom: .2rem; }
+.data-grid-column-selector:hover, .data-grid-row-selector:hover { background: #d8e2ce; }
 .data-grid tbody th { position: sticky; left: 0; z-index: 1; min-width: 42px; width: 42px; background: #eef3e9; text-align: right; }
 .data-grid .data-grid-corner { left: 0; z-index: 3; min-width: 42px; width: 42px; }
+.data-grid td.is-view-range { box-shadow: inset 0 0 0 1px #a7bd91; }
 .data-grid td.is-selected { background: #d8eeea; box-shadow: inset 0 0 0 1px #146b62; }
+.data-grid th.is-axis-selected, .data-grid th.is-axis-selected .data-grid-column-selector, .data-grid th.is-axis-selected .data-grid-row-selector { background: #bfe3dc; color: #0b514a; }
 .data-grid td input { width: 100%; height: 100%; border: 0; padding: 0; outline: 2px solid #146b62; }
 .data-editor-preview-panel { display: flex; flex-direction: column; padding: .85rem; overflow: auto; }
 .data-view-toolbar { display: grid; grid-template-columns: minmax(0, 1fr) repeat(4, auto); gap: .35rem; margin-bottom: .75rem; }

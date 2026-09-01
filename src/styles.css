@@ -17,6 +17,7 @@
 
 html {
   background: var(--app-bg);
+  font-size: .9rem;
 }
 
 body {

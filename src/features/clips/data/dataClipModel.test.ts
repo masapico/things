@@ -1,12 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { calculateKpi, createDataDocument, inferColumnType, normalizeSelection, transposeDataDocument } from "./dataClipModel";
+import { calculateKpi, createDataDocument, inferColumnType, normalizeDataDocument, normalizeSelection, transposeDataDocument } from "./dataClipModel";
 
 describe("data clip model", () => {
   it("見出しと列型を推定して文書を作成する", () => {
     const document = createDataDocument([["日付", "売上"], ["2026-08-01", "1,200"], ["2026-08-02", "1500"]], true);
     expect(document.columns.map((column) => column.type)).toEqual(["date", "number"]);
     expect(document.rows).toHaveLength(2);
-    expect(document.selection).toEqual({ rowStart: 0, rowEnd: 1, columnStart: 0, columnEnd: 1 });
+    expect(document.version).toBe(2);
+    expect(document.views[0].selection).toEqual({ rowStart: 0, rowEnd: 1, columnStart: 0, columnEnd: 1 });
+    expect(document.defaultViewId).toBe(document.views[0].id);
   });
 
   it("列内に解釈できない値があれば文字列とする", () => {
@@ -37,6 +39,20 @@ describe("data clip model", () => {
     expect(transposed.columns.map((column) => column.name)).toEqual(["令和7年度", "A", "B"]);
     expect(transposed.columns.map((column) => column.type)).toEqual(["string", "number", "number"]);
     expect(transposed.rows).toEqual([["4月", "173", "149"], ["5月", "4655", "267"]]);
-    expect(transposed.selection).toEqual({ rowStart: 0, rowEnd: 1, columnStart: 0, columnEnd: 2 });
+    expect(transposed.views[0].selection).toEqual({ rowStart: 0, rowEnd: 1, columnStart: 0, columnEnd: 2 });
+  });
+
+  it("V1文書を単一ビューのV2文書へ変換する", () => {
+    const converted = normalizeDataDocument({
+      version: 1,
+      columns: [{ id: "column-1", name: "値", type: "number" }],
+      rows: [["10"]],
+      selection: { rowStart: 0, rowEnd: 0, columnStart: 0, columnEnd: 0 },
+      visualization: { type: "kpi", title: "合計", yColumnIds: ["column-1"], unit: "件", kpiAggregation: "sum" },
+    });
+    expect(converted?.version).toBe(2);
+    expect(converted?.views).toHaveLength(1);
+    expect(converted?.views[0].visualization.title).toBe("合計");
+    expect(converted?.defaultViewId).toBe(converted?.views[0].id);
   });
 });

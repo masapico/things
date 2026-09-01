@@ -5,7 +5,7 @@ import type { ClipsResponse } from "../../../lib/pb_types";
 import { pb } from "../../../lib/pocketbase";
 import "./ClipCard.css";
 import { PdfThumbnail } from "./PdfThumbnail";
-import { validateDataDocument } from "../data/dataClipModel";
+import { getDefaultView, normalizeDataDocument } from "../data/dataClipModel";
 
 const DataChart = lazy(() => import("../data/DataChart").then((module) => ({ default: module.DataChart })));
 
@@ -85,6 +85,7 @@ export function ClipCard({ clip, onClick }: ClipCardProps) {
     ? `${pb.baseURL}/api/files/${clip.collectionId}/${clip.id}/${clip.file}`
     : null;
   const extension = getFileExtension(getDisplayFileName(clip));
+  const dataDocument = clipType === "data" ? normalizeDataDocument(clip.data) : null;
 
   return (
     <Card
@@ -144,9 +145,9 @@ export function ClipCard({ clip, onClick }: ClipCardProps) {
         ) : null}
 
         {clipType === "data" ? (
-          validateDataDocument(clip.data) ? (
+          dataDocument ? (
             <Suspense fallback={<div className="clip-card-file-info"><BarChart3 size={22} /> データを読み込み中…</div>}>
-              <DataChart document={clip.data} compact />
+              <DataChart document={dataDocument} view={getDefaultView(dataDocument)} compact />
             </Suspense>
           ) : <div className="clip-card-file-info text-danger">データ形式が不正です</div>
         ) : null}
@@ -160,7 +161,7 @@ export function ClipCard({ clip, onClick }: ClipCardProps) {
         ) : null}
 
         <div className="clip-card-meta small mt-auto">
-          {clipType === "data" && validateDataDocument(clip.data) ? <span>{clip.data.rows.length} 行 × {clip.data.columns.length} 列 · </span> : null}
+          {dataDocument ? <span>{dataDocument.rows.length} 行 × {dataDocument.columns.length} 列・{dataDocument.views.length} ビュー · </span> : null}
           <time dateTime={clip.created} title={formatDate(clip.created)}>
             {formatRelativeDate(clip.created)}
           </time>

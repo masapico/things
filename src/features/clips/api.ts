@@ -1,6 +1,6 @@
 import { pb } from "../../lib/pocketbase";
 import type { ClipsResponse, Create, Update } from "../../lib/pb_types";
-import type { DataClipDocumentV1 } from "./data/dataClipModel";
+import type { DataClipDocument } from "./data/dataClipModel";
 
 export async function getClips(): Promise<ClipsResponse[]> {
   const result = await pb.collection("clips").getFullList<ClipsResponse>({
@@ -64,7 +64,7 @@ export async function getClip(id: string): Promise<ClipsResponse> {
   return await pb.collection("clips").getOne<ClipsResponse>(id);
 }
 
-export async function createDataClip(name: string, document: DataClipDocumentV1): Promise<ClipsResponse> {
+export async function createDataClip(name: string, document: DataClipDocument): Promise<ClipsResponse> {
   const data: Create<"clips"> = {
     kind: "data",
     name,
@@ -74,7 +74,7 @@ export async function createDataClip(name: string, document: DataClipDocumentV1)
   return await pb.collection("clips").create<ClipsResponse>(data);
 }
 
-export async function updateDataClip(id: string, name: string, document: DataClipDocumentV1): Promise<ClipsResponse> {
+export async function updateDataClip(id: string, name: string, document: DataClipDocument): Promise<ClipsResponse> {
   return await updateClip(id, {
     kind: "data",
     name,

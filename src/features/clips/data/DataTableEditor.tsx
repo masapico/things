@@ -1,15 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { Form } from "react-bootstrap";
-import type { DataClipDocumentV1, DataColumnType } from "./dataClipModel";
+import type { DataClipDocument, DataColumnType, DataSelection } from "./dataClipModel";
 
 type Props = {
-  document: DataClipDocumentV1;
+  document: DataClipDocument;
+  selection: DataSelection;
   onSelectionChange: (row: number, column: number, extend: boolean) => void;
   onCellChange: (row: number, column: number, value: string) => void;
   onColumnChange: (column: number, patch: { name?: string; type?: DataColumnType }) => void;
+  onPasteCells: (row: number, column: number, text: string) => void;
 };
 
-export function DataTableEditor({ document, onSelectionChange, onCellChange, onColumnChange }: Props) {
+export function DataTableEditor({ document, selection, onSelectionChange, onCellChange, onColumnChange, onPasteCells }: Props) {
   const [editing, setEditing] = useState<{ row: number; column: number } | null>(null);
   const [dragging, setDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -19,11 +21,15 @@ export function DataTableEditor({ document, onSelectionChange, onCellChange, onC
     window.addEventListener("mouseup", stop);
     return () => window.removeEventListener("mouseup", stop);
   }, []);
-  const { selection } = document;
   const selected = (row: number, column: number) => row >= selection.rowStart && row <= selection.rowEnd && column >= selection.columnStart && column <= selection.columnEnd;
 
   return (
-    <div className="data-grid-wrap" tabIndex={0}>
+    <div className="data-grid-wrap" tabIndex={0} onPaste={(event) => {
+      const text = event.clipboardData.getData("text/plain");
+      if (!text) return;
+      event.preventDefault();
+      onPasteCells(selection.rowStart, selection.columnStart, text);
+    }}>
       <table className="data-grid"><thead><tr><th className="data-grid-corner">#</th>{document.columns.map((column, index) => <th key={column.id}>
         <Form.Control size="sm" value={column.name} aria-label={`列${index + 1}の名前`} onChange={(event) => onColumnChange(index, { name: event.target.value })} />
         <Form.Select size="sm" value={column.type} aria-label={`${column.name}の型`} onChange={(event) => onColumnChange(index, { type: event.target.value as DataColumnType })}>

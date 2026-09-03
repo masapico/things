@@ -11,6 +11,9 @@
 .data-structure-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin-bottom: .75rem; }
 .data-structure-actions .btn { display: inline-flex; align-items: center; gap: .25rem; }
 .data-structure-actions small { color: #5b6b64; }
+.data-paste-summary { margin-bottom: .75rem; color: #3d514a; font-size: .9rem; }
+.data-paste-textarea { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; white-space: pre; }
+.data-paste-modal .modal-footer .btn { display: inline-flex; align-items: center; gap: .3rem; }
 .data-editor-layout { display: grid; grid-template-columns: minmax(0, 3fr) minmax(340px, 2fr); gap: 1rem; min-height: 68vh; }
 .data-editor-grid-panel, .data-editor-preview-panel { min-width: 0; border: 1px solid #b8c9b4; border-radius: .7rem; background: #fcfdfa; overflow: hidden; }
 .data-grid-wrap { height: 68vh; overflow: auto; user-select: none; }

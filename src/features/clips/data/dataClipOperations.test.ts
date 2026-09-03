@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createDataDocument } from "./dataClipModel";
-import { pasteInsertColumns, pasteInsertRows, pasteOverCells, viewSelectionFromGrid } from "./dataClipOperations";
+import { pasteOverSelection, viewSelectionFromGrid } from "./dataClipOperations";
 
 function salesDocument() {
   const document = createDataDocument([
@@ -13,40 +13,50 @@ function salesDocument() {
 }
 
 describe("data clip table operations", () => {
-  it("セル貼り付けでビュー範囲とY軸を変更しない", () => {
+  it("選択行へ同じ大きさのデータを反映し、表構造とビューを変更しない", () => {
     const original = salesDocument();
+    original.rows.push(["", ""]);
+    original.rows.push(["", ""]);
+    original.views[0].selection.rowEnd = 3;
     const selection = structuredClone(original.views[0].selection);
     const yColumnIds = [...original.views[0].visualization.yColumnIds];
-    const result = pasteOverCells(original, 1, 1, "300");
-    expect(result.document.views[0].selection).toEqual(selection);
-    expect(result.document.views[0].visualization.yColumnIds).toEqual(yColumnIds);
-    expect(result.document.rows[1][1]).toBe("300");
+    const columnIds = original.columns.map((column) => column.id);
+    const result = pasteOverSelection(original, { mode: "rows", rowStart: 2, rowEnd: 3, columnStart: 0, columnEnd: 1 }, "2026-08-03\t300\n2026-08-04\t400");
+    expect(result.rows).toEqual([
+      ["2026-08-01", "100"], ["2026-08-02", "200"], ["2026-08-03", "300"], ["2026-08-04", "400"],
+    ]);
+    expect(result.columns.map((column) => column.id)).toEqual(columnIds);
+    expect(result.views[0].selection).toEqual(selection);
+    expect(result.views[0].visualization.yColumnIds).toEqual(yColumnIds);
   });
 
-  it("空の文字列列へ数値を貼り付けると数値型へ昇格する", () => {
+  it("選択列へ先頭行を含む値を反映し、列名を維持して型を推論する", () => {
     const original = salesDocument();
     original.columns.push({ id: "empty", name: "予算", type: "string" });
     original.rows.forEach((row) => row.push(""));
     original.views[0].selection.columnEnd = 2;
-    const result = pasteOverCells(original, 0, 2, "10\n20");
-    expect(result.document.columns[2].type).toBe("number");
+    const result = pasteOverSelection(original, { mode: "columns", rowStart: 0, rowEnd: 1, columnStart: 2, columnEnd: 2 }, "10\n20");
+    expect(result.rows).toEqual([["2026-08-01", "100", "10"], ["2026-08-02", "200", "20"]]);
+    expect(result.columns[2]).toMatchObject({ id: "empty", name: "予算", type: "number" });
   });
 
-  it("行貼り付けは選択位置の前へ挿入してビュー範囲を拡張する", () => {
-    const result = pasteInsertRows(salesDocument(), 1, "2026-08-03\t300\n2026-08-04\t400");
-    expect(result.document.rows).toEqual([
-      ["2026-08-01", "100"], ["2026-08-03", "300"], ["2026-08-04", "400"], ["2026-08-02", "200"],
-    ]);
-    expect(result.document.views[0].selection.rowEnd).toBe(3);
-    expect(result.selection.mode).toBe("rows");
+  it("選択範囲と行数が異なるデータを拒否する", () => {
+    const original = salesDocument();
+    expect(() => pasteOverSelection(original, { mode: "rows", rowStart: 0, rowEnd: 0, columnStart: 0, columnEnd: 1 }, "A\t1\nB\t2"))
+      .toThrow("選択範囲は1行 × 2列です。貼り付けデータは2行 × 2列でした。");
+    expect(original.rows).toEqual([["2026-08-01", "100"], ["2026-08-02", "200"]]);
   });
 
-  it("列貼り付けは先頭行を列名として型を推論する", () => {
-    const result = pasteInsertColumns(salesDocument(), 1, "予算\t件数\n80\t2\n160\t3");
-    expect(result.document.columns.map((column) => column.name)).toEqual(["日付", "予算", "件数", "売上"]);
-    expect(result.document.columns.slice(1, 3).map((column) => column.type)).toEqual(["number", "number"]);
-    expect(result.document.rows[0]).toEqual(["2026-08-01", "80", "2", "100"]);
-    expect(result.document.views[0].visualization.yColumnIds).toEqual([result.document.columns[3].id]);
+  it("選択範囲と列数が異なるデータや列数が不揃いなデータを拒否する", () => {
+    const original = salesDocument();
+    const selection = { mode: "columns", rowStart: 0, rowEnd: 1, columnStart: 0, columnEnd: 0 } as const;
+    expect(() => pasteOverSelection(original, selection, "A\t1\nB\t2")).toThrow("2行 × 1列");
+    expect(() => pasteOverSelection(original, selection, "A\nB\t2")).toThrow("列数が不揃い");
+  });
+
+  it("セル選択への貼り付けを拒否する", () => {
+    expect(() => pasteOverSelection(salesDocument(), { mode: "cells", rowStart: 0, rowEnd: 0, columnStart: 0, columnEnd: 0 }, "A"))
+      .toThrow("行番号または列記号");
   });
 
   it("行・列選択をビュー範囲へ変換する", () => {

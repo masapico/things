@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { Alert, Button, ButtonGroup, Container, Form, Spinner } from "react-bootstrap";
-import { ArrowLeft, BarChart3, Copy, Plus, Redo2, Repeat2, Save, Star, Trash2, Undo2 } from "lucide-react";
+import { Alert, Button, ButtonGroup, Container, Form, Modal, Spinner } from "react-bootstrap";
+import { ArrowLeft, BarChart3, ClipboardPaste, Copy, Plus, Redo2, Repeat2, Save, Star, Trash2, Undo2 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useBlocker, useNavigate, useRouter } from "@tanstack/react-router";
 import { createDataClip, getClip, updateDataClip } from "../api";
@@ -13,7 +13,7 @@ import {
 import { DataChart } from "../data/DataChart";
 import { DataTableEditor } from "../data/DataTableEditor";
 import {
-  gridSelectionForView, normalizeGridSelection, pasteInsertColumns, pasteInsertRows, pasteOverCells,
+  gridSelectionForView, normalizeGridSelection, pasteOverSelection,
   viewSelectionFromGrid, type GridSelection, type GridSelectionMode,
 } from "../data/dataClipOperations";
 import "../data/dataClip.css";
@@ -74,6 +74,9 @@ export function DataClipEditorPage({ clipId, returnTo }: Props) {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
   const [savedMessage, setSavedMessage] = useState("");
+  const [pasteTarget, setPasteTarget] = useState<{ mode: "rows" | "columns"; selection: GridSelection } | null>(null);
+  const [pasteText, setPasteText] = useState("");
+  const [pasteError, setPasteError] = useState("");
   const anchorRef = useRef<{ mode: GridSelectionMode; row: number; column: number } | null>(null);
   const allowNavigationRef = useRef(false);
 
@@ -183,14 +186,20 @@ export function DataClipEditorPage({ clipId, returnTo }: Props) {
     commit(next);
     setGridSelection(normalizeGridSelection({ ...gridSelection, columnEnd: gridSelection.columnStart, rowStart: 0, rowEnd: next.rows.length - 1 }, next));
   }
-  function pasteData(text: string) {
-    if (!document) return;
+  function openPasteDialog(mode: "rows" | "columns") {
+    if (gridSelection.mode !== mode) return;
+    setPasteTarget({ mode, selection: { ...gridSelection } });
+    setPasteText(""); setPasteError("");
+  }
+  function closePasteDialog() {
+    setPasteTarget(null); setPasteText(""); setPasteError("");
+  }
+  function applyPaste() {
+    if (!document || !pasteTarget) return;
     try {
-      const result = gridSelection.mode === "rows" ? pasteInsertRows(document, gridSelection.rowStart, text)
-        : gridSelection.mode === "columns" ? pasteInsertColumns(document, gridSelection.columnStart, text)
-          : pasteOverCells(document, gridSelection.rowStart, gridSelection.columnStart, text);
-      commit(result.document); setGridSelection(result.selection);
-    } catch (reason) { setError(reason instanceof Error ? reason.message : "貼り付けられませんでした。"); }
+      const next = pasteOverSelection(document, pasteTarget.selection, pasteText);
+      commit(next); setGridSelection(pasteTarget.selection); closePasteDialog();
+    } catch (reason) { setPasteError(reason instanceof Error ? reason.message : "貼り付けられませんでした。"); }
   }
 
   function addView(duplicate: boolean) {
@@ -238,8 +247,8 @@ export function DataClipEditorPage({ clipId, returnTo }: Props) {
     {savedMessage && !isDirty && <Alert variant="success">{savedMessage}</Alert>}
     {!document ? <section className="data-import-panel"><Form.Group><Form.Label>CSVまたはExcelのセルを貼り付け</Form.Label><Form.Control as="textarea" rows={14} value={rawText} onChange={(event) => setRawText(event.target.value)} autoFocus /></Form.Group><div className="d-flex justify-content-between align-items-center mt-3"><Form.Check label="先頭行を列名として使う" checked={firstRowIsHeader} onChange={(event) => setFirstRowIsHeader(event.target.checked)} /><Button onClick={importData} disabled={!rawText.trim()}>データを読み込む</Button></div></section> : activeView && <>
       <div className="data-editor-title-row"><Form.Control value={name} onChange={(event) => { setName(event.target.value); setIsDirty(true); }} aria-label="CLIPタイトル" /><ButtonGroup><Button variant="outline-secondary" onClick={undo} disabled={!undoStack.length}><Undo2 size={16} /></Button><Button variant="outline-secondary" onClick={redo} disabled={!redoStack.length}><Redo2 size={16} /></Button></ButtonGroup><Button variant="outline-secondary" onClick={transpose}><Repeat2 size={15} /> 行列を転置</Button></div>
-      <div className="data-structure-actions"><ButtonGroup size="sm"><Button variant="outline-secondary" onClick={() => insertRow(false)}><Plus size={14} /> 行を前に</Button><Button variant="outline-secondary" onClick={() => insertRow(true)}><Plus size={14} /> 行を後に</Button><Button variant="outline-danger" onClick={deleteRows} disabled={document.rows.length <= gridSelection.rowEnd - gridSelection.rowStart + 1}><Trash2 size={14} /> 選択行</Button></ButtonGroup><ButtonGroup size="sm"><Button variant="outline-secondary" onClick={() => insertColumn(false)}><Plus size={14} /> 列を左に</Button><Button variant="outline-secondary" onClick={() => insertColumn(true)}><Plus size={14} /> 列を右に</Button><Button variant="outline-danger" onClick={deleteColumns} disabled={document.columns.length <= gridSelection.columnEnd - gridSelection.columnStart + 1}><Trash2 size={14} /> 選択列</Button></ButtonGroup><Button size="sm" variant="outline-primary" onClick={() => updateView((view) => { view.selection = viewSelectionFromGrid(gridSelection, document); })}>選択範囲をビューに反映</Button><small>{gridSelection.mode === "rows" ? "貼り付けると選択行の前へ挿入します" : gridSelection.mode === "columns" ? "先頭行を列名として選択列の左へ挿入します" : "貼り付けると選択セルから上書きします"}</small></div>
-      <div className="data-editor-layout"><section className="data-editor-grid-panel"><DataTableEditor document={document} selection={gridSelection} viewSelection={activeView.selection} onPaste={pasteData}
+      <div className="data-structure-actions"><ButtonGroup size="sm"><Button variant="outline-secondary" onClick={() => insertRow(false)}><Plus size={14} /> 行を前に</Button><Button variant="outline-secondary" onClick={() => insertRow(true)}><Plus size={14} /> 行を後に</Button><Button variant="outline-primary" onClick={() => openPasteDialog("rows")} disabled={gridSelection.mode !== "rows"}><ClipboardPaste size={14} /> 行を貼り付け</Button><Button variant="outline-danger" onClick={deleteRows} disabled={document.rows.length <= gridSelection.rowEnd - gridSelection.rowStart + 1}><Trash2 size={14} /> 選択行</Button></ButtonGroup><ButtonGroup size="sm"><Button variant="outline-secondary" onClick={() => insertColumn(false)}><Plus size={14} /> 列を左に</Button><Button variant="outline-secondary" onClick={() => insertColumn(true)}><Plus size={14} /> 列を右に</Button><Button variant="outline-primary" onClick={() => openPasteDialog("columns")} disabled={gridSelection.mode !== "columns"}><ClipboardPaste size={14} /> 列を貼り付け</Button><Button variant="outline-danger" onClick={deleteColumns} disabled={document.columns.length <= gridSelection.columnEnd - gridSelection.columnStart + 1}><Trash2 size={14} /> 選択列</Button></ButtonGroup><Button size="sm" variant="outline-primary" onClick={() => updateView((view) => { view.selection = viewSelectionFromGrid(gridSelection, document); })}>選択範囲をビューに反映</Button><small>行番号または列記号を選択すると、追加済みの範囲へデータを貼り付けられます。</small></div>
+      <div className="data-editor-layout"><section className="data-editor-grid-panel"><DataTableEditor document={document} selection={gridSelection} viewSelection={activeView.selection}
         onSelectionChange={selectGrid}
         onCellChange={(row, column, value) => { const next = cloneDocument(document); const wasEmptyStringColumn = next.columns[column].type === "string" && next.rows.every((item) => !(item[column] ?? "").trim()); next.rows[row][column] = value; if (wasEmptyStringColumn) next.columns[column].type = inferColumnType(next.rows.map((item) => item[column])); commit(next); }}
         onColumnChange={(column, patch: { name?: string; type?: DataColumnType }) => { const next = cloneDocument(document); Object.assign(next.columns[column], patch); commit(next); }} /></section>
@@ -249,6 +258,16 @@ export function DataClipEditorPage({ clipId, returnTo }: Props) {
         {activeView.visualization.type !== "table" && <><Form.Label>{activeView.visualization.type === "kpi" ? "値" : "Y軸"}</Form.Label><Form.Select multiple={activeView.visualization.type === "line" || activeView.visualization.type === "bar"} value={activeView.visualization.type === "line" || activeView.visualization.type === "bar" ? activeView.visualization.yColumnIds : (activeView.visualization.yColumnIds[0] ?? "")} onChange={(event) => updateView((view) => { view.visualization.yColumnIds = Array.from(event.target.selectedOptions, (option) => option.value); })}>{numeric.map((column) => <option key={column.id} value={column.id}>{column.name}</option>)}</Form.Select><Form.Label>単位</Form.Label><Form.Control value={activeView.visualization.unit} onChange={(event) => updateView((view) => { view.visualization.unit = event.target.value; })} /></>}
         {activeView.visualization.type === "kpi" && <><Form.Label>集計</Form.Label><Form.Select value={activeView.visualization.kpiAggregation} onChange={(event) => updateView((view) => { view.visualization.kpiAggregation = event.target.value as typeof view.visualization.kpiAggregation; })}><option value="latest">最新値</option><option value="sum">合計</option><option value="average">平均</option><option value="min">最小</option><option value="max">最大</option><option value="count">件数</option></Form.Select></>}
         </div><div className="data-editor-chart"><div className="data-editor-chart-title"><BarChart3 size={16} /> プレビュー</div><DataChart document={document} view={activeView} /></div></aside></div>
+      <Modal show={Boolean(pasteTarget)} onHide={closePasteDialog} centered className="data-paste-modal">
+        <Modal.Header closeButton><Modal.Title>{pasteTarget?.mode === "rows" ? "行を貼り付け" : "列を貼り付け"}</Modal.Title></Modal.Header>
+        <Modal.Body>
+          <p className="data-paste-summary">選択範囲：{pasteTarget ? `${pasteTarget.selection.rowEnd - pasteTarget.selection.rowStart + 1}行 × ${pasteTarget.selection.columnEnd - pasteTarget.selection.columnStart + 1}列` : ""}</p>
+          <Form.Group><Form.Label>ExcelまたはCSVのデータを貼り付け</Form.Label><Form.Control as="textarea" rows={10} value={pasteText} onChange={(event) => { setPasteText(event.target.value); setPasteError(""); }} autoFocus className="data-paste-textarea" /></Form.Group>
+          {pasteTarget?.mode === "columns" && <Form.Text>先頭行を含むすべての内容をデータとして反映します。列名は変更しません。</Form.Text>}
+          {pasteError && <Alert variant="danger" className="mt-3 mb-0">{pasteError}</Alert>}
+        </Modal.Body>
+        <Modal.Footer><Button variant="outline-secondary" onClick={closePasteDialog}>キャンセル</Button><Button onClick={applyPaste} disabled={!pasteText}><ClipboardPaste size={15} /> 反映</Button></Modal.Footer>
+      </Modal>
     </>}
   </Container>;
 }

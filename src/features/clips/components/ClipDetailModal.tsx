@@ -1,8 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button, Form, Modal } from "react-bootstrap";
-import Markdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import {
   FileIcon,
   FileTextIcon,
@@ -21,6 +19,7 @@ import { pb } from "../../../lib/pocketbase";
 import { updateClip, deleteClip } from "../api";
 import { ImageAnnotator } from "./ImageAnnotator";
 import { MarkdownClipEditor } from "./MarkdownClipEditor";
+import { MarkdownWithMermaid } from "./MarkdownWithMermaid";
 import { PdfThumbnail } from "./PdfThumbnail";
 import { EMPTY_ANNOTATION_DOCUMENT, parseAnnotationDocument } from "../annotations/annotationModel";
 import type { AnnotationDocument } from "../annotations/annotationModel";
@@ -342,9 +341,7 @@ export function ClipDetailModal({ clip, show, onClose }: ClipDetailModalProps) {
                   <Form.Label className="clip-field-label">メモ</Form.Label>
                   <div className="clip-pad-wrap clip-pad-preview">
                     <div className="clip-markdown-body">
-                      <Markdown remarkPlugins={[remarkGfm]}>
-                        {readonlyText}
-                      </Markdown>
+                      <MarkdownWithMermaid>{readonlyText}</MarkdownWithMermaid>
                     </div>
                   </div>
                 </div>

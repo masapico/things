@@ -1,17 +1,20 @@
 import { useState, useEffect } from "react";
-import { Button, Form, Modal, Stack } from "react-bootstrap";
+import { Alert, Button, Form, Modal, Stack } from "react-bootstrap";
 import type { ProjectsResponse, ClipsResponse } from "../../../lib/pb_types";
-import { PenLineIcon } from "lucide-react";
+import { PenLineIcon, Trash2Icon } from "lucide-react";
 import { ClipSelector } from "../../../components/ClipSelector";
 import { ClipDetailModal } from "../../clips/components/ClipDetailModal";
 import { pb } from "../../../lib/pocketbase";
 import { useQueryClient } from "@tanstack/react-query";
+import { deleteProject, ProjectHasTasksError } from "../api";
 import "./TaskEditModal.css";
 
 type ProjectEditModalProps = {
   project: ProjectsResponse;
   show: boolean;
+  taskCount: number;
   onClose: () => void;
+  onDeleted: () => void;
 };
 
 /** PocketBase の ISO 日付文字列を <input type="date"> 用の YYYY-MM-DD 形式に変換 */
@@ -24,7 +27,9 @@ function toDateInputValue(isoString?: string): string {
 export function ProjectEditModal({
   project,
   show,
+  taskCount,
   onClose,
+  onDeleted,
 }: ProjectEditModalProps) {
   const queryClient = useQueryClient();
 
@@ -37,6 +42,8 @@ export function ProjectEditModal({
     project.clips ?? [],
   );
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   // ClipDetailModal 用
   const [viewingClip, setViewingClip] = useState<ClipsResponse | null>(null);
@@ -51,6 +58,7 @@ export function ProjectEditModal({
         setEndDate(toDateInputValue(project.endDate));
         setIsActive(project.isActive ?? true);
         setSelectedClips(project.clips ?? []);
+        setDeleteError("");
       });
     }
   }, [show, project]);
@@ -77,6 +85,37 @@ export function ProjectEditModal({
     }
   }
 
+  async function handleDelete() {
+    if (taskCount > 0) {
+      setDeleteError(`このプロジェクトには${taskCount}件のタスクがあります。先にタスクの所属を外すか、タスクを削除してください。`);
+      return;
+    }
+    if (!window.confirm(`「${project.name}」を削除しますか？この操作は取り消せません。`)) return;
+
+    setDeleteError("");
+    setIsDeleting(true);
+    try {
+      await deleteProject(project.id);
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["activeProjects"] }),
+        queryClient.invalidateQueries({ queryKey: ["archivedProjects"] }),
+        queryClient.invalidateQueries({ queryKey: ["projectTaskCounts"] }),
+      ]);
+      queryClient.removeQueries({ queryKey: ["project", project.id] });
+      queryClient.removeQueries({ queryKey: ["projectTasks", project.id] });
+      onDeleted();
+    } catch (error) {
+      if (error instanceof ProjectHasTasksError) {
+        setDeleteError("このプロジェクトに紐づくタスクが見つかりました。先にタスクの所属を外すか、タスクを削除してください。");
+      } else {
+        console.error("Failed to delete project:", error);
+        setDeleteError("プロジェクトを削除できませんでした。もう一度お試しください。");
+      }
+    } finally {
+      setIsDeleting(false);
+    }
+  }
+
   const hasChanges =
     name !== project.name ||
     memo !== (project.memo ?? "") ||
@@ -90,12 +129,12 @@ export function ProjectEditModal({
     <>
       <Modal
         show={show}
-        onHide={onClose}
+        onHide={() => !isDeleting && onClose()}
         centered
         size="lg"
         className="task-edit-modal"
       >
-        <Modal.Header closeButton className="task-edit-modal-header">
+        <Modal.Header closeButton={!isDeleting} className="task-edit-modal-header">
           <div className="task-edit-header-row w-100">
             <div className="task-edit-header-icon">
               <PenLineIcon size={20} />
@@ -114,6 +153,7 @@ export function ProjectEditModal({
           </div>
         </Modal.Header>
         <Modal.Body>
+          {deleteError ? <Alert variant="danger" role="alert">{deleteError}</Alert> : null}
           <Form>
             {/* プロジェクト名 */}
             <Form.Group className="mb-3">
@@ -195,15 +235,19 @@ export function ProjectEditModal({
             </Form.Group>
           </Form>
         </Modal.Body>
-        <Modal.Footer>
+        <Modal.Footer className="d-flex justify-content-between">
+          <Button variant="outline-danger" onClick={() => void handleDelete()} disabled={isSaving || isDeleting}>
+            <Trash2Icon size={14} />
+            {isDeleting ? "削除中…" : "削除"}
+          </Button>
           <div className="ms-auto d-flex gap-2">
-            <Button className="task-edit-btn-cancel" onClick={onClose}>
+            <Button className="task-edit-btn-cancel" onClick={onClose} disabled={isSaving || isDeleting}>
               キャンセル
             </Button>
             <Button
               className="task-edit-btn-save"
               onClick={handleSave}
-              disabled={!name.trim() || !hasChanges || isSaving}
+              disabled={!name.trim() || !hasChanges || isSaving || isDeleting}
             >
               {isSaving ? "保存中…" : "保存"}
             </Button>

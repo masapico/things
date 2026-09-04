@@ -77,6 +77,23 @@ export async function getProjectTasks(projectId: string): Promise<TasksResponse[
   });
 }
 
+export class ProjectHasTasksError extends Error {
+  constructor() {
+    super("Project has related tasks");
+    this.name = "ProjectHasTasksError";
+  }
+}
+
+export async function deleteProject(projectId: string): Promise<void> {
+  const relatedTasks = await pb.collection("tasks").getList<TasksResponse>(1, 1, {
+    filter: `project = "${projectId}"`,
+    fields: "id",
+  });
+  if (relatedTasks.totalItems > 0) throw new ProjectHasTasksError();
+
+  await pb.collection("projects").delete(projectId);
+}
+
 export async function getReviewTasks(): Promise<TasksResponse[]> {
   return await pb.collection("tasks").getFullList<TasksResponse>({
     filter: 'status != "completed"',

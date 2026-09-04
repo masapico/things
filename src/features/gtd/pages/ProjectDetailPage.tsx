@@ -428,8 +428,13 @@ export function ProjectDetailPage({
       {/* ── 編集モーダル ── */}
       <ProjectEditModal
         project={project}
+        taskCount={tasks?.length ?? 0}
         show={showEditModal}
         onClose={() => setShowEditModal(false)}
+        onDeleted={() => {
+          setShowEditModal(false);
+          navigate(returnTo === "review" ? { to: "/gtd/review" } : { to: "/gtd", search: { view: returnTo } });
+        }}
       />
 
       {/* ── 複製モーダル ── */}

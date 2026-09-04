@@ -4,7 +4,10 @@ import { deserializeMd, MarkdownPlugin, serializeMd } from "@platejs/markdown";
 import { createPlateEditor, ParagraphPlugin } from "platejs/react";
 import { ListPlugin } from "@platejs/list/react";
 import { IndentPlugin } from "@platejs/indent/react";
+import { CodeBlockPlugin } from "@platejs/code-block/react";
+import type { TCodeBlockElement } from "platejs";
 import remarkGfm from "remark-gfm";
+import { getMermaidCodeBlockSource } from "./mermaidCodeBlock";
 
 describe("Plate Markdown serialization", () => {
   it("主要なMarkdown表現を往復して保持する", () => {
@@ -40,5 +43,14 @@ describe("Plate Markdown serialization", () => {
     expect(output).toMatch(/\s+[*+-] \[ \] todo child/);
     expect(output).toMatch(/\s+[*+-] \[x\] done child/i);
     expect(output).toMatch(/[*+-] sibling/);
+  });
+
+  it("Mermaidコードブロックの言語と内容を往復して保持する", () => {
+    const markdown = "```mermaid\nflowchart TD\n  A --> B\n```\n";
+    const editor = createPlateEditor({ plugins: [ParagraphPlugin, CodeBlockPlugin, MarkdownPlugin] });
+    editor.tf.setValue(deserializeMd(editor, markdown));
+
+    expect(getMermaidCodeBlockSource(editor.children[0] as TCodeBlockElement)).toBe("flowchart TD\n  A --> B");
+    expect(serializeMd(editor)).toContain(markdown.trim());
   });
 });

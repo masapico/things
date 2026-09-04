@@ -1,0 +1,20 @@
+.mermaid-diagram-shell { min-width: 0; overflow: auto; border: 1px solid #d8ded9; border-radius: .5rem; background: #fff; }
+.mermaid-diagram { min-width: min-content; padding: 1rem; text-align: center; }
+.mermaid-diagram svg { display: block; width: auto; max-width: 100%; height: auto; margin: 0 auto; }
+.mermaid-loading, .mermaid-empty { display: flex; min-height: 8rem; align-items: center; justify-content: center; gap: .5rem; padding: 1rem; color: #6c757d; }
+.mermaid-error.alert { margin: .75rem; white-space: pre-wrap; font-size: .85rem; }
+.mermaid-editor-layout { display: grid; grid-template-columns: minmax(15rem, .8fr) minmax(0, 1.4fr); gap: 1rem; }
+.mermaid-template-list { display: grid; align-content: start; gap: .5rem; }
+.mermaid-template-button { width: 100%; padding: .65rem .75rem; border: 1px solid #d8ded9; border-radius: .45rem; background: #fff; color: inherit; text-align: left; }
+.mermaid-template-button:hover, .mermaid-template-button.is-selected { border-color: var(--bs-primary); background: #f3f8ff; }
+.mermaid-template-button strong, .mermaid-template-button span { display: block; }
+.mermaid-template-button span { margin-top: .15rem; color: #6c757d; font-size: .8rem; }
+.mermaid-source { min-height: 17rem; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; white-space: pre; }
+.mermaid-preview-title { margin: 1rem 0 .4rem; color: #4d5b52; font-size: .8rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.markdown-mermaid-block { margin: .75rem 0; border: 1px solid #d8ded9; border-radius: .5rem; background: #f8faf8; overflow: hidden; }
+.markdown-mermaid-toolbar { display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding: .4rem .6rem; border-bottom: 1px solid #d8ded9; }
+.markdown-mermaid-toolbar span { color: #526158; font-size: .8rem; font-weight: 600; }
+.markdown-mermaid-source { margin: 0; padding: .75rem; border-top: 1px solid #d8ded9; background: #f4f6f4; overflow: auto; }
+.markdown-mermaid-source summary { cursor: pointer; color: #526158; font-size: .8rem; }
+.markdown-mermaid-source pre { margin: .5rem 0 0; }
+@media (max-width: 767.98px) { .mermaid-editor-layout { grid-template-columns: 1fr; } }

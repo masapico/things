@@ -9,3 +9,8 @@
 .markdown-plate-content code { padding: .1rem .25rem; border-radius: .2rem; background: #f1f3f5; }
 .markdown-plate-content ul, .markdown-plate-content ol { padding-left: 1.65rem !important; }
 .markdown-plate-content li { padding-left: .2rem; }
+.markdown-plate-content [data-slate-node="element"] { box-sizing: border-box; }
+.markdown-todo-list { margin: 0; padding: 0; list-style: none; }
+.markdown-todo-item { display: flex; align-items: flex-start; gap: .45rem; padding-left: 0 !important; list-style: none; }
+.markdown-todo-item > input { flex: 0 0 auto; margin-top: .3rem; accent-color: var(--bs-primary); cursor: pointer; }
+.markdown-todo-item > input:focus-visible { outline: 2px solid var(--bs-primary); outline-offset: 2px; }

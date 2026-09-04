@@ -43,6 +43,8 @@ export function ClipRegister() {
   useEffect(() => {
     const handlePaste = (event: ClipboardEvent) => {
       if (window.location.pathname.startsWith("/clips/data/")) return;
+      if (document.querySelector(".modal.show")) return;
+
       const target = event.target as HTMLElement | null;
       const isEditable =
         target?.isContentEditable ||

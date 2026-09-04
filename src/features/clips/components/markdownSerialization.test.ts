@@ -3,6 +3,8 @@ import { BaseBoldPlugin, BaseH1Plugin, BaseItalicPlugin, BaseStrikethroughPlugin
 import { deserializeMd, MarkdownPlugin, serializeMd } from "@platejs/markdown";
 import { createPlateEditor, ParagraphPlugin } from "platejs/react";
 import { ListPlugin } from "@platejs/list/react";
+import { IndentPlugin } from "@platejs/indent/react";
+import remarkGfm from "remark-gfm";
 
 describe("Plate Markdown serialization", () => {
   it("主要なMarkdown表現を往復して保持する", () => {
@@ -25,5 +27,18 @@ describe("Plate Markdown serialization", () => {
     expect(output).toMatch(/[*+-] two/);
     expect(output).toContain("1. first");
     expect(output).toContain("2. second");
+  });
+
+  it("入れ子の混在リストとチェック状態を往復して保持する", () => {
+    const markdown = "- parent\n  1. numbered child\n     - [ ] todo child\n     - [x] done child\n- sibling\n";
+    const editor = createPlateEditor({ plugins: [ParagraphPlugin, IndentPlugin, ListPlugin, MarkdownPlugin.configure({ options: { remarkPlugins: [remarkGfm] } })] });
+    editor.tf.setValue(deserializeMd(editor, markdown));
+    const output = serializeMd(editor);
+
+    expect(output).toMatch(/[*+-] parent/);
+    expect(output).toMatch(/\s+1\. numbered child/);
+    expect(output).toMatch(/\s+[*+-] \[ \] todo child/);
+    expect(output).toMatch(/\s+[*+-] \[x\] done child/i);
+    expect(output).toMatch(/[*+-] sibling/);
   });
 });
